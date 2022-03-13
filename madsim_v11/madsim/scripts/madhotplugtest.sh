@@ -1,7 +1,7 @@
 #!/bin/sh
 #/*                                                                            
 #/*  PRODUCT      : MAD Device Simulation Framework                            
-#/*  COPYRIGHT    : (c) 2021 HTF Consulting                                    
+#/*  COPYRIGHT    : (c) 2022 HTF Consulting                                    
 #/*                                                                            
 #/* This source code is provided by Dual/GPL license to the Linux open source   
 #/* community                                                                  
@@ -46,17 +46,17 @@ cd $appbasepath
 #printf "\nHotplug tests\n"
 for (( dn=1; dn<=$number_bus_slots; dn++ ))
 do
-    $simapp_path$simapp_exec $dn hun 
+    $simapp_path$simapp $dn hun 
 done
 tree /sys/devices/$busdevname/
 
 for (( dn=1; dn<=$number_bus_slots; dn++ ))
 do
-    $simapp_path$simapp_exec $dn hpl 1001
+    $simapp_path$simapp $dn hpl 1001
 done
 tree /sys/devices/$busdevname/
 
-#$simapp_path$simapp_exec 2 hpl 1001 
+#$simapp_path$simapp 2 hpl 1001 
 #tree /sys/devices/$busdevname/
 
 rmmod $madmodule
