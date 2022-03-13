@@ -334,15 +334,15 @@ static void maddev_cleanup_module(void)
             pmaddevobj = 
             (PMADDEVOBJ)((u8*)mad_dev_objects + (PAGE_SIZE * i));
 
-            if (pmaddevobj == NULL)
-                {continue;}
+            if (pmaddevobj->bReady == false)
+                {
+				PWARN("maddev_cleanup... i=%d dev#=%d pmadobj=%px device not active!\n",
+                      (int)i, (int)pmaddevobj->devnum, pmaddevobj);
+				continue;
+				}
 
             ASSERT((int)(i == pmaddevobj->devnum));
-            if (pmaddevobj->bReady == true) //if not unplugged
-                {maddev_remove_device(pmaddevobj);}
-            else
-                {PWARN("maddev_cleanup... i=%d dev#=%d pmadobj=%px device not active!\n",
-                       (int)i, (int)pmaddevobj->devnum, pmaddevobj);}
+            maddev_remove_device(pmaddevobj);
 		    }
 
 		kfree(mad_dev_objects);
