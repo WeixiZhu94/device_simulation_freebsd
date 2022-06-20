@@ -35,8 +35,8 @@
 
 extern struct mad_dev_obj *mad_dev_objects;
 
-static u8   IoDataRd[MAD_UNITIO_SIZE_BYTES * (1 << MAD_BUFRD_IO_COUNT_BITS)];
-static u8   IoDataWr[MAD_UNITIO_SIZE_BYTES * (1 << MAD_BUFRD_IO_COUNT_BITS)];
+// static u8   IoDataRd[MAD_UNITIO_SIZE_BYTES * (1 << MAD_BUFRD_IO_COUNT_BITS)];
+// static u8   IoDataWr[MAD_UNITIO_SIZE_BYTES * (1 << MAD_BUFRD_IO_COUNT_BITS)];
 
 //This function implements a queued read through a kernel io control block
 #if 0
@@ -247,7 +247,7 @@ maddevb_collect_biovecs(struct mad_dev_obj *pmaddevobj, struct bio* pbio,
 
     ASSERT((int)(totl_sectors == nr_sectors));
 
-    PDEBUG("maddevb_collect_biovecs... dev#=%d bio=%px total_bvecs=%d, totl_sctrs=%d\n",
+    PDEBUG("maddevb_collect_biovecs... dev#=%ld bio=%px total_bvecs=%d, totl_sctrs=%d\n",
            pmaddevobj->devnum, pbio, (int)totl_bvecs, (int)totl_sectors);
 
     return totl_bvecs;
@@ -273,7 +273,7 @@ maddevb_xfer_sgdma_bvecs(PMADDEVOBJ pmaddevobj, struct bio_vec* biovecs,
     size_t  bvlen_totl = 0;
     u32  totl_sectors = 0;
     u32 flags1 = 0; 
-    U32 flags2 = 0;
+    // U32 flags2 = 0;
     U64    CDPP;
     long   iostat;
     U32 j;
@@ -281,7 +281,7 @@ maddevb_xfer_sgdma_bvecs(PMADDEVOBJ pmaddevobj, struct bio_vec* biovecs,
     if (bWr)
         {DmaCntl |= MAD_DMA_CNTL_H2D;} //Write == Host2Disk
 
-    PINFO("maddev_xfer_sgdma_bvecs... dev#=%d nr_bvecs=%d #sectors=%ld wr=%d\n",
+    PINFO("maddev_xfer_sgdma_bvecs... dev#=%d nr_bvecs=%ld #sectors=%d wr=%d\n",
           (int)pmaddevobj->devnum, nr_bvecs, nr_sectors, bWr);
 
     pmaddevobj->ioctl_f = eIoPending;
@@ -349,7 +349,7 @@ maddevb_xfer_sgdma_bvecs(PMADDEVOBJ pmaddevobj, struct bio_vec* biovecs,
         ASSERT((int)(totl_sectors == nr_sectors));
         }
 
-    PDEBUG("maddev_xfer_sgdma_bvecs... dev#=%d #bvecs=%d #sectors=%d iostat=%ld iocount=%ld\n",
+    PDEBUG("maddev_xfer_sgdma_bvecs... dev#=%d #bvecs=%d #sectors=%d iostat=%d iocount=%ld\n",
            (int)pmaddevobj->devnum, (int)nr_bvecs, (int)nr_sectors,
            (int)iostat, iocount);
     pmaddevobj->ioctl_f = eIoReset;
@@ -366,12 +366,12 @@ irqreturn_t maddevb_isr(int irq, void* dev_id)
 	PMADREGS pmadregs;
 	//
 	u32 flags1 = 0;
-    U32 flags2 = 0;
+    // U32 flags2 = 0;
 	u32 IntID = 0;
 
     ASSERT((int)(pmaddevobj != NULL));
     pmadregs = pmaddevobj->pDevBase;
-	PDEBUG("maddevb_isr... dev#=%d pmaddevobj=%px irq=%d IntID=x%X\n",
+	PDEBUG("maddevb_isr... dev#=%d pmaddevobj=%px irq=%d IntID=x%lX\n",
            (int)pmaddevobj->devnum, pmaddevobj, irq, pmadregs->IntID);
 
     maddev_acquire_lock_disable_ints(&pmaddevobj->devlock, flags1);
@@ -411,7 +411,7 @@ irqreturn_t maddevb_isr(int irq, void* dev_id)
     /* Invoke the DPC handler */
     tasklet_hi_schedule(&pmaddevobj->dpctask);
 
-    #ifndef _MAD_SIMULATION_MODE_(real hardware)
+    #ifndef _MAD_SIMULATION_MODE_ //(real hardware)
     //With real hardware release the spinlock at device-irql  AFTER enqueueing the DPC
     maddev_enable_ints_release_lock(&pmaddevobj->devlock, flags1);
     #endif
@@ -454,7 +454,7 @@ void maddevb_dpctask(ulong indx)
             }
         else
             {
-            PWARN("maddevb_dpc... dev#=%d Int unexpected! ioctl_f=%d\n",
+            PWARN("maddevb_dpc... dev#=%d Int unexpected! ioctl_f=%ld\n",
                   (int)pmaddevobj->devnum, pmaddevobj->ioctl_f);
             ASSERT((int)false);
             }

@@ -122,6 +122,92 @@ static int madbus_dev_release(struct inode *inode, struct file *fp)
 	return 0;
 }
 
+
+//This function simulates a PCI device hotplug
+static int madbus_hotplug(U32 indx, U16 pci_devid)
+{
+    register U32 j;
+    //
+    PMADBUSOBJ pmbobj_hpl;
+    struct pci_driver* pPciDrvr;
+    struct pci_dev*    pPciDev = NULL;
+    int                rc = -EUNATCH; //No 'protocol' driver attached until we find one
+
+    PINFO("madbus_hotplug... dev#=%d pci_devid=x%X\n", (int)indx, pci_devid);
+
+    if ((indx < 1) || (indx > madbus_nbr_slots))
+        {return -EBADSLT;} //Slot# out of bounds 
+
+    pmbobj_hpl = &madbus_objects[indx];
+    if (pmbobj_hpl->pci_devid != 0)
+       {return -EEXIST;} //This bus slot is in use;
+
+    pPciDev = madbus_setup_pci_device(indx, pci_devid);
+    if ((pPciDev == NULL) || (IS_ERR(pPciDev)))
+        {return -EFAULT;}
+
+    ASSERT((int)(pPciDev == &pmbobj_hpl->pcidev));
+
+    //Find the correct device driver from the set of known client drivers
+    //Calling every drivers' probe function until a match
+    for (j = 0; j < NumDrvrs; j++)
+        {
+        pPciDrvr = PciDrvrs[j];
+        if (pPciDrvr == NULL)
+            {continue;}
+
+        ASSERT((int)(pPciDrvr->probe != NULL));
+        if (pPciDrvr->probe == NULL)
+            {continue;}
+
+        rc = pPciDrvr->probe(&pmbobj_hpl->pcidev, pPciDrvr->id_table);
+        if (rc == 0)
+            {break;}
+        }
+
+    if (rc == 0)
+        {ASSERT((int)(pmbobj_hpl->pcidev.driver != NULL));}
+    else
+        //Mark this slot as free
+        {pmbobj_hpl->pci_devid = 0;}
+
+    //The hotplug result is whatever the last probe function returned
+    //if any probe was invoked
+    return rc;
+}
+
+//This function simulates a PCI device hot unplug
+static int madbus_hotunplug(U32 indx)
+{
+    PMADBUSOBJ pmbobj_hpl = &madbus_objects[indx];
+    //
+    struct pci_driver *pPciDrvr;
+    int rc = 0; 
+
+    PINFO("madbus_hotunplug... pmobj=%px dev#=%d\n", pmbobj_hpl, (int)indx);
+
+    if ((indx < 1) || (indx > madbus_nbr_slots))
+        {return -EBADSLT;} //Slot# out of bounds 
+
+    if (pmbobj_hpl->pci_devid == 0)
+       {return -ENODEV;} //This bus slot has no device;
+
+    pPciDrvr = pmbobj_hpl->pcidev.driver; 
+    if (pPciDrvr == NULL)
+        {return -EUNATCH;} //No 'protocol' driver attached 
+
+    if (pPciDrvr->remove == NULL)
+       {return -EFAULT;}
+
+    /*rc =*/ pPciDrvr->remove(&pmbobj_hpl->pcidev);
+    rc = 0;
+
+    pmbobj_hpl->pci_devid = 0;
+
+    //The final result of the unplug is ok if any remove was invoked
+    return 0;
+}
+
 //This is the ioctl function for a bus child device
 //
 static long madbus_dev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
@@ -135,7 +221,7 @@ static long madbus_dev_ioctl(struct file *fp, unsigned int cmd, unsigned long ar
     int err = 0;
 	int retval = 0;
 
-	PINFO("madbusobj_ioctl: dev#=%d fp=%px cmd=x%X arg=x%X\n",
+	PINFO("madbusobj_ioctl: dev#=%d fp=%px cmd=x%X arg=x%lX\n",
 		  (int)mbobj->devnum, fp, cmd, arg);
 
 	// Extract the type and number bitfields, and don't decode
@@ -300,15 +386,15 @@ static struct vm_operations_struct madbus_remap_vm_ops =
 static int madbus_dev_mmap(struct file *fp, struct vm_area_struct* vma)
 {
 	struct madbus_object *mbobj = fp->private_data;
-	struct inode* inode_str     = fp->f_inode;
+	// struct inode* inode_str     = fp->f_inode;
     phys_addr_t    pfn          = phys_to_pfn(mbobj->MadDevPA);
     size_t MapSize              = vma->vm_end - vma->vm_start;
     //
 	int rc = 0;
 
-	PINFO("madbus_dev_mmap... dev#=%d fp=%px pfn=x%llX PA=x%llX MapSize=%d prot=x%X\n",
+	PINFO("madbus_dev_mmap... dev#=%d fp=%px pfn=x%llX PA=x%llX MapSize=%d prot=x%lX\n",
           (int)mbobj->devnum, fp, pfn, mbobj->MadDevPA, 
-          (int)MapSize, vma->vm_page_prot);
+          (int)MapSize, vma->vm_page_prot.pgprot);
 
     rc = remap_pfn_range(vma, vma->vm_start, pfn, MapSize, vma->vm_page_prot);
     if (rc != 0)
@@ -324,7 +410,7 @@ static int madbus_dev_mmap(struct file *fp, struct vm_area_struct* vma)
 
     //Increment the reference count on first use
 	madbus_vma_open(vma);
-    PDEBUG("madbus_dev_mmap:remap_pfn_range... dev#=%d start=%px rc=%d\n",
+    PDEBUG("madbus_dev_mmap:remap_pfn_range... dev#=%d start=%lx rc=%d\n",
            (int)mbobj->devnum, vma->vm_start, rc);
 
     return rc;
@@ -350,10 +436,10 @@ U8 bBusDevRegstrd = 0;
 //Free device memory   consistend with how it was malloced
 static int madbus_free_device_memory(PMADBUSOBJ pmadbusobj)
 {
-size_t size;
-int rc = 0;
+	// size_t size;
+	int rc = 0;
 
-	PINFO("madbus_free_device_memory... dev#=%d\n", pmadbusobj->devnum);
+	PINFO("madbus_free_device_memory... dev#=%ld\n", pmadbusobj->devnum);
 
     if (pmadbusobj->SimParms.pInBufr != NULL)
         kfree(pmadbusobj->SimParms.pInBufr);
@@ -389,7 +475,7 @@ int rc = 0;
         }
 
     if (rc != 0)
-        {PWARN("madbus_free_device_memory... dev#=%d rc=%d\n", 
+        {PWARN("madbus_free_device_memory... dev#=%ld rc=%d\n", 
                pmadbusobj->devnum, rc);}
 
     return rc;
@@ -474,10 +560,9 @@ static int madbus_dev_setup_cdev(struct madbus_object *mbobj, int indx)
 
 static int madbus_malloc_device_memory(PMADBUSOBJ pmadbusobj)
 {
-static U32 gfpflags = (MAD_DEVICE_KMALLOC_FLAGS | __GFP_DIRECT_RECLAIM);
-//
-size_t size;
-int rc = 0;
+	// static U32 gfpflags = (MAD_DEVICE_KMALLOC_FLAGS | __GFP_DIRECT_RECLAIM);
+	// size_t size;
+	int rc = 0;
 
     pmadbusobj->SimParms.pInBufr = kzalloc(PAGE_SIZE, MAD_KMALLOC_FLAGS);
     pmadbusobj->SimParms.pOutBufr = kzalloc(PAGE_SIZE, MAD_KMALLOC_FLAGS);
@@ -544,7 +629,7 @@ int rc = 0;
         memset(((u8*)pmadbusobj->pmaddevice + MAD_DEVICE_MEM_SIZE_NODATA),
                0xFF, MAD_DEVICE_DATA_SIZE);
 
-        PINFO("madbus_setup_device... dev#=%d order=%d pPage=%px PA=x%llX kva=%px #pages=%ld size=%ld\n",
+        PINFO("madbus_setup_device... dev#=%d order=%d pPage=%px PA=x%llX kva=%px #pages=%d size=%ld\n",
               (int)pmadbusobj->devnum, MAD_XALLOC_PAGES_ORDER, pmadbusobj->pPage, 
               pmadbusobj->MadDevPA, pmadbusobj->pmaddevice,
               MAD_DEVICE_MAX_PAGES, (MAD_DEVICE_MAX_PAGES * PAGE_SIZE));

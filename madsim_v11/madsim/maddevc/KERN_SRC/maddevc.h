@@ -125,7 +125,6 @@ extern ssize_t maddev_direct_io(struct file *filp, const char __user *buf,
 static int maddev_setup_cdev(/*PMADDEVOBJ*/ void* pmaddevobj, int indx);
 #endif
 
-static long maddev_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
 extern irqreturn_t maddevc_isr(int irq, void* dev_id);
 //void maddevc_dpc(struct work_struct *work);
 extern void maddevc_dpctask(ulong indx);

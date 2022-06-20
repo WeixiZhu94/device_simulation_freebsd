@@ -8,7 +8,7 @@ obj-m		:= maddevc.o
 KERN_SRC	:= /lib/modules/$(shell uname -r)/build/
 PWD			:= $(shell pwd)
 
-KBUILD_EXTRA_SYMBOLS := /home/htfones/eclipse-wkspc/madsim/madbus/KERN_SRC/Module.symvers
+KBUILD_EXTRA_SYMBOLS := /root/device_simulation_freebsd/madsim_v11/madsim/madbus/KERN_SRC/Module.symvers
 
 modules:
 	make -C $(KERN_SRC) M=$(PWD) modules

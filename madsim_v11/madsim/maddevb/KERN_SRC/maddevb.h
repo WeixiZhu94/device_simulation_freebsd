@@ -190,7 +190,7 @@ enum maddevb_device_flags
 extern int maddev_major;     /* main.c */
 extern int maddev_nbr_devs;
 
-static struct maddevb_cmd
+struct maddevb_cmd
 {
 	struct list_head list;
 	struct llist_node ll_list;
@@ -203,7 +203,7 @@ static struct maddevb_cmd
 	struct hrtimer timer;
 };
 
-static struct maddevb_queue
+struct maddevb_queue
 {
 	unsigned long *tag_map;
 	wait_queue_head_t wait;
@@ -214,7 +214,7 @@ static struct maddevb_queue
 	struct maddevb_cmd *cmds;
 };
 
-static struct maddevb 
+struct maddevb 
 {
 	struct maddevblk_device *mbdev;
 	struct list_head list;
@@ -233,7 +233,7 @@ static struct maddevb
 	char disk_name[DISK_NAME_LEN];
 };
 
-static struct maddevblk_device
+struct maddevblk_device
 {
 	struct maddevb *pmaddevb;
 	struct config_item item;
@@ -275,25 +275,8 @@ static inline u64 mb_per_tick(int mbps)
 }
 
 extern int maddevb_create_device(/*PMADDEVOBJ pmaddev*/void* pv);
-static int maddevb_gendisk_register(struct maddevb *maddevb);
-static blk_qc_t maddevb_queue_bio(struct request_queue *q, struct bio *bio);
 void maddevb_restart_queue_async(struct maddevb *maddevb);
-static void maddevb_end_cmd(struct maddevb_cmd *cmd);
-static bool maddevb_should_requeue_request(struct request *rq);
-static bool maddevb_should_timeout_request(struct request *rq);
-static blk_status_t maddevb_handle_cmd(struct maddevb_cmd *cmd, sector_t sector,
-				                       sector_t nr_sectors, enum req_opf op);
-static int maddevb_init_tag_set(struct maddevb *maddevb, struct blk_mq_tag_set *set);
-static int maddevb_init_driver_queues(struct maddevb *maddevb);
-static void maddevb_init_queues(struct maddevb *maddevb);
-static void maddevb_config_discard(struct maddevb *maddevb);
-static int maddevb_setup_queues(struct maddevb *maddevb);
-static void maddevb_validate_conf(struct maddevblk_device *dev);
-bool maddevb_setup_fault(void);
-static void maddevb_setup_bwtimer(struct maddevb *maddevb);
-void maddevb_cleanup_queues(struct maddevb *maddevb);
 extern void maddevb_delete_device(struct maddevb *maddevb);
-static void maddevb_free_device(struct maddevblk_device *dev);
 int maddevb_ioctl(struct block_device* bdev, fmode_t mode, 
                   unsigned int cmd, unsigned long arg);
 int maddevb_collect_biovecs(struct mad_dev_obj *pmaddevobj, struct bio* pbio,
@@ -363,20 +346,6 @@ maddev_write_direct(struct file *filp, const char __user *buf, size_t count, lof
 
 //loff_t  maddev_llseek(struct file *filp, loff_t off, int whence);
 #endif
-
-static int maddevb_rw_page(struct block_device *bdev, sector_t sector,
-		                   struct page *pPages, unsigned int op);
-static int maddevb_open(struct block_device *bdev, fmode_t mode);
-static void maddevb_release(struct gendisk *disk, fmode_t mode);
-static int maddevb_revalidate_disk(struct gendisk *disk);
-static int maddevb_getgeo(struct block_device* bdev, struct hd_geometry* geo);
-static void maddevb_swap_slot_free_notify(struct block_device* bdev, 
-                                          unsigned long offset);
-//static int maddevb_zone_report(struct gendisk *disk, sector_t sector,
-//		                       struct blk_zone *zones, unsigned int *nr_zones);
-static int maddevb_zone_report(struct gendisk *disk, sector_t sector,
-		                       /*struct blk_zone *zones,*/ 
-							   unsigned int nr_zones, report_zones_cb cb, void* data);
 
 //int maddevb_ioctl(struct block_device* bdev, fmode_t mode, unsigned int cmd, unsigned long arg);
 extern irqreturn_t maddevb_isr(int irq, void* dev_id);

@@ -42,6 +42,15 @@
 #define _DEVICE_DRIVER_MAIN_
 #include "maddevc.h"		/* local definitions */
 
+//Function prototypes
+static ssize_t
+maddev_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos);
+static ssize_t
+maddev_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos);
+static loff_t  maddev_llseek(struct file *filp, loff_t off, int whence);
+
+static long maddev_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
+
 //Our parameters which can be set at load time.
 int maddev_major = MADDEVOBJ_MAJOR;
 module_param(maddev_major, int, S_IRUGO);
@@ -80,10 +89,6 @@ static struct pci_device_id pci_ids[] =
 //
 MODULE_DEVICE_TABLE(pci, pci_ids);
 //
-//These function prototypes are needed here but are defined in maddrvrdefs.h
-static int maddev_probe(struct pci_dev *pcidev, const struct pci_device_id *ids);
-static void maddev_shutdown(struct pci_dev *pcidev);
-static void maddev_remove(struct pci_dev *pcidev);
 
 #include "../../include/maddrvrdefs.c"
 
@@ -283,7 +288,7 @@ maddev_read(struct file *fp, char __user *usrbufr, size_t count, loff_t *f_pos)
     struct mad_dev_obj *pmaddevobj = (struct mad_dev_obj*)fp->private_data;
     ssize_t iocount = 0;                                                         
 
-    PINFO("maddev_read... dev#=%d fp=%p count=%ld offset_arg=%ld fppos=%ld\n",
+    PINFO("maddev_read... dev#=%d fp=%p count=%ld offset_arg=%ld fppos=%lld\n",
           (int)pmaddevobj->devnum, fp, (U32)count, (U32)*f_pos, fp->f_pos);
 
     mutex_lock(&pmaddevobj->devmutex);
@@ -307,7 +312,7 @@ static ssize_t maddev_write(struct file *fp, const char __user *usrbufr, size_t 
     PMADDEVOBJ pmaddevobj = (PMADDEVOBJ)fp->private_data;
     ssize_t iocount = 0;                                                         
 
-    PINFO("maddev_write... dev#=%d fp=%p count=%ld offset_arg=%ld fppos=%ld\n",
+    PINFO("maddev_write... dev#=%d fp=%p count=%ld offset_arg=%ld fppos=%lld\n",
           (int)pmaddevobj->devnum, fp, (U32)count, (U32)*f_pos, fp->f_pos);
 
     mutex_lock(&pmaddevobj->devmutex);
@@ -339,7 +344,7 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 	long retval = 0;
 	U32  remains = 0;
     u32 flags1 = 0;
-    U32 flags2 = 0;
+    // U32 flags2 = 0;
 
 	PINFO("maddev_ioctl... dev#=%d fp=%p cmd=x%X arg=x%X\n",
 		  (int)pmaddevobj->devnum, fp, cmd, (int)arg);
@@ -475,7 +480,7 @@ static loff_t maddev_llseek(struct file *fp, loff_t off, int whence)
 	//
 	loff_t newpos = 0;
    	u32 flags1 = 0;
-    U32 flags2 = 0;
+    // U32 flags2 = 0;
     int rc = 0;
 
 	PINFO("maddev_llseek... dev#=%d lseek=%ld\n",
@@ -593,13 +598,13 @@ static struct vm_operations_struct maddev_remap_vm_ops =
 static int maddev_mmap(struct file *fp, struct vm_area_struct* vma)
 {
 	struct mad_dev_obj *pmaddevobj = fp->private_data;
-	struct inode* inode_str = fp->f_inode;
+	// struct inode* inode_str = fp->f_inode;
     U32    pfn              = phys_to_pfn(pmaddevobj->MadDevPA);
     size_t MapSize          = vma->vm_end - vma->vm_start;
 	//
 	int rc = 0;
 
-	PINFO("maddev_mmap... dev#=%d fp=%px pfn=0x%llX PA=x%llX MapSize=%ld\n",
+	PINFO("maddev_mmap... dev#=%d fp=%px pfn=0x%lX PA=x%llX MapSize=%ld\n",
           (int)pmaddevobj->devnum, fp, pfn, pmaddevobj->MadDevPA, MapSize);
 
     mutex_lock(&pmaddevobj->devmutex);
@@ -623,7 +628,7 @@ static int maddev_mmap(struct file *fp, struct vm_area_struct* vma)
 	maddev_vma_open(vma);
     mutex_unlock(&pmaddevobj->devmutex);
 
-    PDEBUG("maddev_mmap:remap_pfn_range... dev#=%d start=%px rc=%d\n",
+    PDEBUG("maddev_mmap:remap_pfn_range... dev#=%d start=%lx rc=%d\n",
            (int)pmaddevobj->devnum, vma->vm_start, rc);
 
     return rc;

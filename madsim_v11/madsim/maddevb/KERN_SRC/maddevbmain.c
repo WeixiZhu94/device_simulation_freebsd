@@ -129,11 +129,11 @@ MADREGS MadRegsRst = {0, MAD_STATUS_CACHE_INIT_MASK, 0, 0x080B0B, 0, 0, 0, 0, 0,
 
 struct mad_dev_obj *mad_dev_objects; /* allocated in maddev_init_module */
 
-static struct class *mad_class = NULL;
-static char maddrvrname[] = DRIVER_NAME;
+struct class *mad_class = NULL;
+char maddrvrname[] = DRIVER_NAME;
 
 //* The structures & entry points general to a pci module
-static struct pci_device_id pci_ids[] =
+struct pci_device_id pci_ids[] =
 {
 	{ PCI_DEVICE(MAD_PCI_VENDOR_ID, MAD_PCI_BLOCK_INT_DEVICE_ID), },
     { PCI_DEVICE(MAD_PCI_VENDOR_ID, MAD_PCI_BLOCK_MSI_DEVICE_ID), },
@@ -146,10 +146,6 @@ MODULE_DEVICE_TABLE(pci, pci_ids);
 struct mutex lock;
 DEFINE_IDA(maddevb_indexes);
 
-//These function prototypes are needed here but are defined in maddrvrdefs.h
-static int maddev_probe(struct pci_dev *pcidev, const struct pci_device_id *ids);
-static void maddev_shutdown(struct pci_dev *pcidev);
-static void maddev_remove(struct pci_dev *pcidev);
 //
 struct mad_dev_obj; // *PMADDEVOBJ;
 
@@ -242,7 +238,7 @@ static int maddev_seq_show(struct seq_file *s, void *v)
 /*
  * Tie the sequence operators up.
  */
-static struct seq_operations maddev_seq_ops = {
+struct seq_operations maddev_seq_ops = {
 	.start = maddev_seq_start,
 	.next  = maddev_seq_next,
 	.stop  = maddev_seq_stop,
@@ -266,7 +262,7 @@ static int maddevseq_proc_open(struct inode *inode, struct file *file)
 /*
  * Create a set of file operations for our proc files.
  */
-static struct file_operations maddevmem_proc_ops = {
+struct file_operations maddevmem_proc_ops = {
 	.owner   = THIS_MODULE,
 	.open    = maddevmem_proc_open,
 	.read    = seq_read,
@@ -274,7 +270,7 @@ static struct file_operations maddevmem_proc_ops = {
 	.release = single_release
 };
 
-static struct file_operations maddevseq_proc_ops = {
+struct file_operations maddevseq_proc_ops = {
 	.owner   = THIS_MODULE,
 	.open    = maddevseq_proc_open,
 	.read    = seq_read,
@@ -316,7 +312,7 @@ int maddevb_system_ioctl(struct block_device* bdev, fmode_t mode,
         {
         case CDROM_GET_CAPABILITY:
             rc = MADDEVB_GENHD_FLAGS;
-            PINFO("maddevb_system_ioctl... cdrom_get_caps; dev#=%d flags=x%X\n",
+            PINFO("maddevb_system_ioctl... cdrom_get_caps; dev#=%ld flags=x%X\n",
                   pmaddevobj->devnum, rc);
             break;
 
@@ -331,7 +327,7 @@ int maddevb_system_ioctl(struct block_device* bdev, fmode_t mode,
         case CDROM_CHANGER_NSLOTS:
         case CDROM_LOCKDOOR:	
         case CDROM_DEBUG: 
-            PINFO("maddevb_system_ioctl... cdrom_ioctl dev#=%d rc=-ENOSYS\n");
+            // PINFO("maddevb_system_ioctl... cdrom_ioctl dev#=%d rc=-ENOSYS\n");
             rc = -ENOSYS;
             break;
 
@@ -351,24 +347,24 @@ int maddevb_system_ioctl(struct block_device* bdev, fmode_t mode,
 int maddevb_ioctl(struct block_device* bdev, fmode_t mode,
                   unsigned int cmd, unsigned long arg)
 {
-    static U32      MadIntAlignRd = (MAD_INT_STATUS_ALERT_BIT | MAD_INT_ALIGN_INPUT_BIT);
-    static U32      MadIntAlignWr = (MAD_INT_STATUS_ALERT_BIT | MAD_INT_ALIGN_OUTPUT_BIT);
-	static u8       CacheData[MAD_CACHE_SIZE_BYTES];
-	static MADREGS  MadRegs;
+    // static U32      MadIntAlignRd = (MAD_INT_STATUS_ALERT_BIT | MAD_INT_ALIGN_INPUT_BIT);
+    // static U32      MadIntAlignWr = (MAD_INT_STATUS_ALERT_BIT | MAD_INT_ALIGN_OUTPUT_BIT);
+	// u8       CacheData[MAD_CACHE_SIZE_BYTES];
+	MADREGS  MadRegs;
 	//
     struct maddevb* pmaddevb       = bdev->bd_disk->private_data;
 	struct mad_dev_obj *pmaddevobj =  (PMADDEVOBJ)pmaddevb->mbdev->pmaddevobj;
 	PMADREGS        pmadregs  = (PMADREGS)pmaddevobj->pDevBase;
 	PMADCTLPARMS    pCtlParms = (PMADCTLPARMS)arg;
-	u8*             pUsrBufr  = (u8 *)arg;
+	// u8*             pUsrBufr  = (u8 *)arg;
 	//
-    void*           pBufr = CacheData;
+    // void*           pBufr = CacheData;
 	int err = 0;
 	long retval = 0;
-	U32  CntlReg = 0;
-	U32  IntReg = 0;
-	U32  RegVal;
-	U32  WorkBits;
+	// U32  CntlReg = 0;
+	// U32  IntReg = 0;
+	// U32  RegVal;
+	// U32  WorkBits;
 	U32  remains = 0;
     U32  flags1 = 0;
 
@@ -392,7 +388,7 @@ int maddevb_ioctl(struct block_device* bdev, fmode_t mode,
         (_IOC_NR(cmd) > MADDEVOBJ_IOCTL_MAX_NBR))
 	    {
         mutex_unlock(&pmaddevobj->devmutex);
-        PWARN("maddev_ioctl... dev#=%d cmd=x%X rc=-EACCES\n", 
+        PWARN("maddev_ioctl... dev#=%ld cmd=x%X rc=-EACCES\n", 
               pmaddevobj->devnum, cmd);
 		return -EACCES;
 	    }
@@ -401,7 +397,7 @@ int maddevb_ioctl(struct block_device* bdev, fmode_t mode,
 	if (err)
 	    {
         mutex_unlock(&pmaddevobj->devmutex);
-        PERR( "maddevb_ioctl... dev#=%d rc=-EINVAL\n", pmaddevobj->devnum);
+        PERR( "maddevb_ioctl... dev#=%ld rc=-EINVAL\n", pmaddevobj->devnum);
 		return -EINVAL;
 	    }
  
@@ -513,7 +509,7 @@ int maddevb_init_module(void)
         {
         maddevb_major = mjr;
         maddev_major = mjr;
-        PINFO("maddevb_init_module... mjr=%d reassigned!\n", 
+        PINFO("maddevb_init_module... mjr=%d mnr=%d reassigned!\n", 
               maddevb_major, maddev_minor);
         }
 

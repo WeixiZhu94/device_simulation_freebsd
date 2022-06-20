@@ -125,21 +125,12 @@ typedef struct madbus_object MADBUSOBJ, *PMADBUSOBJ;
 
 #define to_madbus_object(dev) container_of(dev, struct madbus_object, dev);
 
-static int madbus_setup_device(PMADBUSOBJ pmaddbusobj);
 extern int register_mad_device(struct madbus_object *);
 extern void unregister_mad_device(struct madbus_object *);
 extern int madbus_create_thread(PMADBUSOBJ pmadbusobj);
 extern int madbus_dev_thread(void* pvoid);
-static void mbdt_process_bufrd_io(PMADBUSOBJ pmadbusobj, bool write);
-static void mbdt_process_cache_io(PMADBUSOBJ pmadbusobj, bool write);
-static void mbdt_process_align_cache(PMADBUSOBJ pmadbusobj, bool write);
-static void mbdt_process_dma_io(PMADBUSOBJ pmadbusobj, bool write);
-static void mbdt_process_sgdma(PMADREGS pmaddevice, bool bWrite);
 //
 void madsim_complete_simulated_io(void* vpmadbusobj, PMADREGS pmadregs);
-static void madsim_complete_xfer_one_dma_element(PMADBUSOBJ pmadbusobj, 
-                                                 PMAD_DMA_CHAIN_ELEMENT pSgDmaElement);
-static void madsim_complete_simulated_sgdma(PMADBUSOBJ pmadbusobj, PMADREGS pmadregs);
 #ifdef _SIM_DRIVER_
 #include "../../include/simdrvrlib.h"
 #endif

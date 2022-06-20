@@ -380,7 +380,7 @@ maddev_direct_io(struct file *filp, const char __user *usrbufr,
 
     BUG_ON(!(virt_addr_valid(pmaddevobj)));
 
-    PINFO("maddev_direct_io... dev#=%d fp=%px count=%ld offset=%ld\n",
+    PINFO("maddev_direct_io... dev#=%d fp=%px count=%ld offset=%d\n",
 		  (int)pmaddevobj->devnum, filp, count, offset);
 
     if (((U32)count + offset) >= (MAD_TOTAL_ALLOC_SIZE - MAD_DEVICE_DATA_OFFSET))
@@ -388,16 +388,16 @@ maddev_direct_io(struct file *filp, const char __user *usrbufr,
 
     //If the io queue is not free we return
     if (IoQbusy)
-        {
-        PERR("maddev_direct_io... dev#=%d Io-Q busy rc=-EAGAIN\n",
-             (int)pmaddevobj->devnum, num_pgs);
+    {
+        // PERR("maddev_direct_io... dev#=%d Io-Q busy rc=-EAGAIN\n",
+        //      (int)pmaddevobj->devnum, num_pgs);
         return -EAGAIN;
-        }
+    }
 
     num_pgs = maddev_get_user_pages(start_page, pg_cnt, pPages, pVMAs, bUpdate);
     if (num_pgs != pg_cnt)
         {
-        PERR("maddev_direct_io:get_user_pages... dev#=%d num_pgs=%ld rc=-EFAULT\n",
+        PERR("maddev_direct_io:get_user_pages... dev#=%d num_pgs=%d rc=-EFAULT\n",
 		     (int)pmaddevobj->devnum, num_pgs);
         return (ssize_t)-EFAULT;
         }
@@ -418,7 +418,7 @@ maddev_direct_io(struct file *filp, const char __user *usrbufr,
 
     maddev_put_user_pages(pPages, num_pgs);
 
-    PDEBUG("maddev_direct_io... dev#=%d iocount=%ld offset=%ld\n",
+    PDEBUG("maddev_direct_io... dev#=%d iocount=%ld offset=%d\n",
            (int)pmaddevobj->devnum, iocount, offset);
 
     return iocount;
@@ -432,7 +432,7 @@ irqreturn_t maddevc_isr(int irq, void* dev_id)
 	PMADREGS pmadregs;
 	//
 	u32 flags1 = 0;
-    U32 flags2 = 0;
+    // U32 flags2 = 0;
 	u32 IntID = 0;
 
     ASSERT((int)(pmaddevobj != NULL));

@@ -59,7 +59,7 @@ struct async_work
 };
 
 // The device context structure
-static struct mad_dev_obj
+struct mad_dev_obj
 {
 	U32                devnum;
 	//U32                size;       /* amount of data stored here */
@@ -108,27 +108,21 @@ static struct mad_dev_obj
 typedef struct mad_dev_obj MADDEVOBJ;
 typedef struct mad_dev_obj* PMADDEVOBJ;
 
-//Function prototypes
-static ssize_t
-maddev_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos);
 ///*static*/ ssize_t
 //maddev_read_bufrd(struct file *filp, char __user *buf, size_t count, loff_t *f_pos);
-static ssize_t
-maddev_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos);
 //static ssize_t
 //maddev_write_bufrd(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos);
 
-static loff_t  maddev_llseek(struct file *filp, loff_t off, int whence);
 bool  maddev_need_sg(struct page* pPages[], u32 num_pgs);
 void maddev_put_user_pages(struct page* page_list[], u32 num_pgs);
 
-static void maddev_cleanup_module(void);
-static int  maddev_probe(struct pci_dev *pcidev, const struct pci_device_id *ids);
-static void maddev_shutdown(struct pci_dev *pcidev);
-static void maddev_remove(struct pci_dev *pcidev);
-static int  maddev_setup_device(PMADDEVOBJ pmaddevobj, 
+void maddev_cleanup_module(void);
+int  maddev_probe(struct pci_dev *pcidev, const struct pci_device_id *ids);
+void maddev_shutdown(struct pci_dev *pcidev);
+void maddev_remove(struct pci_dev *pcidev);
+int  maddev_setup_device(PMADDEVOBJ pmaddevobj, 
                                 struct pci_dev** ppPciDvTmp, U8 HPL);
-static void maddev_remove_device(PMADDEVOBJ pmaddevobj);
+void maddev_remove_device(PMADDEVOBJ pmaddevobj);
 
 void maddev_program_stream_io(spinlock_t *splock, PMADREGS pmadregs,
 		                     U32 ControlReg, U32 IntEnableReg,

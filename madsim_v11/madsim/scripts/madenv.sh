@@ -61,7 +61,7 @@ madbus_major=1
 maddev_major=0
 mode="664"
 #
-appbasepath="/home/htfones/eclipse-wkspc/madsim"
+appbasepath="/root/device_simulation_freebsd/madsim_v11/madsim"
 simapp_path="madsimui/Debug/"
 simapp="madsimui"
 #

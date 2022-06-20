@@ -35,6 +35,15 @@
 #define _SIM_DRIVER_
 #include "madbus.h"
 
+
+static void mbdt_process_bufrd_io(PMADBUSOBJ pmadbusobj, bool write);
+static void mbdt_process_cache_io(PMADBUSOBJ pmadbusobj, bool write);
+static void mbdt_process_align_cache(PMADBUSOBJ pmadbusobj, bool write);
+static void mbdt_process_dma_io(PMADBUSOBJ pmadbusobj, bool write);
+static void madsim_complete_xfer_one_dma_element(PMADBUSOBJ pmadbusobj, 
+                                                 PMAD_DMA_CHAIN_ELEMENT pSgDmaElement);
+static void madsim_complete_simulated_sgdma(PMADBUSOBJ pmadbusobj, PMADREGS pmadregs);
+
 static IoMesgId mbdt_get_programmed_iotype(PMADREGS pMadDevRegs);
 static void mbdt_process_io(PMADBUSOBJ pmadbusobj);
 
@@ -171,7 +180,7 @@ u32 IntEnable = pMadDevRegs->IntEnable;
         
     if (dev_iotag != pMadDevRegs->IoTag)
         {
-        PERR("mbdt_get_progammed_iotype... sequence error; expected=%ld device=%ld\n",
+        PERR("mbdt_get_progammed_iotype... sequence error; expected=%d device=%ld\n",
              dev_iotag, pMadDevRegs->IoTag); 
         BUG_ON(dev_iotag != pMadDevRegs->IoTag);
         }
@@ -215,7 +224,7 @@ static void mbdt_process_io(PMADBUSOBJ pmadbusobj)
 	PMADREGS pmaddev = pmadbusobj->pmaddevice;
 	u32      IoType  = pmaddev->MesgID;
 
-	PINFO("mbdthread%d:mbdt_process_io... IoType=%d IntEnable=x%X IntID=x%X\n",
+	PINFO("mbdthread%d:mbdt_process_io... IoType=%d IntEnable=x%lX IntID=x%lX\n",
 	   	  (int)pmadbusobj->devnum, (int)IoType, pmaddev->IntEnable, pmaddev->IntID);
 
     ASSERT((int)(pmaddev->IntEnable != 0));
@@ -256,7 +265,7 @@ static void mbdt_process_io(PMADBUSOBJ pmadbusobj)
 
         default:
             PWARN("madbus_dev_thread:mbdt_complete_simulated_io... dev#=%d invalid iotype=%d\n",
-                  (int)pmadbusobj->devnum), IoType;
+                  (int)pmadbusobj->devnum, IoType);
         }
 
 	//pmadbusobj->pmaddevice->MesgID = 0; //So as not to repeat the i/o
@@ -281,7 +290,7 @@ static void mbdt_process_bufrd_io(PMADBUSOBJ pmadbusobj, bool bWrite)
 	irqreturn_t  isr_rc;
     U32      msidx = 0;
 
-    PINFO("mbdt_process_bufrd_io... \ndev#=%d CountBits=x%X IoSzf=x%X UnitSz=%ld IoCount=%ld RdIndx=%ld WrIndx=%ld\n",
+    PINFO("mbdt_process_bufrd_io... \ndev#=%ld CountBits=x%lX IoSzf=x%X UnitSz=%ld IoCount=%ld RdIndx=%ld WrIndx=%ld\n",
           pmadbusobj->devnum, CountBits, UnitSzB, UnitSize, IoCount,
           pmaddevice->ByteIndxRd, pmaddevice->ByteIndxWr);
 
@@ -308,7 +317,6 @@ static void mbdt_process_bufrd_io(PMADBUSOBJ pmadbusobj, bool bWrite)
     //Release the target device driver's device spinlock 
 	//spin_unlock(pSimParms->pdevlock);
 
-Invoke_ISR:;
     //PDEBUG("madbus_dev_thread:mbdt_process_bufrd_io... dev#=%d pmaddev=%px msidx=%d isrfn=%px iocount=%ld\n",
     //       (int)pmadbusobj->devnum, pmaddevice, msidx, pmadbusobj->isrfn[msidx], IoCount);
 
@@ -393,7 +401,6 @@ static void mbdt_process_cache_io(PMADBUSOBJ pmadbusobj, bool write)
     //Release the target device driver's device spinlock 
 	//spin_unlock(pSimParms->pdevlock);
 
-Invoke_ISR:; 
     //Call the device driver's ISR
     isr_rc = pmadbusobj->isrfn[msidx](pmadbusobj->irq[msidx], pSimParms->pmaddevobj);
 	if (isr_rc != IRQ_HANDLED)
@@ -475,7 +482,7 @@ static void mbdt_process_dma_io(PMADBUSOBJ pmadbusobj, bool bWrite)
     U8       bSGDMA = ((ControlReg & MAD_CONTROL_CHAINED_DMA_BIT) != 0);
     U32      CountBits =
              ((pmaddevice->Control & MAD_CONTROL_IO_COUNT_MASK) >> MAD_CONTROL_IO_COUNT_SHIFT);
-    U32      UnitSize = MAD_SECTOR_SIZE;
+    // U32      UnitSize = MAD_SECTOR_SIZE;
 	//
     U32      msidx = 0;
 	irqreturn_t  isr_rc;
@@ -511,7 +518,6 @@ static void mbdt_process_dma_io(PMADBUSOBJ pmadbusobj, bool bWrite)
             }
         }
 
-Invoke_ISR:; 
     //PDEBUG("madbus_dev_thread:mbdt_processs_dma_io... dev#=%d IntID=x%X\n",
     //     (int)pmadbusobj->devnum, pmaddevice->IntID);
     //Release the target device driver's device spinlock 
@@ -672,7 +678,7 @@ void madsim_complete_simulated_io(void* vpmadbusobj, PMADREGS pmadregs)
     		     (int)pmadbusobj->devnum, IoType);
 	    }
 
-    PINFO("madsim_complete_simulated_io...\n          dev#=%d IoType=%d IntID=x%X Control=x%X HostPA=x%llX DevLoclAddr=x%lX iocount=%ld\n",
+    PINFO("madsim_complete_simulated_io...\n          dev#=%d IoType=%d IntID=x%lX Control=x%lX HostPA=x%llX DevLoclAddr=x%llX iocount=%ld\n",
           (int)pmadbusobj->devnum, (int)IoType, pmadregs->IntID, pmadregs->Control,
           pmadregs->HostPA, pmadregs->DevLoclAddr, IoCount);
 
@@ -685,7 +691,7 @@ static void madsim_complete_simulated_sgdma(PMADBUSOBJ pmadbusobj, PMADREGS pmad
     PMAD_DMA_CHAIN_ELEMENT pSgDmaElement = 
                            (PMAD_DMA_CHAIN_ELEMENT)phys_to_virt(BCDPP);
     //
-    U64        CDPP;
+    // U64        CDPP;
     U32        IoCount = 0;
     U32        num_elems = 1;
 
@@ -702,7 +708,7 @@ static void madsim_complete_simulated_sgdma(PMADBUSOBJ pmadbusobj, PMADREGS pmad
 
     pmadbusobj->pmaddevice->DTBC = IoCount;
 
-    PDEBUG("madsim_complete_simulated_sgdma... dev#=%d num_elems=%d iocount=%ld\n",
+    PDEBUG("madsim_complete_simulated_sgdma... dev#=%d num_elems=%ld iocount=%ld\n",
            (int)pmadbusobj->devnum, num_elems, IoCount);
     return;
 }
