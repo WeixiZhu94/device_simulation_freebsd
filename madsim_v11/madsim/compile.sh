@@ -7,8 +7,9 @@ for src in madbus maddevb maddevc
 do
 	cd $src/KERN_SRC
 	make
-	cd ..
+	cd ../..
 done
+
 # wait
 
 # for src in madsimui madtest madtestb madtestc 
