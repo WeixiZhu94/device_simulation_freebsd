@@ -54,7 +54,7 @@
 // #include <linux/highmem.h>
 #include <linux/interrupt.h>
 //
-#include <asm/uaccess.h>	/* copy_*_user */
+#include <linux/uaccess.h>	/* copy_*_user */
 // #include <asm/page.h>	
 //
 #ifdef _SIM_DRIVER_

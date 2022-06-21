@@ -166,7 +166,7 @@ static int madbus_hotplug(U32 indx, U16 pci_devid)
         }
 
     if (rc == 0)
-        {ASSERT((int)(pmbobj_hpl->pcidev.driver != NULL));}
+        ;// {ASSERT((int)(pmbobj_hpl->pcidev.driver != NULL));}
     else
         //Mark this slot as free
         {pmbobj_hpl->pci_devid = 0;}
@@ -187,14 +187,14 @@ static int madbus_hotunplug(U32 indx)
     PINFO("madbus_hotunplug... pmobj=%px dev#=%d\n", pmbobj_hpl, (int)indx);
 
     if ((indx < 1) || (indx > madbus_nbr_slots))
-        {return -EBADSLT;} //Slot# out of bounds 
+        {return -1;} //Slot# out of bounds 
 
     if (pmbobj_hpl->pci_devid == 0)
        {return -ENODEV;} //This bus slot has no device;
 
     pPciDrvr = pmbobj_hpl->pcidev.driver; 
     if (pPciDrvr == NULL)
-        {return -EUNATCH;} //No 'protocol' driver attached 
+        {return -1;} //No 'protocol' driver attached 
 
     if (pPciDrvr->remove == NULL)
        {return -EFAULT;}
@@ -394,7 +394,7 @@ static int madbus_dev_mmap(struct file *fp, struct vm_area_struct* vma)
 
 	PINFO("madbus_dev_mmap... dev#=%d fp=%px pfn=x%llX PA=x%llX MapSize=%d prot=x%lX\n",
           (int)mbobj->devnum, fp, pfn, mbobj->MadDevPA, 
-          (int)MapSize, vma->vm_page_prot.pgprot);
+          (int)MapSize, vma->vm_page_prot);
 
     rc = remap_pfn_range(vma, vma->vm_start, pfn, MapSize, vma->vm_page_prot);
     if (rc != 0)
@@ -492,7 +492,7 @@ static void madbus_exit(void)
 	PMADBUSOBJ pmadbusobj;
 	int rc = 0;
 
-	PINFO("madbus_exit()... devno=x%X\n", devno);
+	PINFO("madbus_exit()... devno=x%lX\n", devno);
 
 	if (madbus_objects != NULL)
 	    {
@@ -524,7 +524,7 @@ static void madbus_exit(void)
     if (bBusDevRegstrd)
         {device_unregister(&madbus_dev);}
 	//
-    driver_unregister(&madbus_drvr);
+    // driver_unregister(&madbus_drvr);
     //
     // bus_remove_file(&madbus_type, &madbus_attr_ver);
     //
