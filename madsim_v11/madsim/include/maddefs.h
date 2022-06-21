@@ -517,6 +517,8 @@ static inline int add_uevent_var(struct kobj_uevent_env *env, const char *format
     return 0;
 }
 
+struct lock_class_key { };
+
 /**
  * struct bus_type - The bus type of the device
  *
@@ -610,5 +612,38 @@ struct bus_type {
     bool need_parent_lock;
 };
 
+struct bus_attribute {
+    struct attribute    attr;
+    ssize_t (*show)(struct bus_type *bus, char *buf);
+    ssize_t (*store)(struct bus_type *bus, const char *buf, size_t count);
+};
+
+struct device_driver {
+    const char      *name;
+    struct bus_type     *bus;
+
+    struct module       *owner;
+    const char      *mod_name;  /* used for built-in modules */
+
+    bool suppress_bind_attrs;   /* disables bind/unbind via sysfs */
+    enum probe_type probe_type;
+
+    const struct of_device_id   *of_match_table;
+    const struct acpi_device_id *acpi_match_table;
+
+    int (*probe) (struct device *dev);
+    void (*sync_state)(struct device *dev);
+    int (*remove) (struct device *dev);
+    void (*shutdown) (struct device *dev);
+    int (*suspend) (struct device *dev, pm_message_t state);
+    int (*resume) (struct device *dev);
+    const struct attribute_group **groups;
+    const struct attribute_group **dev_groups;
+
+    const struct dev_pm_ops *pm;
+    void (*coredump) (struct device *dev);
+
+    struct driver_private *p;
+};
 
 #endif //_MADDEFS_
