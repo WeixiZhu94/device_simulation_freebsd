@@ -66,6 +66,8 @@ int    sim_free_irq(unsigned int irq, void* dev_id);
 
 PMAD_SIMULATOR_PARMS madbus_xchange_parms(int num);
 
+void   SimInitPciConfig(char* PciCnfgSpace);
+
 
 // static void* Get_KVA(phys_addr_t PhysAddr, struct page** ppPgStr);
 // static void   SimInitPciCnfgSpace(char* PciCnfgSpace);
@@ -575,8 +577,8 @@ int  sim_request_irq(unsigned int irq, void* isrfunxn,
 {
     U32 devnum;
     PMADBUSOBJ pmadbusobj;
-    int isrdx = 0;
-    U8  bMSI;
+    // int isrdx = 0;
+    // U8  bMSI;
 
     if (dev_id == NULL)
         {return -ENODEV;}
