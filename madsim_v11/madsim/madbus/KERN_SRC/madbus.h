@@ -42,7 +42,7 @@
 #include <linux/ioctl.h> /* needed for the _IOW etc stuff used later */
 #include <linux/fs.h>		/* everything... */
 #include <linux/cdev.h>
-#include <linux/device.h>
+// #include <linux/device.h>
 #include <linux/kthread.h>
 #include <linux/slab.h>		/* kmalloc() */
 #include <linux/module.h>
