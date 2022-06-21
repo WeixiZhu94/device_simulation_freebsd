@@ -33,6 +33,8 @@
 #ifndef _SIM_DRVR_LIB_
 #define _SIM_DRVR_LIB_
 
+#include "linux_pci_regs.h"
+
 struct pci_dev* madbus_setup_pci_device(U32 indx, U16 pci_devid);
 
 int    pcisim_register_driver(struct pci_driver *pcidrvr);
@@ -61,6 +63,8 @@ int    sim_request_irq(unsigned int irq,
                        /*irqreturn_t (*isrfunxn)()*/ void* isrfunxn,
                        U32 flags, const char* dev_name, void* dev_id);
 int    sim_free_irq(unsigned int irq, void* dev_id);
+
+PMAD_SIMULATOR_PARMS madbus_xchange_parms(int num);
 
 
 // static void* Get_KVA(phys_addr_t PhysAddr, struct page** ppPgStr);
@@ -521,7 +525,7 @@ phys_addr_t pcisim_resource_start(const struct pci_dev *pdev, int bar)
 EXPORT_SYMBOL(pcisim_resource_start);  
 
 //This function implements a simulation of the equivalent pci function
-U64 pcisim_resource_end(const struct pci_dev *pdev, int bar)
+U32 pcisim_resource_end(const struct pci_dev *pdev, int bar)
 {
    PMADBUSOBJ pmadbusobj = container_of(pdev, MADBUSOBJ, pcidev);
    if (pmadbusobj->pci_devid == 0)
@@ -580,8 +584,8 @@ int  sim_request_irq(unsigned int irq, void* isrfunxn,
     devnum = *(U32*)dev_id; //assumes device# is at offset zero
     pmadbusobj = &madbus_objects[devnum];
 
-    bMSI = pmadbusobj->pcidev.msi_cap;
-    if(!bMSI)
+    // bMSI = pmadbusobj->pcidev.msi_cap;
+    // if(!bMSI)
         { //Legacy INT devices have one ISR
         if (irq != ((U32)(madbus_base_irq + devnum)))
             {return -EINVAL;}
@@ -589,15 +593,15 @@ int  sim_request_irq(unsigned int irq, void* isrfunxn,
         pmadbusobj->isrfn[0] = isrfunxn;
         pmadbusobj->irq[0] = irq;
         }
-    else 
-        { //MSI-capable devices may have 1..8 ISRs
-        isrdx = (int)(irq - (U32)(madbus_base_irq + devnum));
-        if ((isrdx < 0) || (isrdx > 7))
-           {return -EINVAL;}
+    // else 
+    //     { //MSI-capable devices may have 1..8 ISRs
+    //     isrdx = (int)(irq - (U32)(madbus_base_irq + devnum));
+    //     if ((isrdx < 0) || (isrdx > 7))
+    //        {return -EINVAL;}
 
-        pmadbusobj->isrfn[isrdx] = isrfunxn;
-        pmadbusobj->irq[isrdx] = irq;
-        }
+    //     pmadbusobj->isrfn[isrdx] = isrfunxn;
+    //     pmadbusobj->irq[isrdx] = irq;
+    //     }
 
     //The requestor is granted the irq
     return 0;       
