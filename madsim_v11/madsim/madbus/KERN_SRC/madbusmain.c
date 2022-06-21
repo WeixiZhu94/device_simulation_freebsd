@@ -181,7 +181,7 @@ static int madbus_hotunplug(U32 indx)
 {
     PMADBUSOBJ pmbobj_hpl = &madbus_objects[indx];
     //
-    struct pci_driver *pPciDrvr;
+    // struct pci_driver *pPciDrvr;
     int rc = 0; 
 
     PINFO("madbus_hotunplug... pmobj=%px dev#=%d\n", pmbobj_hpl, (int)indx);
@@ -192,14 +192,14 @@ static int madbus_hotunplug(U32 indx)
     if (pmbobj_hpl->pci_devid == 0)
        {return -ENODEV;} //This bus slot has no device;
 
-    pPciDrvr = pmbobj_hpl->pcidev.driver; 
-    if (pPciDrvr == NULL)
-        {return -1;} //No 'protocol' driver attached 
+    // pPciDrvr = pmbobj_hpl->pcidev.driver; 
+    // if (pPciDrvr == NULL)
+    //     {return -1;} //No 'protocol' driver attached 
 
-    if (pPciDrvr->remove == NULL)
-       {return -EFAULT;}
+    // if (pPciDrvr->remove == NULL)
+    //    {return -EFAULT;}
 
-    /*rc =*/ pPciDrvr->remove(&pmbobj_hpl->pcidev);
+    // /*rc =*/ pPciDrvr->remove(&pmbobj_hpl->pcidev);
     rc = 0;
 
     pmbobj_hpl->pci_devid = 0;

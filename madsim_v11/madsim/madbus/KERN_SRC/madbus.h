@@ -134,6 +134,14 @@ void madsim_complete_simulated_io(void* vpmadbusobj, PMADREGS pmadregs);
 #ifdef _SIM_DRIVER_
 #include "../../include/simdrvrlib.h"
 #endif
+
+
+/* used to decode ioctl numbers.. */
+#define _IOC_DIR(nr)        (((nr) >> _IOC_DIRSHIFT) & _IOC_DIRMASK)
+#define _IOC_TYPE(nr)       (((nr) >> _IOC_TYPESHIFT) & _IOC_TYPEMASK)
+#define _IOC_NR(nr)     (((nr) >> _IOC_NRSHIFT) & _IOC_NRMASK)
+#define _IOC_SIZE(nr)       (((nr) >> _IOC_SIZESHIFT) & _IOC_SIZEMASK)
+
 //
 
 
