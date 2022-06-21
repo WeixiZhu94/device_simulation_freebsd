@@ -821,3 +821,4 @@ static moduledata_t fake_dev = {
 };
 
 DECLARE_MODULE(madbus, fake_dev, SI_SUB_DRIVERS, SI_ORDER_MIDDLE);
+MODULE_DEPEND(madbus, linux, 1, 1, 1);
