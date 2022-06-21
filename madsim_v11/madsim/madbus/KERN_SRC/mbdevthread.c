@@ -639,7 +639,7 @@ void madsim_complete_simulated_io(void* vpmadbusobj, PMADREGS pmadregs)
     //PINFO("madsim_complete_simulated_io... IoCount=%ld RdIndx=%ld WrIndx=%ld\n",
     //      IoCount, pIsrState->ByteIndxRd, pIsrState->ByteIndxWr);
 
-    BUG_ON(!(virt_addr_valid(pHostData)));
+    // BUG_ON(!(virt_addr_valid(pHostData)));
 
 	switch (IoType)
 	    {
@@ -729,8 +729,8 @@ static void madsim_complete_xfer_one_dma_element(PMADBUSOBJ pmadbusobj,
     U8*        pHostData = (U8 *) phys_to_virt(pSgDmaElement->HostAddr);
     bool       bWrite = ((pSgDmaElement->DmaCntl & MAD_DMA_CNTL_H2D) != 0);
 
-    BUG_ON(!(virt_addr_valid(pHostData)));
-    BUG_ON(!(virt_addr_valid(pDeviceLoc)));
+    // BUG_ON(!(virt_addr_valid(pHostData)));
+    // BUG_ON(!(virt_addr_valid(pDeviceLoc)));
     BUG_ON(!((pSgDmaElement->DevLoclAddr % MAD_SECTOR_SIZE) == 0));
     ASSERT((int)(pSgDmaElement->DXBC != 0));
     ASSERT((int)((pSgDmaElement->DXBC % MAD_SECTOR_SIZE) == 0));

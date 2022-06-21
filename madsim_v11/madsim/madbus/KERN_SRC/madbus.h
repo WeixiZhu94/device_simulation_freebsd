@@ -131,7 +131,7 @@ typedef struct madbus_object MADBUSOBJ, *PMADBUSOBJ;
 extern int register_mad_device(struct madbus_object *);
 extern void unregister_mad_device(struct madbus_object *);
 extern int madbus_create_thread(PMADBUSOBJ pmadbusobj);
-extern int madbus_dev_thread(void* pvoid);
+extern void madbus_dev_thread(void* pvoid);
 //
 void madsim_complete_simulated_io(void* vpmadbusobj, PMADREGS pmadregs);
 #ifdef _SIM_DRIVER_
