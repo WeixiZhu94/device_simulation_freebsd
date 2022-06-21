@@ -73,15 +73,14 @@ typedef unsigned long long ULONG64;
 // typedef unsigned short u16;
 // #endif
 // //
-// typedef unsigned short U16;
-
-// typedef unsigned long U32;
+typedef unsigned short U16;
+typedef unsigned long U32;
+typedef ULONG64 U64;
 
 // #ifndef u64
 // typedef ULONG64 u64;
 // #endif
 // //
-// typedef ULONG64 U64;
 
 #ifndef PAGE_SIZE
 #define PAGE_SIZE 4096
