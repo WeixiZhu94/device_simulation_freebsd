@@ -48,14 +48,14 @@
 #include <linux/module.h>
 #include <linux/pci.h>
 #include <linux/kernel.h>
-#include <linux/init.h>
+// #include <linux/init.h>
 #include <linux/string.h>
 #include <linux/mm.h>
-#include <linux/highmem.h>
+// #include <linux/highmem.h>
 #include <linux/interrupt.h>
 //
 #include <asm/uaccess.h>	/* copy_*_user */
-#include <asm/page.h>	
+// #include <asm/page.h>	
 //
 #ifdef _SIM_DRIVER_
 #define DRIVER_NAME "madbus.ko"
