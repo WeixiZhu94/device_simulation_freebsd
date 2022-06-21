@@ -130,17 +130,18 @@ IoMesgId mesgid = eNOP;
         {
         mesgid =  mbdt_get_programmed_iotype(pmaddevice);
      	if (mesgid != eNOP) //We are ready to complete an i/o
-    	    {
+        {
             pmaddevice->MesgID = mesgid;
     	    mbdt_process_io(pmadbusobj);
 
             //Check for kthread_stop after some work - before releasing our quantum
     		// if (kthread_should_stop()) 
       //           {break;}
-    	    }
+                kproc_suspend_check(pmadbusobj->pThread);  
+        }
 
-        tsleep(&pmadbusobj->pThread, 0,
-            "dev thread", 1 * hz / 1000);
+        // tsleep(&pmadbusobj->pThread, 0,
+        //     "dev thread", 1 * hz / 1000);
 
         //Release our quantum 
     	// schedule(); 
@@ -148,6 +149,7 @@ IoMesgId mesgid = eNOP;
         //Check for kthread_stop after reactivating
        	// if (kthread_should_stop()) 
         //     {break;}
+        kproc_suspend_check(pmadbusobj->pThread);  
 
         //Let's confirm that we maintain processor affinity after releasing our quantum
        	// cur_cpu = get_cpu();

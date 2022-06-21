@@ -508,7 +508,7 @@ static void madbus_exit(void)
 	        if ((pmadbusobj->pThread != NULL) && 
                 (!(IS_ERR(pmadbusobj->pThread))))
 	    	    {
-	    		rc = kthread_stop(pmadbusobj->pThread);
+	    		rc = kproc_suspend(pmadbusobj->pThread, hz);
 	    		if (rc != 0)
                     {PWARN("kthread_stop returned: (%d), dev#=%d, pThread=%px\n",
                            rc, (int)i, pmadbusobj->pThread);}
