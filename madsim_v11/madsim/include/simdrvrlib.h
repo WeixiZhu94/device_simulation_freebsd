@@ -58,15 +58,13 @@ U32    pcisim_resource_start(const struct pci_dev *dev, int bar);
 U32    pcisim_resource_end(const struct pci_dev *dev, int bar);
 U32    pcisim_resource_len(const struct pci_dev *dev, int bar);
 U32    pcisim_resource_flags(const struct pci_dev *dev, int bar);
-
 int    sim_request_irq(unsigned int irq, 
                        /*irqreturn_t (*isrfunxn)()*/ void* isrfunxn,
                        U32 flags, const char* dev_name, void* dev_id);
 int    sim_free_irq(unsigned int irq, void* dev_id);
-
 PMAD_SIMULATOR_PARMS madbus_xchange_parms(int num);
-
 void   SimInitPciConfig(char* PciCnfgSpace);
+struct pci_dev* madbus_setup_pci_device(U32 indx, U16 pci_devid);
 
 
 // static void* Get_KVA(phys_addr_t PhysAddr, struct page** ppPgStr);

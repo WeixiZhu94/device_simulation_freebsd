@@ -131,12 +131,12 @@ static int madbus_hotplug(U32 indx, U16 pci_devid)
     PMADBUSOBJ pmbobj_hpl;
     struct pci_driver* pPciDrvr;
     struct pci_dev*    pPciDev = NULL;
-    int                rc = -EUNATCH; //No 'protocol' driver attached until we find one
+    int                rc = -1; //No 'protocol' driver attached until we find one
 
     PINFO("madbus_hotplug... dev#=%d pci_devid=x%X\n", (int)indx, pci_devid);
 
     if ((indx < 1) || (indx > madbus_nbr_slots))
-        {return -EBADSLT;} //Slot# out of bounds 
+        {return -1;} //Slot# out of bounds 
 
     pmbobj_hpl = &madbus_objects[indx];
     if (pmbobj_hpl->pci_devid != 0)

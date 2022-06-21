@@ -1,4 +1,3 @@
- SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  *	PCI standard defines
  *	Copyright 1994, Drew Eckhardt
