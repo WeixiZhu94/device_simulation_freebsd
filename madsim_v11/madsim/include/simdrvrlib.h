@@ -100,21 +100,21 @@ struct device_private
 //
 //Respond to udev events.
 //
-static int mad_uevent(struct device *dev, struct kobj_uevent_env *env)
-{
-	if (add_uevent_var(env, "MADBUS_VERSION=%s", Version))
-		return -ENOMEM;
+// static int mad_uevent(struct device *dev, struct kobj_uevent_env *env)
+// {
+// 	if (add_uevent_var(env, "MADBUS_VERSION=%s", Version))
+// 		return -ENOMEM;
 
-	return 0;
-}
+// 	return 0;
+// }
 
 /*
  * Match LDD devices to drivers.  Just do a simple name test.
  */
-static int mad_match(struct device *dev, struct device_driver *driver)
-{
-	return !strncmp(dev_name(dev), driver->name, strlen(driver->name));
-}
+// static int mad_match(struct device *dev, struct device_driver *driver)
+// {
+// 	return !strncmp(dev_name(dev), driver->name, strlen(driver->name));
+// }
 //The bus type definition.
 //
 // static struct bus_type madbus_type =

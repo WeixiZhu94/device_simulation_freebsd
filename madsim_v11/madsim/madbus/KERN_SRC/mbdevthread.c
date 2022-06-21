@@ -62,20 +62,22 @@ int rc = 0;
 
     ThreadName[TNDX] = DevNumStr[pmadbusobj->devnum];
  
-    pmadbusobj->pThread = 
-    kthread_create(madbus_dev_thread, (void *)pmadbusobj, "%s", ThreadName);
-    //
-    kthread_bind(pmadbusobj->pThread, pmadbusobj->devnum); //assigning cpu=dev#
+
+    int error = kproc_create(&madbus_dev_thread, (void *)pmadbusobj, &pmadbusobj->pThread, 0, 0, ThreadName);
+    if (error)
+        printf("kproc thread %s creation failed\n", ThreadName);
+
+    // kthread_bind(pmadbusobj->pThread, pmadbusobj->devnum); //assigning cpu=dev#
     
     //kthread_bind succeeds even when specifying a nox-existent cpu - go figure
-    if (!IS_ERR(pmadbusobj->pThread))
-        {wake_up_process(pmadbusobj->pThread);}
+    // if (!IS_ERR(pmadbusobj->pThread))
+    //     {wake_up_process(pmadbusobj->pThread);}
 
     PINFO("madbus_create_thread... dev#=%d pmadbusobj=%px pThread=%px\n",
     	  (int)pmadbusobj->devnum, pmadbusobj, pmadbusobj->pThread);
 
     //Release quantum for sequencing... so that threads initialize in start order
-    schedule(); 
+    // schedule(); 
 
     if ((pmadbusobj->pThread == NULL) || (IS_ERR(pmadbusobj->pThread)))
         {
@@ -96,8 +98,8 @@ int madbus_dev_thread(void* pvoid)
 PMADBUSOBJ pmadbusobj = (PMADBUSOBJ)pvoid;
 PMADREGS   pmaddevice = pmadbusobj->pmaddevice;
 //
-int bindcpu = get_cpu();
-int cur_cpu = -1;
+// int bindcpu = get_cpu();
+// int cur_cpu = -1;
 IoMesgId mesgid = eNOP;
 //int rc = 0;
 
@@ -109,14 +111,14 @@ IoMesgId mesgid = eNOP;
     //We want to run specifically on cpu# = dev# and leave cpu 0 alone
     //This test only works because kthread_bind(s) to proc_0 when we ask for cpu > (numcpus - 1)
     // (devnum == numcpus)
-    if (bindcpu != pmadbusobj->devnum)
-        {
-        pmadbusobj->pThread = NULL;
-        PERR("MBDT... bindcpu(%d) != devnum(%d); returning -EINVAL\n",
-    		 bindcpu, (int)pmadbusobj->devnum);
+    // if (bindcpu != pmadbusobj->devnum)
+    //     {
+    //     pmadbusobj->pThread = NULL;
+    //     PERR("MBDT... bindcpu(%d) != devnum(%d); returning -EINVAL\n",
+    // 		 bindcpu, (int)pmadbusobj->devnum);
 
-        return -EBADSLT; //Invalid bus slot - whatever
-        }
+    //     return -EBADSLT; //Invalid bus slot - whatever
+    //     }
 
     //Initialize the device (any non-zero values) before processing begins
     pmaddevice->Status |= MAD_STATUS_CACHE_INIT_MASK;
@@ -133,22 +135,25 @@ IoMesgId mesgid = eNOP;
     	    mbdt_process_io(pmadbusobj);
 
             //Check for kthread_stop after some work - before releasing our quantum
-    		if (kthread_should_stop()) 
-                {break;}
+    		// if (kthread_should_stop()) 
+      //           {break;}
     	    }
 
+        tsleep(&pmadbusobj->pThread, 0,
+            "dev thread", 1 * hz / 1000);
+
         //Release our quantum 
-    	schedule(); 
+    	// schedule(); 
 
         //Check for kthread_stop after reactivating
-       	if (kthread_should_stop()) 
-            {break;}
+       	// if (kthread_should_stop()) 
+        //     {break;}
 
         //Let's confirm that we maintain processor affinity after releasing our quantum
-       	cur_cpu = get_cpu();
-       	if (cur_cpu != bindcpu) //Should not happen after initial check above
-            {PWARN("MBDT... cur_cpu(%d) != bindcpu-devnum(%d)\n",
-                   cur_cpu, (int)pmadbusobj->devnum);}
+       	// cur_cpu = get_cpu();
+       	// if (cur_cpu != bindcpu) //Should not happen after initial check above
+        //     {PWARN("MBDT... cur_cpu(%d) != bindcpu-devnum(%d)\n",
+        //            cur_cpu, (int)pmadbusobj->devnum);}
         }
 
     PINFO("madbus_dev_thread exiting... pmadbusobj=%px dev#=%d\n",
@@ -280,7 +285,7 @@ static void mbdt_process_bufrd_io(PMADBUSOBJ pmadbusobj, bool bWrite)
 {
    	PMAD_SIMULATOR_PARMS pSimParms = &pmadbusobj->SimParms;
 	PMADREGS pmaddevice = pmadbusobj->pmaddevice;
-    U8       bMSI = pmadbusobj->pcidev.msi_cap;
+    // U8       bMSI = pmadbusobj->pcidev.msi_cap;
     U32      CountBits =
              ((pmaddevice->Control & MAD_CONTROL_IO_COUNT_MASK) >> MAD_CONTROL_IO_COUNT_SHIFT);
     U8       UnitSzB = ((pmaddevice->Control & MAD_CONTROL_IOSIZE_BYTES_BIT) != 0);      
@@ -295,8 +300,8 @@ static void mbdt_process_bufrd_io(PMADBUSOBJ pmadbusobj, bool bWrite)
           pmaddevice->ByteIndxRd, pmaddevice->ByteIndxWr);
 
     ASSERT((int)((pmaddevice->Control & MAD_CONTROL_CACHE_XFER_BIT) == 0));
-    if (bMSI)
-        {msidx = pmaddevice->MesgID - 1;}
+    // if (bMSI)
+    //     {msidx = pmaddevice->MesgID - 1;}
 
     //Acquire the target device driver's device spinlock before changing the device state
 	//spin_lock(pSimParms->pdevlock);
@@ -339,7 +344,7 @@ static void mbdt_process_cache_io(PMADBUSOBJ pmadbusobj, bool write)
 	U8*      pDevData   = ((u8*)pmaddevice + MAD_DEVICE_DATA_OFFSET);
 	U8*      pCacheData = (u8*)pmaddevice;
 	PMAD_SIMULATOR_PARMS pSimParms = &pmadbusobj->SimParms;
-    U8       bMSI = pmadbusobj->pcidev.msi_cap;
+    // U8       bMSI = pmadbusobj->pcidev.msi_cap;
     //
     irqreturn_t  isr_rc;
     U32      msidx = 0;
@@ -348,8 +353,8 @@ static void mbdt_process_cache_io(PMADBUSOBJ pmadbusobj, bool write)
 
     //We know that the block-io driver has six MSI-ISRs
     //MesgID 3..8 --> ISR[0..5] ... we just know
-    if (bMSI)
-        {msidx = pmaddevice->MesgID - 3;}
+    // if (bMSI)
+    //     {msidx = pmaddevice->MesgID - 3;}
 
     //Acquire the target device driver's device spinlock before changing
     //the device state
@@ -421,7 +426,7 @@ static void mbdt_process_align_cache(PMADBUSOBJ pmadbusobj, bool bWrite)
 	u32      OffsetBits = 
              (pmaddevice->Control & MAD_CONTROL_IO_OFFSET_MASK);
 	PMAD_SIMULATOR_PARMS pSimParms = &pmadbusobj->SimParms;
-    U8       bMSI = pmadbusobj->pcidev.msi_cap;
+    // U8       bMSI = pmadbusobj->pcidev.msi_cap;
 	//
     U32      msidx = 0;
 	u32          AlignVal;
@@ -429,8 +434,8 @@ static void mbdt_process_align_cache(PMADBUSOBJ pmadbusobj, bool bWrite)
 
     //We know that the block-io driver has six MSI-ISRs
     //MesgID 3..8 --> ISR[0..5] ... we just know
-    if (bMSI)
-        {msidx = pmaddevice->MesgID - 3;}
+    // if (bMSI)
+    //     {msidx = pmaddevice->MesgID - 3;}
 
 	if (bWrite)
         {pDevData += (pmaddevice->CacheIndxWr * MAD_CACHE_SIZE_BYTES);}

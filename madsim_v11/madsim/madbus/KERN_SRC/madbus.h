@@ -66,6 +66,8 @@
 #include "../../include/madkonsts.h"
 #include "../../include/madbusioctls.h"
 
+#include <sys/kthread.h>
+
 #define  MADBUSOBJNAME   "madbusobjX"
 #define  MBDEVNUMDX      9 //......^
 
@@ -117,7 +119,7 @@ struct madbus_object
 
 	struct     cdev cdev_str;
     char       dummy[sizeof(struct list_head)];
-	struct     task_struct *pThread;
+	struct     proc *pThread;
 	struct     mad_simulator_parms SimParms;
    	char       *name;
 };
