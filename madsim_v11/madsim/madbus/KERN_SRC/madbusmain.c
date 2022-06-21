@@ -629,7 +629,7 @@ static int madbus_malloc_device_memory(PMADBUSOBJ pmadbusobj)
         memset(((u8*)pmadbusobj->pmaddevice + MAD_DEVICE_MEM_SIZE_NODATA),
                0xFF, MAD_DEVICE_DATA_SIZE);
 
-        PINFO("madbus_setup_device... dev#=%d order=%d pPage=%px PA=x%lX kva=%px #pages=%d size=%ld\n",
+        PINFO("madbus_setup_device... dev#=%d order=%d pPage=%px PA=x%lX kva=%px #pages=%d size=%d\n",
               (int)pmadbusobj->devnum, MAD_XALLOC_PAGES_ORDER, pmadbusobj->pPage, 
               pmadbusobj->MadDevPA, pmadbusobj->pmaddevice,
               MAD_DEVICE_MAX_PAGES, (MAD_DEVICE_MAX_PAGES * PAGE_SIZE));
