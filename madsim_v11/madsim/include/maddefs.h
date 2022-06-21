@@ -525,9 +525,9 @@ enum probe_type {
 
 #define _DEVICE_H_
 
-struct device {
+struct linux_5_7_19_device {
     struct kobject kobj;
-    struct device       *parent;
+    struct linux_5_7_19_device       *parent;
 
     struct device_private   *p;
 
@@ -587,7 +587,7 @@ struct device {
     struct class        *class;
     const struct attribute_group **groups;  /* optional groups */
 
-    void    (*release)(struct device *dev);
+    void    (*release)(struct linux_5_7_19_device *dev);
     struct iommu_group  *iommu_group;
     struct dev_iommu    *iommu;
 
@@ -615,17 +615,17 @@ struct linux_5_7_19_device_driver {
     const struct of_device_id   *of_match_table;
     const struct acpi_device_id *acpi_match_table;
 
-    int (*probe) (struct device *dev);
-    void (*sync_state)(struct device *dev);
-    int (*remove) (struct device *dev);
-    void (*shutdown) (struct device *dev);
-    int (*suspend) (struct device *dev, pm_message_t state);
-    int (*resume) (struct device *dev);
+    int (*probe) (dev#=%ld*dev);
+    void (*sync_state)(struct linux_5_7_19_device *dev);
+    int (*remove) (struct linux_5_7_19_device *dev);
+    void (*shutdown) (struct linux_5_7_19_device *dev);
+    int (*suspend) (struct linux_5_7_19_device *dev, pm_message_t state);
+    int (*resume) (struct linux_5_7_19_device *dev);
     const struct attribute_group **groups;
     const struct attribute_group **dev_groups;
 
     const struct dev_pm_ops *pm;
-    void (*coredump) (struct device *dev);
+    void (*coredump) (struct linux_5_7_19_device *dev);
 
     struct driver_private *p;
 };
@@ -635,27 +635,27 @@ struct lock_class_key { };
 struct bus_type {
     const char      *name;
     const char      *dev_name;
-    struct device       *dev_root;
+    struct linux_5_7_19_device       *dev_root;
     const struct attribute_group **bus_groups;
     const struct attribute_group **dev_groups;
     const struct attribute_group **drv_groups;
 
-    int (*match)(struct device *dev, struct linux_5_7_19_device_driver *drv);
-    int (*uevent)(struct device *dev, struct kobj_uevent_env *env);
-    int (*probe)(struct device *dev);
-    void (*sync_state)(struct device *dev);
-    int (*remove)(struct device *dev);
-    void (*shutdown)(struct device *dev);
+    int (*match)(struct linux_5_7_19_device *dev, struct linux_5_7_19_device_driver *drv);
+    int (*uevent)(struct linux_5_7_19_device *dev, struct kobj_uevent_env *env);
+    int (*probe)(struct linux_5_7_19_device *dev);
+    void (*sync_state)(struct linux_5_7_19_device *dev);
+    int (*remove)(struct linux_5_7_19_device *dev);
+    void (*shutdown)(struct linux_5_7_19_device *dev);
 
-    int (*online)(struct device *dev);
-    int (*offline)(struct device *dev);
+    int (*online)(struct linux_5_7_19_device *dev);
+    int (*offline)(struct linux_5_7_19_device *dev);
 
-    int (*suspend)(struct device *dev, pm_message_t state);
-    int (*resume)(struct device *dev);
+    int (*suspend)(struct linux_5_7_19_device *dev, pm_message_t state);
+    int (*resume)(struct linux_5_7_19_device *dev);
 
-    int (*num_vf)(struct device *dev);
+    int (*num_vf)(struct linux_5_7_19_device *dev);
 
-    int (*dma_configure)(struct device *dev);
+    int (*dma_configure)(struct linux_5_7_19_device *dev);
 
     const struct dev_pm_ops *pm;
 
