@@ -44,6 +44,7 @@
 #define _SIM_DRIVER_
 //
 #include "madbus.h"
+#include <sys/module.h>
 
 //Our parameters which can be set at load time.
 //
@@ -783,5 +784,40 @@ InitExit:;
  	return ret;
 }
 //
-module_init(madbus_init);
-module_exit(madbus_exit);
+// module_init(madbus_init);
+// module_exit(madbus_exit);
+
+
+
+static int fake_device_event_handler(struct module *module,
+    int event_type, void *arg) 
+{
+    int retval = 0;
+
+    switch (event_type) {
+
+        case MOD_LOAD:
+            uprintf("simulated bus dev started\n");
+            madbus_init();
+            break;
+
+        case MOD_UNLOAD:
+            uprintf("simulated bus dev terminated\n");
+            madbus_exit();
+            break;
+
+        default:
+            retval = EOPNOTSUPP;
+            break;
+    }
+
+    return retval;
+}
+
+static moduledata_t fake_dev = {
+    "simulate_dev",
+    fake_device_event_handler,
+    NULL
+};
+
+DECLARE_MODULE(madbus, fake_dev, SI_SUB_DRIVERS, SI_ORDER_MIDDLE);
