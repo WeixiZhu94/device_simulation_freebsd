@@ -44,6 +44,25 @@ int    pcisim_disable_device(struct pci_dev* pcidev);
 int    pcisim_enable_msi_block(struct pci_dev* pcidev, int num);
 void   pcisim_disable_msi(struct pci_dev* pPciDev);
 
+
+struct pci_dev*
+pcisim_get_device(unsigned int vendor, unsigned int device, struct pci_dev *from);
+int    pcisim_read_config_byte(const struct pci_dev *dev, int where, U8 *val);
+int    pcisim_read_config_word(const struct pci_dev *dev, int where, U16 *val);
+int    pcisim_read_config_dword(const struct pci_dev *dev, int where, U32 *val);
+int    pcisim_request_region(const struct pci_dev *dev, int bar, char* resname);
+void   pcisim_release_region(const struct pci_dev *dev, int bar);
+U32    pcisim_resource_start(const struct pci_dev *dev, int bar);
+U32    pcisim_resource_end(const struct pci_dev *dev, int bar);
+U32    pcisim_resource_len(const struct pci_dev *dev, int bar);
+U32    pcisim_resource_flags(const struct pci_dev *dev, int bar);
+
+int    sim_request_irq(unsigned int irq, 
+                       /*irqreturn_t (*isrfunxn)()*/ void* isrfunxn,
+                       U32 flags, const char* dev_name, void* dev_id);
+int    sim_free_irq(unsigned int irq, void* dev_id);
+
+
 // static void* Get_KVA(phys_addr_t PhysAddr, struct page** ppPgStr);
 // static void   SimInitPciCnfgSpace(char* PciCnfgSpace);
 // static int    madbus_set_pci_config(PMADBUSOBJ pmadbusobj);
