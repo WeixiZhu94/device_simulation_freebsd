@@ -85,12 +85,12 @@ static int mad_match(struct device *dev, struct device_driver *driver)
 }
 //The bus type definition.
 //
-static struct bus_type madbus_type =
-{
-	.name = "madbus",
-	.match = mad_match,
-	.uevent = mad_uevent,
-};
+// static struct bus_type madbus_type =
+// {
+// 	.name = "madbus",
+// 	.match = mad_match,
+// 	.uevent = mad_uevent,
+// };
 //
 // static struct attribute madbus_attr =
 // {
@@ -109,7 +109,7 @@ static struct bus_attribute madbus_attr_ver =
 static struct device_driver madbus_drvr =
 {
     .name  = "madbus",
-    .bus   = &madbus_type,
+    // .bus   = &madbus_type,
     .owner = THIS_MODULE,
 };
 
@@ -160,7 +160,7 @@ int pcisim_register_driver(struct pci_driver *pcidrvr)
 	//
     ASSERT((int)(pcidrvr != NULL));
 
-	pcidrvr->driver.bus = &madbus_type;
+	// pcidrvr->driver.bus = &madbus_type;
 	rc = driver_register(&pcidrvr->driver);
 	if (rc)
 	    {
@@ -240,7 +240,7 @@ int sim_register_device(struct device* pDevice)
 {
     PINFO("sim_register_device... pDevice=%px\n", pDevice);
 
-    pDevice->bus     = &madbus_type;
+    // pDevice->bus     = &madbus_type;
     pDevice->parent  = &madbus_dev;
     pDevice->release = madbus_release;
     pDevice->p       = &maddev_priv_data;
