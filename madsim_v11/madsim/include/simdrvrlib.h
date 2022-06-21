@@ -35,6 +35,15 @@
 
 struct pci_dev* madbus_setup_pci_device(U32 indx, U16 pci_devid);
 
+int    pcisim_register_driver(struct pci_driver *pcidrvr);
+void   pcisim_unregister_driver(struct pci_driver *pcidrvr);
+int    sim_register_device(struct device* pDevice);
+void   sim_unregister_device(struct device* pDevice);
+int    pcisim_enable_device(struct pci_dev* pcidev);
+int    pcisim_disable_device(struct pci_dev* pcidev);
+int    pcisim_enable_msi_block(struct pci_dev* pcidev, int num);
+void   pcisim_disable_msi(struct pci_dev* pPciDev);
+
 // static void* Get_KVA(phys_addr_t PhysAddr, struct page** ppPgStr);
 // static void   SimInitPciCnfgSpace(char* PciCnfgSpace);
 // static int    madbus_set_pci_config(PMADBUSOBJ pmadbusobj);
@@ -151,7 +160,6 @@ static struct pci_driver* PciDrvrs[MADBUS_NUMBER_SLOTS] = {NULL, NULL, NULL};
 static U8     bDrvSysfs[MADBUS_NUMBER_SLOTS] = {0, 0, 0};
 static U32    NumDrvrs = 0;
 
-int pcisim_register_driver(struct pci_driver *pcidrvr);
 //This function implements a simulation of the equivalent pci function
 //We save this pci-driver struct in a set to work w/ multiple client device drivrs
 //
@@ -207,7 +215,7 @@ void pcisim_unregister_driver(struct pci_driver *pcidrvr)
             //if (bDrvSysfs[j] != 0)
             //    {driver_remove_file(&pcidrvr->driver, &DrvrAttr);}
 
-	        driver_unregister(&pcidrvr->driver);
+	        // driver_unregister(&pcidrvr->driver);
             PciDrvrs[j] = PciDrvrs[NumDrvrs-1];
             bDrvSysfs[j] = bDrvSysfs[NumDrvrs-1];
             PciDrvrs[NumDrvrs-1] = NULL;
@@ -244,7 +252,7 @@ int sim_register_device(struct device* pDevice)
     // pDevice->bus     = &madbus_type;
     pDevice->parent  = &madbus_dev;
     pDevice->release = madbus_release;
-    pDevice->p       = &maddev_priv_data;
+    // pDevice->p       = &maddev_priv_data;
     //
     //return device_register(pDevice);
     //device_initialize(pDevice);
@@ -263,7 +271,7 @@ static void sim_device_unregister(struct device* pDevice)
 void sim_unregister_device(struct device* pDevice)
 {
     PINFO("sim_unregister_device... pDevice=%px\n", pDevice);
-    pDevice->bus = NULL;
+    // pDevice->bus = NULL;
     //device_unregister(pDevice);
     sim_device_unregister(pDevice);
 }
@@ -298,7 +306,7 @@ pcisim_get_device(unsigned int vendor, unsigned int pci_devid, struct pci_dev *s
             }
 
         if (indx >= madbus_nbr_slots) //There are no more free bus slots 
-            {return ERR_PTR(-EBADSLT);}
+            {return ERR_PTR(-1);}
         }
 
     //We are returning a pcidev - let's set it up 1st
