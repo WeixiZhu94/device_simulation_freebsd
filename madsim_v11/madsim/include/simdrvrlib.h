@@ -151,6 +151,7 @@ static struct pci_driver* PciDrvrs[MADBUS_NUMBER_SLOTS] = {NULL, NULL, NULL};
 static U8     bDrvSysfs[MADBUS_NUMBER_SLOTS] = {0, 0, 0};
 static U32    NumDrvrs = 0;
 
+int pcisim_register_driver(struct pci_driver *pcidrvr);
 //This function implements a simulation of the equivalent pci function
 //We save this pci-driver struct in a set to work w/ multiple client device drivrs
 //
@@ -161,12 +162,12 @@ int pcisim_register_driver(struct pci_driver *pcidrvr)
     ASSERT((int)(pcidrvr != NULL));
 
 	// pcidrvr->driver.bus = &madbus_type;
-	rc = driver_register(&pcidrvr->driver);
-	if (rc)
-	    {
-	    PERR("pcisim_register_driver:driver_register returned (%d)\n", rc);
-	    return rc;
-	    }
+	// rc = driver_register(&pcidrvr->driver);
+	// if (rc)
+	//     {
+	//     PERR("pcisim_register_driver:driver_register returned (%d)\n", rc);
+	//     return rc;
+	//     }
 
     PciDrvrs[NumDrvrs] = pcidrvr;
 

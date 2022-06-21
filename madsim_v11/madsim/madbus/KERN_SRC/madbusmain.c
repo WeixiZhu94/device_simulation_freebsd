@@ -725,12 +725,12 @@ static int madbus_init(void)
 	// 	{PERR("Unable to create bus attribute(s): rc=%d continuing...\n", ret);}
 
     //Register this driver as the base of the device tree
-	ret = driver_register(&madbus_drvr);
-    if (ret != 0)
-        {
-        PERR("Unable to register the madbus driver; rc=%d\n", ret);
-        return ret;
-        }
+	// ret = driver_register(&madbus_drvr);
+ //    if (ret != 0)
+ //        {
+ //        PERR("Unable to register the madbus driver; rc=%d\n", ret);
+ //        return ret;
+ //        }
 
     //Register our one-per-bus device - defined statically
     ret = device_register(&madbus_dev);

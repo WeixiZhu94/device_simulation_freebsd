@@ -67,12 +67,12 @@ typedef unsigned long long ULONG64;
 // typedef unsigned char u8;
 // #endif
 // //
-// typedef unsigned char U8;
 
 // #ifndef u16
 // typedef unsigned short u16;
 // #endif
 // //
+typedef unsigned char U8;
 typedef unsigned short U16;
 typedef unsigned long U32;
 typedef ULONG64 U64;
