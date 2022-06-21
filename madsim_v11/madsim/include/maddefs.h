@@ -472,4 +472,10 @@ typedef struct _MADREGS
 #define MADMASK_BIT14            0x4000
 #define MADMASK_BIT15            0x8000
 //
+
+struct klist_node {
+    void            *n_klist;   /* never access directly */
+    struct list_head    n_node;
+    struct kref     n_ref;
+};
 #endif //_MADDEFS_
