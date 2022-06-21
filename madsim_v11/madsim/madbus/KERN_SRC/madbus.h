@@ -136,6 +136,8 @@ void madsim_complete_simulated_io(void* vpmadbusobj, PMADREGS pmadregs);
 #include "../../include/simdrvrlib.h"
 #endif
 
+#define page_to_virt(x)     PHYS_TO_DMAP(VM_PAGE_TO_PHYS(x))
+#define virt_to_phys(x)     DMAP_TO_VM_PAGE(VM_PAGE_TO_PHYS(x))
 //
 
 

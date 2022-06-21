@@ -227,17 +227,17 @@ static long madbus_dev_ioctl(struct file *fp, unsigned int cmd, unsigned long ar
 	// Extract the type and number bitfields, and don't decode
 	// wrong cmds: return ENOTTY (inappropriate ioctl) before access_ok()
 	//
-	if ((_IOC_TYPE(cmd) != MADBUS_IOC_MAGIC) || (_IOC_NR(cmd) > MADBUS_IOC_MAX_NBR))
-	    {
-		PWARN("madbusobj_ioctl: returning -EACCES\n");
-		return -EACCES;
-	    }
+	// if ((_IOC_TYPE(cmd) != MADBUS_IOC_MAGIC) || (_IOC_NR(cmd) > MADBUS_IOC_MAX_NBR))
+	//     {
+	// 	PWARN("madbusobj_ioctl: returning -EACCES\n");
+	// 	return -EACCES;
+	//     }
 
 	//The direction is a bitmask, and VERIFY_WRITE catches R/W transfers.
     // `Type' is user-oriented, while access_ok is kernel-oriented,
     //  so the concept of "read" and "write" is reversed
 	//
-	err = !access_ok(/*VERIFY_WRITE,*/ (void __user *)arg, _IOC_SIZE(cmd));
+	err = !linux_access_ok(/*VERIFY_WRITE,*/ (void __user *)arg, _IOC_SIZE(cmd));
 	if (err)
 	    {
 		PWARN("madbusobj_ioctl: returning -EFAULT\n");
@@ -392,7 +392,7 @@ static int madbus_dev_mmap(struct file *fp, struct vm_area_struct* vma)
     //
 	int rc = 0;
 
-	PINFO("madbus_dev_mmap... dev#=%d fp=%px pfn=x%llX PA=x%llX MapSize=%d prot=x%lX\n",
+	PINFO("madbus_dev_mmap... dev#=%d fp=%px pfn=x%lX PA=x%lX MapSize=%d prot=x%lX\n",
           (int)mbobj->devnum, fp, pfn, mbobj->MadDevPA, 
           (int)MapSize, vma->vm_page_prot);
 
