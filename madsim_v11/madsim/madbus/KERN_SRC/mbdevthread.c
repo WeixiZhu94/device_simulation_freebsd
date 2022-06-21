@@ -51,19 +51,19 @@ static void mbdt_process_io(PMADBUSOBJ pmadbusobj);
 //
 int madbus_create_thread(PMADBUSOBJ pmadbusobj)
 {
-//static ULONG Flags = (CLONE_FS | CLONE_FILES | CLONE_SIGHAND | SIGCHLD);
-static char ThreadName[] = "mbdthreadX";
-static ULONG TNDX = 9;    //.........^
-static char DevNumStr[] = DEVNUMSTR;
-//
-int rc = 0;
+    //static ULONG Flags = (CLONE_FS | CLONE_FILES | CLONE_SIGHAND | SIGCHLD);
+    static char ThreadName[] = "mbdthreadX";
+    static ULONG TNDX = 9;    //.........^
+    static char DevNumStr[] = DEVNUMSTR;
+    //
+    int rc = 0;
 
     ASSERT((int)(pmadbusobj != NULL));
 
     ThreadName[TNDX] = DevNumStr[pmadbusobj->devnum];
  
 
-    int error = kproc_create(&madbus_dev_thread, (void *)pmadbusobj, &pmadbusobj->pThread, 0, 0, ThreadName);
+    int error = kproc_create(&madbus_dev_thread, (void *)pmadbusobj, &pmadbusobj->pThread, 0, 0, "%s", ThreadName);
     if (error)
         printf("kproc thread %s creation failed\n", ThreadName);
 
@@ -93,20 +93,20 @@ int rc = 0;
 //This thread will look for a change in the state of the 'hardware'
 //and do whatever processing is called for to complete a device i/o until shutdown
 //
-int madbus_dev_thread(void* pvoid)
+void madbus_dev_thread(void* pvoid)
 {
-PMADBUSOBJ pmadbusobj = (PMADBUSOBJ)pvoid;
-PMADREGS   pmaddevice = pmadbusobj->pmaddevice;
-//
-// int bindcpu = get_cpu();
-// int cur_cpu = -1;
-IoMesgId mesgid = eNOP;
-//int rc = 0;
+    PMADBUSOBJ pmadbusobj = (PMADBUSOBJ)pvoid;
+    PMADREGS   pmaddevice = pmadbusobj->pmaddevice;
+    //
+    // int bindcpu = get_cpu();
+    // int cur_cpu = -1;
+    IoMesgId mesgid = eNOP;
+    //int rc = 0;
 
     ASSERT((int)(pmaddevice != NULL));
      
-    PINFO("madbus_dev_thread... dev#=%d cpu=%d pmadbusobj=%px pmaddevice=%px\n",
-    	  (int)pmadbusobj->devnum, bindcpu, pmadbusobj, pmaddevice);
+    PINFO("madbus_dev_thread... dev#=%d cpu=? pmadbusobj=%px pmaddevice=%px\n",
+    	  (int)pmadbusobj->devnum, pmadbusobj, pmaddevice);
  
     //We want to run specifically on cpu# = dev# and leave cpu 0 alone
     //This test only works because kthread_bind(s) to proc_0 when we ask for cpu > (numcpus - 1)
@@ -164,7 +164,7 @@ IoMesgId mesgid = eNOP;
     //Falling through and returning 0 is sufficient
     //exit_kthread(pmadbusobj->pThread);
 
-    return 0;
+    return;
 }
 
 //Detemine what Io has been programmed and  needs to be completed in this device thread
@@ -497,8 +497,8 @@ static void mbdt_process_dma_io(PMADBUSOBJ pmadbusobj, bool bWrite)
     //We know that the block-io driver has six MSI-ISRs
     //MesgID 3..8 --> ISR[0..5] ... we just know
     //
-    if (pmadbusobj->pcidev.msi_cap != 0)
-        {msidx = pmaddevice->MesgID - 3;}
+    // if (pmadbusobj->pcidev.msi_cap != 0)
+    //     {msidx = pmaddevice->MesgID - 3;}
  
     //Acquire the target device driver's device spinlock before changing
     //the device state
@@ -617,7 +617,7 @@ void madsim_complete_simulated_io(void* vpmadbusobj, PMADREGS pmadregs)
     u8*        pDevData  = 
                ((u8*)pmadbusobj->pmaddevice + MAD_DEVICE_DATA_OFFSET);
     U8*        pDeviceLoc = (pDevData + pmadregs->DevLoclAddr);
-    U8*        pHostData = phys_to_virt(pmadregs->HostPA);
+    U8*        pHostData = (U8*) phys_to_virt(pmadregs->HostPA);
     U32        CountBits =
                ((pmadregs->Control & MAD_CONTROL_IO_COUNT_MASK) >> MAD_CONTROL_IO_COUNT_SHIFT);
     U8         UnitSzB = ((pmadregs->Control & MAD_CONTROL_IOSIZE_BYTES_BIT) != 0);      
@@ -708,7 +708,7 @@ static void madsim_complete_simulated_sgdma(PMADBUSOBJ pmadbusobj, PMADREGS pmad
     while ((pSgDmaElement->CDPP & MAD_DMA_CDPP_END) == 0)
         {
         num_elems++;
-        pSgDmaElement = phys_to_virt(pSgDmaElement->CDPP);
+        pSgDmaElement = (PMAD_DMA_CHAIN_ELEMENT) phys_to_virt(pSgDmaElement->CDPP);
         madsim_complete_xfer_one_dma_element(pmadbusobj, pSgDmaElement);
         IoCount += pSgDmaElement->DXBC;
         }
@@ -726,7 +726,7 @@ static void madsim_complete_xfer_one_dma_element(PMADBUSOBJ pmadbusobj,
     u8*        pDevData  = 
                ((u8*)pmadbusobj->pmaddevice + MAD_DEVICE_DATA_OFFSET);
     U8*        pDeviceLoc = (pDevData + pSgDmaElement->DevLoclAddr);
-    U8*        pHostData = phys_to_virt(pSgDmaElement->HostAddr);
+    U8*        pHostData = (U8 *) phys_to_virt(pSgDmaElement->HostAddr);
     bool       bWrite = ((pSgDmaElement->DmaCntl & MAD_DMA_CNTL_H2D) != 0);
 
     BUG_ON(!(virt_addr_valid(pHostData)));
