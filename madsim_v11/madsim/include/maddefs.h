@@ -51,7 +51,7 @@
 #define  MAD_PCI_BLOCK_MSI_DEVICE_ID (MAD_PCI_BASE_DEVICE_ID+3)
 #define  MAD_PCI_MAX_DEVICE_ID       MAD_PCI_BLOCK_MSI_DEVICE_ID
 
-#define  MAD_PCI_CFG_SPACE_SIZE  (PCI_CFG_SPACE_EXP_SIZE / 2) // 2K
+#define  MAD_PCI_CFG_SPACE_SIZE  (4096 / 2) // 2K
 #define  MAD_PCI_VENDOR_OFFSET   (MAD_PCI_CFG_SPACE_SIZE / 2) // 1K
 
 #define  MADBUS_NUMBER_SLOTS     3
@@ -63,25 +63,25 @@
 typedef unsigned long      ULONG;
 typedef unsigned long long ULONG64;
 
-#ifndef u8
-typedef unsigned char u8;
-#endif
-//
-typedef unsigned char U8;
+// #ifndef u8
+// typedef unsigned char u8;
+// #endif
+// //
+// typedef unsigned char U8;
 
-#ifndef u16
-typedef unsigned short u16;
-#endif
-//
-typedef unsigned short U16;
+// #ifndef u16
+// typedef unsigned short u16;
+// #endif
+// //
+// typedef unsigned short U16;
 
-typedef unsigned long U32;
+// typedef unsigned long U32;
 
-#ifndef u64
-typedef ULONG64 u64;
-#endif
-//
-typedef ULONG64 U64;
+// #ifndef u64
+// typedef ULONG64 u64;
+// #endif
+// //
+// typedef ULONG64 U64;
 
 #ifndef PAGE_SIZE
 #define PAGE_SIZE 4096
