@@ -819,17 +819,17 @@ static inline void madbus_init_pcidev(PMADBUSOBJ pmadbusobj)
     pPciCnfgParm = &(pmadbusobj->PciConfig[PCI_SUBSYSTEM_ID]);
     pPciDev->subsystem_device = *(U16*)pPciCnfgParm;
 
-    pPciDev->cfg_size = MAD_PCI_CFG_SPACE_SIZE;
+    // pPciDev->cfg_size = MAD_PCI_CFG_SPACE_SIZE;
 
     pPciCnfgParm = &(pmadbusobj->PciConfig[PCI_INTERRUPT_LINE]);
     pPciDev->irq = (int)*pPciCnfgParm;
 
-    pPciDev->msi_cap = pmadbusobj->PciConfig[PCI_CAPABILITY_LIST + PCI_CAP_ID_MSI];
+    // pPciDev->msi_cap = pmadbusobj->PciConfig[PCI_CAPABILITY_LIST + PCI_CAP_ID_MSI];
 
     //We don't populate the pci slot struct - just use the pntr as a slot#
-    pPciDev->slot = (struct pci_slot *)pmadbusobj->devnum;
+    // pPciDev->slot = (struct pci_slot *)pmadbusobj->devnum;
 
-    pPciDev->driver = NULL;//Should be assigned by the claiming device driver 
+    // pPciDev->driver = NULL;//Should be assigned by the claiming device driver 
 
     return;
 }

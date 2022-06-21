@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+ SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  *	PCI standard defines
  *	Copyright 1994, Drew Eckhardt
@@ -37,9 +37,9 @@
  */
 #define PCI_STD_HEADER_SIZEOF   64
 #define PCI_STD_NUM_BARS    6   /* Number of standard BARs */
-#define PCI_VENDOR_ID       0x00    /* 16 bits */
+// #define PCI_VENDOR_ID       0x00    /* 16 bits */
 #define PCI_DEVICE_ID       0x02    /* 16 bits */
-#define PCI_COMMAND     0x04    /* 16 bits */
+// #define PCI_COMMAND     0x04    /* 16 bits */
 #define  PCI_COMMAND_IO     0x1 /* Enable response in I/O space */
 #define  PCI_COMMAND_MEMORY 0x2 /* Enable response in Memory space */
 #define  PCI_COMMAND_MASTER 0x4 /* Enable bus mastering */
@@ -103,13 +103,13 @@
 /* Capability lists */
 
 #define PCI_CAP_LIST_ID     0   /* Capability ID */
-#define  PCI_CAP_ID_PM      0x01    /* Power Management */
-#define  PCI_CAP_ID_AGP     0x02    /* Accelerated Graphics Port */
+// #define  PCI_CAP_ID_PM      0x01    /* Power Management */
+// #define  PCI_CAP_ID_AGP     0x02    /* Accelerated Graphics Port */
 #define  PCI_CAP_ID_VPD     0x03    /* Vital Product Data */
 #define  PCI_CAP_ID_SLOTID  0x04    /* Slot Identification */
 #define  PCI_CAP_ID_MSI     0x05    /* Message Signalled Interrupts */
 #define  PCI_CAP_ID_CHSWP   0x06    /* CompactPCI HotSwap */
-#define  PCI_CAP_ID_PCIX    0x07    /* PCI-X */
+// #define  PCI_CAP_ID_PCIX    0x07    /* PCI-X */
 #define  PCI_CAP_ID_HT      0x08    /* HyperTransport */
 #define  PCI_CAP_ID_VNDR    0x09    /* Vendor-Specific */
 #define  PCI_CAP_ID_DBG     0x0A    /* Debug port */
@@ -118,7 +118,7 @@
 #define  PCI_CAP_ID_SSVID   0x0D    /* Bridge subsystem vendor/device ID */
 #define  PCI_CAP_ID_AGP3    0x0E    /* AGP Target PCI-PCI bridge */
 #define  PCI_CAP_ID_SECDEV  0x0F    /* Secure Device */
-#define  PCI_CAP_ID_EXP     0x10    /* PCI Express */
+// #define  PCI_CAP_ID_EXP     0x10    /* PCI Express */
 #define  PCI_CAP_ID_MSIX    0x11    /* MSI-X */
 #define  PCI_CAP_ID_SATA    0x12    /* SATA Data/Index Conf. */
 #define  PCI_CAP_ID_AF      0x13    /* PCI Advanced Features */
@@ -129,4 +129,4 @@
 #define PCI_CAP_SIZEOF      4
 
 
-#endif /* LINUX_PCI_REGS_H */
+#endif /* LINUX_PCI_REGS_H 
