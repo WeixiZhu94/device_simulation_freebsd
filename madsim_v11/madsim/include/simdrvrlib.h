@@ -59,8 +59,8 @@ struct device_private
 	struct klist_node knode_bus;
 	struct klist_node knode_class;
 	struct list_head deferred_probe;
-	struct linux_5_7_19_device_driver *async_driver;
-	struct linux_5_7_19_device *device;
+	struct device_driver *async_driver;
+	struct device *device;
 	u8 dead:1;
 };
 
@@ -68,7 +68,7 @@ struct device_private
 //
 //Respond to udev events.
 //
-static int mad_uevent(struct linux_5_7_19_device *dev, struct kobj_uevent_env *env)
+static int mad_uevent(struct device *dev, struct kobj_uevent_env *env)
 {
 	if (add_uevent_var(env, "MADBUS_VERSION=%s", Version))
 		return -ENOMEM;
@@ -79,7 +79,7 @@ static int mad_uevent(struct linux_5_7_19_device *dev, struct kobj_uevent_env *e
 /*
  * Match LDD devices to drivers.  Just do a simple name test.
  */
-static int mad_match(struct linux_5_7_19_device *dev, struct linux_5_7_19_device_driver *driver)
+static int mad_match(struct device *dev, struct device_driver *driver)
 {
 	return !strncmp(dev_name(dev), driver->name, strlen(driver->name));
 }
@@ -106,7 +106,7 @@ static struct bus_attribute madbus_attr_ver =
 };
 
 //The driver definition
-static struct linux_5_7_19_device_driver madbus_drvr =
+static struct device_driver madbus_drvr =
 {
     .name  = "madbus",
     .bus   = &madbus_type,
@@ -115,13 +115,13 @@ static struct linux_5_7_19_device_driver madbus_drvr =
 
 //The bus device definition 
 //
-static void madbus_release(struct linux_5_7_19_device *pdev)
+static void madbus_release(struct device *pdev)
 {
 	printk(KERN_DEBUG "madbus_release pdev=%px\n", pdev);
     ASSERT((int)(pdev != NULL));
 }
 //	
-struct linux_5_7_19_device madbus_dev =
+struct device madbus_dev =
 {
     .parent    = NULL,
 	.init_name = madbus_id, 

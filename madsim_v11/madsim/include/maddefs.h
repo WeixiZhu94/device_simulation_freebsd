@@ -517,160 +517,160 @@ static inline int add_uevent_var(struct kobj_uevent_env *env, const char *format
     return 0;
 }
 
-enum probe_type {
-    PROBE_DEFAULT_STRATEGY,
-    PROBE_PREFER_ASYNCHRONOUS,
-    PROBE_FORCE_SYNCHRONOUS,
-};
+// enum probe_type {
+//     PROBE_DEFAULT_STRATEGY,
+//     PROBE_PREFER_ASYNCHRONOUS,
+//     PROBE_FORCE_SYNCHRONOUS,
+// };
 
-#define _DEVICE_H_
+// #define _DEVICE_H_
 
-struct linux_5_7_19_device {
-    struct kobject kobj;
-    struct linux_5_7_19_device       *parent;
+// struct linux_5_7_19_device {
+//     struct kobject kobj;
+//     struct linux_5_7_19_device       *parent;
 
-    struct device_private   *p;
+//     struct device_private   *p;
 
-    const char      *init_name; /* initial name of the device */
-    const struct device_type *type;
+//     const char      *init_name; /* initial name of the device */
+//     const struct device_type *type;
 
-    struct bus_type *bus;       /* type of bus device is on */
-    struct device_driver *driver;   /* which driver has allocated this
-                       device */
-    void        *platform_data; /* Platform specific data, device
-                       core doesn't touch it */
-    void        *driver_data;   /* Driver data, set and get with
-                       dev_set_drvdata/dev_get_drvdata */
-    struct mutex        mutex;  /* mutex to synchronize calls to
-                     * its driver.
-                     */
+//     struct bus_type *bus;       /* type of bus device is on */
+//     struct device_driver *driver;   /* which driver has allocated this
+//                        device */
+//     void        *platform_data; /* Platform specific data, device
+//                        core doesn't touch it */
+//     void        *driver_data;   /* Driver data, set and get with
+//                        dev_set_drvdata/dev_get_drvdata */
+//     struct mutex        mutex;  /* mutex to synchronize calls to
+//                      * its driver.
+//                      */
 
-    struct dev_links_info   links;
-    struct dev_pm_info  power;
-    struct dev_pm_domain    *pm_domain;
+//     struct dev_links_info   links;
+//     struct dev_pm_info  power;
+//     struct dev_pm_domain    *pm_domain;
 
-    struct irq_domain   *msi_domain;
-    struct dev_pin_info *pins;
-    struct list_head    msi_list;
+//     struct irq_domain   *msi_domain;
+//     struct dev_pin_info *pins;
+//     struct list_head    msi_list;
 
-    const struct dma_map_ops *dma_ops;
-    u64     *dma_mask;  /* dma mask (if dma'able device) */
-    u64     coherent_dma_mask;/* Like dma_mask, but for
-                         alloc_coherent mappings as
-                         not all hardware supports
-                         64 bit addresses for consistent
-                         allocations such descriptors. */
-    u64     bus_dma_limit;  /* upstream dma constraint */
-    unsigned long   dma_pfn_offset;
+//     const struct dma_map_ops *dma_ops;
+//     u64     *dma_mask;  /* dma mask (if dma'able device) */
+//     u64     coherent_dma_mask;/* Like dma_mask, but for
+//                          alloc_coherent mappings as
+//                          not all hardware supports
+//                          64 bit addresses for consistent
+//                          allocations such descriptors. */
+//     u64     bus_dma_limit;  /* upstream dma constraint */
+//     unsigned long   dma_pfn_offset;
 
-    struct device_dma_parameters *dma_parms;
+//     struct device_dma_parameters *dma_parms;
 
-    struct list_head    dma_pools;  /* dma pools (if dma'ble) */
+//     struct list_head    dma_pools;  /* dma pools (if dma'ble) */
 
-    struct dma_coherent_mem *dma_mem; /* internal for coherent mem
-                         override */
-    struct cma *cma_area;       /* contiguous memory area for dma
-                       allocations */
-    /* arch specific additions */
-    struct dev_archdata archdata;
+//     struct dma_coherent_mem *dma_mem; /* internal for coherent mem
+//                          override */
+//     struct cma *cma_area;       /* contiguous memory area for dma
+//                        allocations */
+//     /* arch specific additions */
+//     struct dev_archdata archdata;
 
-    struct device_node  *of_node; /* associated device tree node */
-    struct fwnode_handle    *fwnode; /* firmware device node */
+//     struct device_node  *of_node; /* associated device tree node */
+//     struct fwnode_handle    *fwnode; /* firmware device node */
 
-    int     numa_node;  /* NUMA node this device is close to */
-    dev_t           devt;   /* dev_t, creates the sysfs "dev" */
-    u32         id; /* device instance */
+//     int     numa_node;  /* NUMA node this device is close to */
+//     dev_t           devt;   /* dev_t, creates the sysfs "dev" */
+//     u32         id; /* device instance */
 
-    spinlock_t      devres_lock;
-    struct list_head    devres_head;
+//     spinlock_t      devres_lock;
+//     struct list_head    devres_head;
 
-    struct class        *class;
-    const struct attribute_group **groups;  /* optional groups */
+//     struct class        *class;
+//     const struct attribute_group **groups;  /* optional groups */
 
-    void    (*release)(struct linux_5_7_19_device *dev);
-    struct iommu_group  *iommu_group;
-    struct dev_iommu    *iommu;
+//     void    (*release)(struct linux_5_7_19_device *dev);
+//     struct iommu_group  *iommu_group;
+//     struct dev_iommu    *iommu;
 
-    bool            offline_disabled:1;
-    bool            offline:1;
-    bool            of_node_reused:1;
-    bool            state_synced:1;
-#if defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_DEVICE) || \
-    defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU) || \
-    defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU_ALL)
-    bool            dma_coherent:1;
-#endif
-};
+//     bool            offline_disabled:1;
+//     bool            offline:1;
+//     bool            of_node_reused:1;
+//     bool            state_synced:1;
+// #if defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_DEVICE) || \
+//     defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU) || \
+//     defined(CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU_ALL)
+//     bool            dma_coherent:1;
+// #endif
+// };
 
-struct linux_5_7_19_device_driver {
-    const char      *name;
-    struct bus_type     *bus;
+// struct linux_5_7_19_device_driver {
+//     const char      *name;
+//     struct bus_type     *bus;
 
-    struct module       *owner;
-    const char      *mod_name;  /* used for built-in modules */
+//     struct module       *owner;
+//     const char      *mod_name;  /* used for built-in modules */
 
-    bool suppress_bind_attrs;   /* disables bind/unbind via sysfs */
-    enum probe_type probe_type;
+//     bool suppress_bind_attrs;   /* disables bind/unbind via sysfs */
+//     enum probe_type probe_type;
 
-    const struct of_device_id   *of_match_table;
-    const struct acpi_device_id *acpi_match_table;
+//     const struct of_device_id   *of_match_table;
+//     const struct acpi_device_id *acpi_match_table;
 
-    int (*probe) (dev#=%ld*dev);
-    void (*sync_state)(struct linux_5_7_19_device *dev);
-    int (*remove) (struct linux_5_7_19_device *dev);
-    void (*shutdown) (struct linux_5_7_19_device *dev);
-    int (*suspend) (struct linux_5_7_19_device *dev, pm_message_t state);
-    int (*resume) (struct linux_5_7_19_device *dev);
-    const struct attribute_group **groups;
-    const struct attribute_group **dev_groups;
+//     int (*probe) (dev#=%ld*dev);
+//     void (*sync_state)(struct linux_5_7_19_device *dev);
+//     int (*remove) (struct linux_5_7_19_device *dev);
+//     void (*shutdown) (struct linux_5_7_19_device *dev);
+//     int (*suspend) (struct linux_5_7_19_device *dev, pm_message_t state);
+//     int (*resume) (struct linux_5_7_19_device *dev);
+//     const struct attribute_group **groups;
+//     const struct attribute_group **dev_groups;
 
-    const struct dev_pm_ops *pm;
-    void (*coredump) (struct linux_5_7_19_device *dev);
+//     const struct dev_pm_ops *pm;
+//     void (*coredump) (struct linux_5_7_19_device *dev);
 
-    struct driver_private *p;
-};
+//     struct driver_private *p;
+// };
 
-struct lock_class_key { };
+// struct lock_class_key { };
 
-struct bus_type {
-    const char      *name;
-    const char      *dev_name;
-    struct linux_5_7_19_device       *dev_root;
-    const struct attribute_group **bus_groups;
-    const struct attribute_group **dev_groups;
-    const struct attribute_group **drv_groups;
+// struct bus_type {
+//     const char      *name;
+//     const char      *dev_name;
+//     struct linux_5_7_19_device       *dev_root;
+//     const struct attribute_group **bus_groups;
+//     const struct attribute_group **dev_groups;
+//     const struct attribute_group **drv_groups;
 
-    int (*match)(struct linux_5_7_19_device *dev, struct linux_5_7_19_device_driver *drv);
-    int (*uevent)(struct linux_5_7_19_device *dev, struct kobj_uevent_env *env);
-    int (*probe)(struct linux_5_7_19_device *dev);
-    void (*sync_state)(struct linux_5_7_19_device *dev);
-    int (*remove)(struct linux_5_7_19_device *dev);
-    void (*shutdown)(struct linux_5_7_19_device *dev);
+//     int (*match)(struct linux_5_7_19_device *dev, struct linux_5_7_19_device_driver *drv);
+//     int (*uevent)(struct linux_5_7_19_device *dev, struct kobj_uevent_env *env);
+//     int (*probe)(struct linux_5_7_19_device *dev);
+//     void (*sync_state)(struct linux_5_7_19_device *dev);
+//     int (*remove)(struct linux_5_7_19_device *dev);
+//     void (*shutdown)(struct linux_5_7_19_device *dev);
 
-    int (*online)(struct linux_5_7_19_device *dev);
-    int (*offline)(struct linux_5_7_19_device *dev);
+//     int (*online)(struct linux_5_7_19_device *dev);
+//     int (*offline)(struct linux_5_7_19_device *dev);
 
-    int (*suspend)(struct linux_5_7_19_device *dev, pm_message_t state);
-    int (*resume)(struct linux_5_7_19_device *dev);
+//     int (*suspend)(struct linux_5_7_19_device *dev, pm_message_t state);
+//     int (*resume)(struct linux_5_7_19_device *dev);
 
-    int (*num_vf)(struct linux_5_7_19_device *dev);
+//     int (*num_vf)(struct linux_5_7_19_device *dev);
 
-    int (*dma_configure)(struct linux_5_7_19_device *dev);
+//     int (*dma_configure)(struct linux_5_7_19_device *dev);
 
-    const struct dev_pm_ops *pm;
+//     const struct dev_pm_ops *pm;
 
-    const struct iommu_ops *iommu_ops;
+//     const struct iommu_ops *iommu_ops;
 
-    struct subsys_private *p;
-    struct lock_class_key lock_key;
+//     struct subsys_private *p;
+//     struct lock_class_key lock_key;
 
-    bool need_parent_lock;
-};
+//     bool need_parent_lock;
+// };
 
-struct bus_attribute {
-    struct attribute    attr;
-    ssize_t (*show)(struct bus_type *bus, char *buf);
-    ssize_t (*store)(struct bus_type *bus, const char *buf, size_t count);
-};
+// struct bus_attribute {
+//     struct attribute    attr;
+//     ssize_t (*show)(struct bus_type *bus, char *buf);
+//     ssize_t (*store)(struct bus_type *bus, const char *buf, size_t count);
+// };
 
 #endif //_MADDEFS_
