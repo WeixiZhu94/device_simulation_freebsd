@@ -128,4 +128,4 @@
 #define PCI_CAP_SIZEOF      4
 
 
-#endif /* LINUX_PCI_REGS_H 
+#endif /* LINUX_PCI_REGS_H */
