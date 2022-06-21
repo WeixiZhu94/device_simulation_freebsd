@@ -140,12 +140,12 @@ static ssize_t show_version(struct device_driver *driver, char *buf)
 }
 */
 //
-static struct driver_attribute DrvrAttr =
-{
-    //.mode = S_IRUGO,
-    .show = NULL, //show_version,
-    .store = NULL,
-};
+// static struct driver_attribute DrvrAttr =
+// {
+//     //.mode = S_IRUGO,
+//     .show = NULL, //show_version,
+//     .store = NULL,
+// };
 
 static struct pci_driver* PciDrvrs[MADBUS_NUMBER_SLOTS] = {NULL, NULL, NULL};
 static U8     bDrvSysfs[MADBUS_NUMBER_SLOTS] = {0, 0, 0};
@@ -170,7 +170,7 @@ int pcisim_register_driver(struct pci_driver *pcidrvr)
 
     PciDrvrs[NumDrvrs] = pcidrvr;
 
-    DrvrAttr.attr.name = pcidrvr->driver.name;
+    // DrvrAttr.attr.name = pcidrvr->driver.name;
     //DrvrAttr.attr.owner = pcidrvr->driver.owner;
     //
 	//rc = driver_create_file(&pcidrvr->driver, &DrvrAttr);
