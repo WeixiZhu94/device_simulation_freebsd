@@ -624,12 +624,12 @@ static int madbus_malloc_device_memory(PMADBUSOBJ pmadbusobj)
     if (rc == 0)
         {
         ASSERT((int)(pmadbusobj->pmaddevice != NULL));
-        pmadbusobj->MadDevPA = virt_to_phys(pmadbusobj->pmaddevice);
+        pmadbusobj->MadDevPA = virt_to_phys((uintptr_t) pmadbusobj->pmaddevice);
         memset(pmadbusobj->pmaddevice, 0x00, MAD_DEVICE_MEM_SIZE_NODATA);
         memset(((u8*)pmadbusobj->pmaddevice + MAD_DEVICE_MEM_SIZE_NODATA),
                0xFF, MAD_DEVICE_DATA_SIZE);
 
-        PINFO("madbus_setup_device... dev#=%d order=%d pPage=%px PA=x%llX kva=%px #pages=%d size=%ld\n",
+        PINFO("madbus_setup_device... dev#=%d order=%d pPage=%px PA=x%lX kva=%px #pages=%d size=%ld\n",
               (int)pmadbusobj->devnum, MAD_XALLOC_PAGES_ORDER, pmadbusobj->pPage, 
               pmadbusobj->MadDevPA, pmadbusobj->pmaddevice,
               MAD_DEVICE_MAX_PAGES, (MAD_DEVICE_MAX_PAGES * PAGE_SIZE));
@@ -651,7 +651,7 @@ static int madbus_setup_device(PMADBUSOBJ pmadbusobj)
 
     //Register the sysfs device
     MadBusObjNames[i][MBDEVNUMDX] = MadBusNumStr[i];
-    pmadbusobj->sysfs_dev.init_name = MadBusObjNames[i];
+    // pmadbusobj->sysfs_dev.init_name = MadBusObjNames[i];
     if (i > 0)
         {pmadbusobj->sysfs_dev.parent = &madbus_dev;}
 
@@ -691,7 +691,7 @@ static int madbus_init(void)
 	PMADBUSOBJ pmadbusobj;
 	//
 	dev = MKDEV(madbus_major, madbus_minor);
-	PINFO("madbus_init()... dev=x%X\n", dev);
+	PINFO("madbus_init()... dev=x%lX\n", dev);
 
 /* Get a range of minor numbers to work with. */
     // If we need a major number allocated dynamically we use alloc_chrdev_region */
