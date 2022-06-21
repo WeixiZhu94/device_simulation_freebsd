@@ -98,12 +98,12 @@ static int mad_match(struct device *dev, struct device_driver *driver)
 //     .mode = 1, 
 // };
 //
-static struct bus_attribute madbus_attr_ver =
-{
-	.attr = {.name = "madbus_attr", .mode=1,},
-	.show = NULL,
-	.store = NULL,
-};
+// static struct bus_attribute madbus_attr_ver =
+// {
+// 	.attr = {.name = "madbus_attr", .mode=1,},
+// 	.show = NULL,
+// 	.store = NULL,
+// };
 
 //The driver definition
 static struct device_driver madbus_drvr =

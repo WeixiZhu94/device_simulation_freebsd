@@ -526,9 +526,9 @@ static void madbus_exit(void)
 	//
     driver_unregister(&madbus_drvr);
     //
-    bus_remove_file(&madbus_type, &madbus_attr_ver);
+    // bus_remove_file(&madbus_type, &madbus_attr_ver);
     //
-	bus_unregister(&madbus_type);
+	// bus_unregister(&madbus_type);
 	//
 	unregister_chrdev_region(devno, madbus_nbr_slots);
 
@@ -712,17 +712,17 @@ static int madbus_init(void)
 	    }
 
     //Register the bus w/ the system before adding devices
-	ret = bus_register(&madbus_type);
-	if (ret)
-	    {
-		PERR("madbus_init:bus_register... rc=%d\n", ret);
-		return ret;
-	    }
+	// ret = bus_register(&madbus_type);
+	// if (ret)
+	//     {
+	// 	PERR("madbus_init:bus_register... rc=%d\n", ret);
+	// 	return ret;
+	//     }
 
     //Set the attribute(s) for this bus
-	ret = bus_create_file(&madbus_type, &madbus_attr_ver);
-	if (ret)
-		{PERR("Unable to create bus attribute(s): rc=%d continuing...\n", ret);}
+	// ret = bus_create_file(&madbus_type, &madbus_attr_ver);
+	// if (ret)
+	// 	{PERR("Unable to create bus attribute(s): rc=%d continuing...\n", ret);}
 
     //Register this driver as the base of the device tree
 	ret = driver_register(&madbus_drvr);
