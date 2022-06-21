@@ -585,7 +585,7 @@ static int madbus_malloc_device_memory(PMADBUSOBJ pmadbusobj)
         case MAD_ALLOC_PAGES_ORDER:
             pmadbusobj->pPage = alloc_pages(__GFP_HIGHMEM, MAD_ALLOC_PAGES_ORDER);
             if (pmadbusobj->pPage != NULL)
-                {pmadbusobj->pmaddevice = page_to_virt(pmadbusobj->pPage);}
+                {pmadbusobj->pmaddevice = (struct _MADREGS *) page_to_virt(pmadbusobj->pPage);}
 
             if (pmadbusobj->pmaddevice == NULL)
                 {
@@ -604,7 +604,7 @@ static int madbus_malloc_device_memory(PMADBUSOBJ pmadbusobj)
             pmadbusobj->pPage = dma_alloc_contiguous(NULL, //no device necessary
                                                      size, gfpflags);
             if (pmadbusobj->pPage != NULL)
-                {pmadbusobj->pmaddevice = page_to_virt(pmadbusobj->pPage);}
+                {pmadbusobj->pmaddevice = (struct _MADREGS *) page_to_virt(pmadbusobj->pPage);}
 
             if (pmadbusobj->pmaddevice == NULL)
                 {
