@@ -110,7 +110,7 @@ static struct device_driver madbus_drvr =
 {
     .name  = "madbus",
     // .bus   = &madbus_type,
-    .owner = THIS_MODULE,
+    // .owner = THIS_MODULE,
 };
 
 //The bus device definition 
@@ -124,7 +124,7 @@ static void madbus_release(struct device *pdev)
 struct device madbus_dev =
 {
     .parent    = NULL,
-	.init_name = madbus_id, 
+	// .init_name = madbus_id, 
     .driver    = &madbus_drvr,
 	.release   = madbus_release,
 };
