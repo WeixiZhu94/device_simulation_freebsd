@@ -68,9 +68,9 @@ typedef unsigned long long u64;
 #ifdef BIO //Block-mode device
 #define  MADDEVNAME      "maddevb_objX"
 #else //Char-mode device
-#define  MADDEVNAME      "maddevc_objX"
+#define  MADDEVNAME      "maddevcx"
 #endif
-#define  MADDEVNUMDX     11 //.......^
+#define  MADDEVNUMDX     7 //.......^
 
 typedef PMADREGS* PPMADREGS; //just an env test
 

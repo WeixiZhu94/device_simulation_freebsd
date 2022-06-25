@@ -35,7 +35,7 @@
 #include "madtest.h"
 #include <sys/stat.h>
 
-char MadDevName[] = MADDEVNAME;
+char MadDevName[] = "MADDEVNAME";
 char MadDevPathName[100] = "";
 
 MADREGS MadRegs;
