@@ -6,16 +6,17 @@
 for src in madbus maddevb maddevc 
 do
 	cd $src/KERN_SRC
-	make &
-	cd ..
+	make
+	cd ../..
 done
-wait
 
-for src in madsimui madtest madtestb madtestc 
-do
-	cd $src/Debug
-	make &
-	cd ..
-done
-wait
+# wait
+
+# for src in madsimui madtest madtestb madtestc 
+# do
+# 	cd $src/Debug
+# 	make &
+# 	cd ..
+# done
+# wait
 

@@ -44,6 +44,7 @@
 #define _SIM_DRIVER_
 //
 #include "madbus.h"
+#include <sys/module.h>
 
 //Our parameters which can be set at load time.
 //
@@ -100,7 +101,7 @@ MADREGS MadRegsRst = {0, 0, 0, 0x00, 0, 0, 0, 0, 0, 0, 0, 0};
 static int madbus_dev_open(struct inode *inode, struct file *fp)
 {
 	struct madbus_object *mbobj = 
-           container_of(inode->i_cdev, struct madbus_object, cdev_str);
+           container_of((struct linux_cdev *)inode->i_cdev, struct madbus_object, cdev_str);
 
 	PINFO("madbus_dev_open: dev#=%d, mbobj=%px inode=%px fp=%px\n",
 		  (int)mbobj->devnum, mbobj, inode, fp);
@@ -131,12 +132,12 @@ static int madbus_hotplug(U32 indx, U16 pci_devid)
     PMADBUSOBJ pmbobj_hpl;
     struct pci_driver* pPciDrvr;
     struct pci_dev*    pPciDev = NULL;
-    int                rc = -EUNATCH; //No 'protocol' driver attached until we find one
+    int                rc = -1; //No 'protocol' driver attached until we find one
 
     PINFO("madbus_hotplug... dev#=%d pci_devid=x%X\n", (int)indx, pci_devid);
 
     if ((indx < 1) || (indx > madbus_nbr_slots))
-        {return -EBADSLT;} //Slot# out of bounds 
+        {return -1;} //Slot# out of bounds 
 
     pmbobj_hpl = &madbus_objects[indx];
     if (pmbobj_hpl->pci_devid != 0)
@@ -166,7 +167,7 @@ static int madbus_hotplug(U32 indx, U16 pci_devid)
         }
 
     if (rc == 0)
-        {ASSERT((int)(pmbobj_hpl->pcidev.driver != NULL));}
+        ;// {ASSERT((int)(pmbobj_hpl->pcidev.driver != NULL));}
     else
         //Mark this slot as free
         {pmbobj_hpl->pci_devid = 0;}
@@ -181,25 +182,25 @@ static int madbus_hotunplug(U32 indx)
 {
     PMADBUSOBJ pmbobj_hpl = &madbus_objects[indx];
     //
-    struct pci_driver *pPciDrvr;
+    // struct pci_driver *pPciDrvr;
     int rc = 0; 
 
     PINFO("madbus_hotunplug... pmobj=%px dev#=%d\n", pmbobj_hpl, (int)indx);
 
     if ((indx < 1) || (indx > madbus_nbr_slots))
-        {return -EBADSLT;} //Slot# out of bounds 
+        {return -1;} //Slot# out of bounds 
 
     if (pmbobj_hpl->pci_devid == 0)
        {return -ENODEV;} //This bus slot has no device;
 
-    pPciDrvr = pmbobj_hpl->pcidev.driver; 
-    if (pPciDrvr == NULL)
-        {return -EUNATCH;} //No 'protocol' driver attached 
+    // pPciDrvr = pmbobj_hpl->pcidev.driver; 
+    // if (pPciDrvr == NULL)
+    //     {return -1;} //No 'protocol' driver attached 
 
-    if (pPciDrvr->remove == NULL)
-       {return -EFAULT;}
+    // if (pPciDrvr->remove == NULL)
+    //    {return -EFAULT;}
 
-    /*rc =*/ pPciDrvr->remove(&pmbobj_hpl->pcidev);
+    // /*rc =*/ pPciDrvr->remove(&pmbobj_hpl->pcidev);
     rc = 0;
 
     pmbobj_hpl->pci_devid = 0;
@@ -227,17 +228,17 @@ static long madbus_dev_ioctl(struct file *fp, unsigned int cmd, unsigned long ar
 	// Extract the type and number bitfields, and don't decode
 	// wrong cmds: return ENOTTY (inappropriate ioctl) before access_ok()
 	//
-	if ((_IOC_TYPE(cmd) != MADBUS_IOC_MAGIC) || (_IOC_NR(cmd) > MADBUS_IOC_MAX_NBR))
-	    {
-		PWARN("madbusobj_ioctl: returning -EACCES\n");
-		return -EACCES;
-	    }
+	// if ((_IOC_TYPE(cmd) != MADBUS_IOC_MAGIC) || (_IOC_NR(cmd) > MADBUS_IOC_MAX_NBR))
+	//     {
+	// 	PWARN("madbusobj_ioctl: returning -EACCES\n");
+	// 	return -EACCES;
+	//     }
 
 	//The direction is a bitmask, and VERIFY_WRITE catches R/W transfers.
     // `Type' is user-oriented, while access_ok is kernel-oriented,
     //  so the concept of "read" and "write" is reversed
 	//
-	err = !access_ok(/*VERIFY_WRITE,*/ (void __user *)arg, _IOC_SIZE(cmd));
+	err = !linux_access_ok(/*VERIFY_WRITE,*/ (void __user *)arg, _IOC_SIZE(cmd));
 	if (err)
 	    {
 		PWARN("madbusobj_ioctl: returning -EFAULT\n");
@@ -392,9 +393,9 @@ static int madbus_dev_mmap(struct file *fp, struct vm_area_struct* vma)
     //
 	int rc = 0;
 
-	PINFO("madbus_dev_mmap... dev#=%d fp=%px pfn=x%llX PA=x%llX MapSize=%d prot=x%lX\n",
+	PINFO("madbus_dev_mmap... dev#=%d fp=%px pfn=x%lX PA=x%lX MapSize=%d prot=x%lX\n",
           (int)mbobj->devnum, fp, pfn, mbobj->MadDevPA, 
-          (int)MapSize, vma->vm_page_prot.pgprot);
+          (int)MapSize, vma->vm_page_prot);
 
     rc = remap_pfn_range(vma, vma->vm_start, pfn, MapSize, vma->vm_page_prot);
     if (rc != 0)
@@ -492,7 +493,7 @@ static void madbus_exit(void)
 	PMADBUSOBJ pmadbusobj;
 	int rc = 0;
 
-	PINFO("madbus_exit()... devno=x%X\n", devno);
+	PINFO("madbus_exit()... devno=x%lX\n", devno);
 
 	if (madbus_objects != NULL)
 	    {
@@ -508,7 +509,7 @@ static void madbus_exit(void)
 	        if ((pmadbusobj->pThread != NULL) && 
                 (!(IS_ERR(pmadbusobj->pThread))))
 	    	    {
-	    		rc = kthread_stop(pmadbusobj->pThread);
+	    		rc = kproc_suspend(pmadbusobj->pThread, hz);
 	    		if (rc != 0)
                     {PWARN("kthread_stop returned: (%d), dev#=%d, pThread=%px\n",
                            rc, (int)i, pmadbusobj->pThread);}
@@ -524,11 +525,11 @@ static void madbus_exit(void)
     if (bBusDevRegstrd)
         {device_unregister(&madbus_dev);}
 	//
-    driver_unregister(&madbus_drvr);
+    // driver_unregister(&madbus_drvr);
     //
-    bus_remove_file(&madbus_type, &madbus_attr_ver);
+    // bus_remove_file(&madbus_type, &madbus_attr_ver);
     //
-	bus_unregister(&madbus_type);
+	// bus_unregister(&madbus_type);
 	//
 	unregister_chrdev_region(devno, madbus_nbr_slots);
 
@@ -585,7 +586,7 @@ static int madbus_malloc_device_memory(PMADBUSOBJ pmadbusobj)
         case MAD_ALLOC_PAGES_ORDER:
             pmadbusobj->pPage = alloc_pages(__GFP_HIGHMEM, MAD_ALLOC_PAGES_ORDER);
             if (pmadbusobj->pPage != NULL)
-                {pmadbusobj->pmaddevice = page_to_virt(pmadbusobj->pPage);}
+                {pmadbusobj->pmaddevice = (struct _MADREGS *) page_to_virt(pmadbusobj->pPage);}
 
             if (pmadbusobj->pmaddevice == NULL)
                 {
@@ -604,7 +605,7 @@ static int madbus_malloc_device_memory(PMADBUSOBJ pmadbusobj)
             pmadbusobj->pPage = dma_alloc_contiguous(NULL, //no device necessary
                                                      size, gfpflags);
             if (pmadbusobj->pPage != NULL)
-                {pmadbusobj->pmaddevice = page_to_virt(pmadbusobj->pPage);}
+                {pmadbusobj->pmaddevice = (struct _MADREGS *) page_to_virt(pmadbusobj->pPage);}
 
             if (pmadbusobj->pmaddevice == NULL)
                 {
@@ -624,12 +625,12 @@ static int madbus_malloc_device_memory(PMADBUSOBJ pmadbusobj)
     if (rc == 0)
         {
         ASSERT((int)(pmadbusobj->pmaddevice != NULL));
-        pmadbusobj->MadDevPA = virt_to_phys(pmadbusobj->pmaddevice);
+        pmadbusobj->MadDevPA = virt_to_phys((uintptr_t) pmadbusobj->pmaddevice);
         memset(pmadbusobj->pmaddevice, 0x00, MAD_DEVICE_MEM_SIZE_NODATA);
         memset(((u8*)pmadbusobj->pmaddevice + MAD_DEVICE_MEM_SIZE_NODATA),
                0xFF, MAD_DEVICE_DATA_SIZE);
 
-        PINFO("madbus_setup_device... dev#=%d order=%d pPage=%px PA=x%llX kva=%px #pages=%d size=%ld\n",
+        PINFO("madbus_setup_device... dev#=%d order=%d pPage=%px PA=x%lX kva=%px #pages=%d size=%d\n",
               (int)pmadbusobj->devnum, MAD_XALLOC_PAGES_ORDER, pmadbusobj->pPage, 
               pmadbusobj->MadDevPA, pmadbusobj->pmaddevice,
               MAD_DEVICE_MAX_PAGES, (MAD_DEVICE_MAX_PAGES * PAGE_SIZE));
@@ -651,7 +652,7 @@ static int madbus_setup_device(PMADBUSOBJ pmadbusobj)
 
     //Register the sysfs device
     MadBusObjNames[i][MBDEVNUMDX] = MadBusNumStr[i];
-    pmadbusobj->sysfs_dev.init_name = MadBusObjNames[i];
+    // pmadbusobj->sysfs_dev.init_name = MadBusObjNames[i];
     if (i > 0)
         {pmadbusobj->sysfs_dev.parent = &madbus_dev;}
 
@@ -691,7 +692,7 @@ static int madbus_init(void)
 	PMADBUSOBJ pmadbusobj;
 	//
 	dev = MKDEV(madbus_major, madbus_minor);
-	PINFO("madbus_init()... dev=x%X\n", dev);
+	PINFO("madbus_init()... dev=x%lX\n", dev);
 
 /* Get a range of minor numbers to work with. */
     // If we need a major number allocated dynamically we use alloc_chrdev_region */
@@ -712,25 +713,25 @@ static int madbus_init(void)
 	    }
 
     //Register the bus w/ the system before adding devices
-	ret = bus_register(&madbus_type);
-	if (ret)
-	    {
-		PERR("madbus_init:bus_register... rc=%d\n", ret);
-		return ret;
-	    }
+	// ret = bus_register(&madbus_type);
+	// if (ret)
+	//     {
+	// 	PERR("madbus_init:bus_register... rc=%d\n", ret);
+	// 	return ret;
+	//     }
 
     //Set the attribute(s) for this bus
-	ret = bus_create_file(&madbus_type, &madbus_attr_ver);
-	if (ret)
-		{PERR("Unable to create bus attribute(s): rc=%d continuing...\n", ret);}
+	// ret = bus_create_file(&madbus_type, &madbus_attr_ver);
+	// if (ret)
+	// 	{PERR("Unable to create bus attribute(s): rc=%d continuing...\n", ret);}
 
     //Register this driver as the base of the device tree
-	ret = driver_register(&madbus_drvr);
-    if (ret != 0)
-        {
-        PERR("Unable to register the madbus driver; rc=%d\n", ret);
-        return ret;
-        }
+	// ret = driver_register(&madbus_drvr);
+ //    if (ret != 0)
+ //        {
+ //        PERR("Unable to register the madbus driver; rc=%d\n", ret);
+ //        return ret;
+ //        }
 
     //Register our one-per-bus device - defined statically
     ret = device_register(&madbus_dev);
@@ -762,6 +763,7 @@ static int madbus_init(void)
         {
        	pmadbusobj = &madbus_objects[i];
        	pmadbusobj->devnum = i;
+        // names cannot be duplicated so just do one device...
         rc = madbus_setup_device(pmadbusobj);
        	if (rc != 0)
         	{
@@ -783,5 +785,41 @@ InitExit:;
  	return ret;
 }
 //
-module_init(madbus_init);
-module_exit(madbus_exit);
+// module_init(madbus_init);
+// module_exit(madbus_exit);
+
+
+
+static int fake_device_event_handler(struct module *module,
+    int event_type, void *arg) 
+{
+    int retval = 0;
+
+    switch (event_type) {
+
+        case MOD_LOAD:
+            uprintf("simulated bus dev started\n");
+            madbus_init();
+            break;
+
+        case MOD_UNLOAD:
+            uprintf("simulated bus dev terminated\n");
+            madbus_exit();
+            break;
+
+        default:
+            retval = EOPNOTSUPP;
+            break;
+    }
+
+    return retval;
+}
+
+static moduledata_t fake_dev = {
+    "simulate_dev",
+    fake_device_event_handler,
+    NULL
+};
+
+DECLARE_MODULE(madbus, fake_dev, SI_SUB_DRIVERS, SI_ORDER_MIDDLE);
+MODULE_DEPEND(madbus, linux, 1, 1, 1);

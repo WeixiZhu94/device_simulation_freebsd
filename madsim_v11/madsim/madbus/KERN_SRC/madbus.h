@@ -42,20 +42,21 @@
 #include <linux/ioctl.h> /* needed for the _IOW etc stuff used later */
 #include <linux/fs.h>		/* everything... */
 #include <linux/cdev.h>
-#include <linux/device.h>
+// #include <linux/device.h>
 #include <linux/kthread.h>
 #include <linux/slab.h>		/* kmalloc() */
 #include <linux/module.h>
 #include <linux/pci.h>
 #include <linux/kernel.h>
-#include <linux/init.h>
+// #include <linux/init.h>
 #include <linux/string.h>
 #include <linux/mm.h>
-#include <linux/highmem.h>
+#include <linux/page.h>
+// #include <linux/highmem.h>
 #include <linux/interrupt.h>
 //
-#include <asm/uaccess.h>	/* copy_*_user */
-#include <asm/page.h>	
+#include <linux/uaccess.h>	/* copy_*_user */
+// #include <asm/page.h>	
 //
 #ifdef _SIM_DRIVER_
 #define DRIVER_NAME "madbus.ko"
@@ -64,6 +65,8 @@
 #include "../../include/maddefs.h"
 #include "../../include/madkonsts.h"
 #include "../../include/madbusioctls.h"
+
+#include <sys/kthread.h>
 
 #define  MADBUSOBJNAME   "madbusobjX"
 #define  MBDEVNUMDX      9 //......^
@@ -116,7 +119,7 @@ struct madbus_object
 
 	struct     cdev cdev_str;
     char       dummy[sizeof(struct list_head)];
-	struct     task_struct *pThread;
+	struct     proc *pThread;
 	struct     mad_simulator_parms SimParms;
    	char       *name;
 };
@@ -128,12 +131,17 @@ typedef struct madbus_object MADBUSOBJ, *PMADBUSOBJ;
 extern int register_mad_device(struct madbus_object *);
 extern void unregister_mad_device(struct madbus_object *);
 extern int madbus_create_thread(PMADBUSOBJ pmadbusobj);
-extern int madbus_dev_thread(void* pvoid);
+extern void madbus_dev_thread(void* pvoid);
 //
 void madsim_complete_simulated_io(void* vpmadbusobj, PMADREGS pmadregs);
 #ifdef _SIM_DRIVER_
 #include "../../include/simdrvrlib.h"
 #endif
+
+#define page_to_virt(x)     PHYS_TO_DMAP(VM_PAGE_TO_PHYS(x))
+#define virt_to_phys(x)     DMAP_TO_PHYS(x)
+#define phys_to_virt(x)     PHYS_TO_DMAP(x)
+
 //
 
 
