@@ -105,8 +105,11 @@ struct pci_driver maddev_driver =
 //This is the open function for one hardware device
 static int maddev_open(struct inode *inode, struct file *fp)
 {
+	// cdev was saved in freebsd file->si_drv1, which is saved in linux file->f_cdev by linux_dev_fdopen
 	struct mad_dev_obj *pmaddevobj = 
-                       container_of((struct linux_cdev *)inode->i_cdev, struct mad_dev_obj, cdev_str);
+                       container_of((struct linux_cdev *)fp->f_cdev, struct mad_dev_obj, cdev_str);
+
+    printf("[!!!] cdev :%p, pmaddevobj : %p\n", fp->f_cdev, pmaddevobj);
 
 	PINFO("maddev_open... dev#=%d maddev=%p inode=%p fp=%p\n",
 		  (int)pmaddevobj->devnum, pmaddevobj, inode, fp);
@@ -122,6 +125,8 @@ static int maddev_open(struct inode *inode, struct file *fp)
 static int maddev_release(struct inode *inode, struct file *fp)
 {
 	struct mad_dev_obj *pmaddevobj = (struct mad_dev_obj*)fp->private_data;
+
+    printf("[!!!] cdev :%p, pmaddevobj : %p\n", fp->f_cdev, pmaddevobj);
 
 	PINFO("maddev_release...dev#=%d inode=%p fp=%p\n",
           (int)pmaddevobj->devnum, inode, fp);
@@ -443,6 +448,7 @@ static int maddev_setup_cdev(void* pvoid, int indx)
 
     //Introduce the device to the kernel
 	rc = cdev_add(&pmaddevobj->cdev_str, devno, 1);
+	printf("[!!!] adding cdev %p to madobj %p\n", &pmaddevobj->cdev_str, pmaddevobj);
     PDEBUG("maddev_setup_cdev... dev#=%d rc=%d\n", (int)pmaddevobj->devnum, rc);
 
     return rc;
