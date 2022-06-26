@@ -70,7 +70,7 @@ MADREGS MadRegsRst = {0, 0, 0, 0x00, 0, 0, 0, 0, 0, 0, 0, 0};
 static int madbus_dev_open(struct inode *inode, struct file *fp)
 {
 	struct madbus_object *mbobj = 
-           container_of((struct linux_cdev *)inode->i_cdev, struct madbus_object, cdev_str);
+           container_of((struct linux_cdev *)fp->f_cdev, struct madbus_object, cdev_str);
 
 	PINFO("madbus_dev_open: dev#=%d, mbobj=%px inode=%px fp=%px\n",
 		  (int)mbobj->devnum, mbobj, inode, fp);
