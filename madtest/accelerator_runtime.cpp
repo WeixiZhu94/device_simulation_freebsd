@@ -53,6 +53,7 @@ void clContextCreate(gmem_vm_mode mode)
         printf("[accelerator runtime] heterogeneous context creation failed， rc = %x\n");
         exit(-1);
     }
+    printf("Context Creation suceeeded\n");
     return;
 }
 

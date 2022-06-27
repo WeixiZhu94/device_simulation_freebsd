@@ -18,6 +18,7 @@ int main(int argc, char **argv)
 	clContextCreate(SHARE_CPU);
 
 	for (int i = 0; i < num_of_tests; i ++) {
+		printf("Test: %s\n", test_name[i]);
 		ret = generate_test(test_program[i], &kernel_args);
 		if (ret)
 			printf("Test generation failed\n");
