@@ -9,16 +9,20 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 		return -1;
 	}
 
+	printf("%s %d\n", __func__, __LINE__);
 	if (kernel == SUM) {
 		struct vector_add_args *args;
+		printf("%s %d\n", __func__, __LINE__);
 		args = (struct vector_add_args*)malloc(sizeof(struct vector_add_args));
 		args->a = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
 		args->b = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
 		args->c = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
 		args->len = TEST_LENGTH;
 
+		printf("%s %d\n", __func__, __LINE__);
 		*kernel_args = (void*) args;
-		if (args->a && args->b && args->c)
+		printf("%s %d\n", __func__, __LINE__);
+		if (args->a != NULL && args->b != NULL && args->c != NULL)
 			return 0;
 		else
 			return -ENOMEM;
