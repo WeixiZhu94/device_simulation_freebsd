@@ -30,6 +30,8 @@
 /* $Id: madapplib.h, v 1.0 2021/01/01 00:00:00 htf $                           */
 /*                                                                             */
 /*******************************************************************************/
+#ifndef _MADAPPLIB_H_
+#define _MADAPPLIB_H_
 
 #define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
 
@@ -44,10 +46,6 @@ int MapDeviceRegs(PMADREGS *ppmadregs, int fd);
 int MapDeviceIoOfset(void **ppIoOfset, int write, int fd);
 void DisplayDevRegs(PMADREGS pmadregs);
 
-//Function definitions
-//
-#ifdef _MAIN_ 
-//
 int ATOH(char* hexstr)
 {
     int j;
@@ -159,6 +157,6 @@ void DisplayDevRegs(PMADREGS pmadregs)
 
     return;
 }
-//
-#endif  //_MAIN_
+
+#endif  //_MADAPPLIB_H_
 

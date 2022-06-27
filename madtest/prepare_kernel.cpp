@@ -27,6 +27,8 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 		printf("CRC test not implemented\n");
 		return -1;
 	}
+	printf("Unknown kernel type\n");
+	return -1;
 }
 
 
@@ -48,4 +50,6 @@ int validate_test(kernel_instance kernel, void *kernel_args)
 		printf("CRC test not implemented\n");
 		return -1;
 	}
+	printf("Unknown kernel type\n");
+	return -1;
 }
