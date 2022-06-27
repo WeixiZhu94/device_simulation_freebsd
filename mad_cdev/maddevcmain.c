@@ -42,6 +42,50 @@
 #define _DEVICE_DRIVER_MAIN_
 #include "maddevc.h"		/* local definitions */
 
+
+// GMEM API USAGE:
+#include <sys/gmem.h>
+#include <sys/gmem/gmem_uvas.h>
+
+gmem_error_t gmem_uvas_create(
+    gmem_uvas_t **uvas_res, 
+    dev_pmap_t **pmap_res, 
+    gmem_dev_t *dev, // this argument is never used, consider removing it.
+    gmem_mmu_ops_t *mmu_ops,
+    dev_pmap_t *pmap_to_share, 
+    void *dev_data, 
+    int mode,
+    vm_offset_t alignment, 
+    vm_offset_t boundary, 
+    vm_offset_t size,
+    vm_offset_t guard)
+{
+
+// context switch is currently unsupported.
+dev_pmap_t *pmap;
+gmem_mmu_ops_t *mmu_ops;
+gmem_vm_mode mode;
+
+static void setup_ctx(gmem_vm_mode running_mode)
+{
+    if (mode == SHARED) {
+        mode = running_mode;
+        gmem_uvas_create(NULL, &pmap, NULL, mmu_ops, NULL, NULL, GMEM_UVAS_SHARE_CPU,
+            0, 0, 0, 0); // SHARE mode should not care about the last 4 args
+        // pmap->data should now contain the CPU pmap
+        // Save your context with pmap->data now.
+    }
+    else
+        printf("Other GMEM UVAS modes not supported yet\n");
+}
+
+static void run_kernel(kernel_instance kernel_type, void *args)
+{
+    // Do we need to translate user-space va to kernel space va?
+    printf("[devc] Nothing is implemented yet for running the kernel\n");
+}
+
+
 //Function prototypes
 static ssize_t
 maddev_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos);
@@ -303,6 +347,15 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
         case MADDEVOBJ_IOC_ALIGN_READ_CACHE:
         case MADDEVOBJ_IOC_ALIGN_WRITE_CACHE:
 	        retval = -ENOSYS; 
+            break;
+
+        case MADDEVOBJ_IOC_CTX_CREATE:
+            setup_ctx((vm_mode) arg);
+            break;
+
+        case MADDEVOBJ_IOC_LAUNCH_KERNEL:
+            struct accelerator_kernel_args *args = (struct accelerator_kernel_args *) arg;
+            run_kernel(args->kernel_type, args->kernel_args);
             break;
 
 	    default:
@@ -587,156 +640,3 @@ static moduledata_t fake_dev = {
 DECLARE_MODULE(maddevc, fake_dev, SI_SUB_DRIVERS, SI_ORDER_MIDDLE);
 MODULE_VERSION(maddevc, 1);
 MODULE_DEPEND(maddevc, madbus, 1, 1, 1);
-
-
-// #ifdef MADDEV_DEBUG /* use proc only if debugging */
-// /*
-//  * The proc filesystem: function to read and entry
-//  */
-// int maddev_read_procmem(struct seq_file *s, void *v)
-// {
-//         int i, j;
-//         int limit = s->size - 80; /* Don't print more than this */
-
-//         for (i = 0; i < maddev_nbr_devs && s->count <= limit; i++)
-//             {
-//             struct mad_dev *d = &mad_dev_object[i];
-//             struct mad_qset *qs = d->data;
-//             if (down_interruptible(&d->sem))
-//                 return -ERESTARTSYS;
-
-//             seq_printf(s,"\nDevice %i: qset %i, q %i, sz %li\n",
-//                       i, d->qset, d->quantum, d->size);
-
-//             for (; qs && s->count <= limit; qs = qs->next)
-//                 { /* scan the list */
-//                 seq_printf(s, "  item at %p, qset at %p\n",
-//                            qs, qs->data);
-//                 if (qs->data && !qs->next) /* dump only the last item */
-//                     for (j = 0; j < d->qset; j++)
-//                        {
-//                        if (qs->data[j])
-//                            seq_printf(s, "    % 4i: %8p\n",
-//                                      j, qs->data[j]);
-//                        }
-//                 }
-//                 up(&mad_dev_object[i].sem);
-//         }
-//         return 0;
-// }
-
-// /*
-//  * Here are our sequence iteration methods.  Our "position" is
-//  * simply the device number.
-//  */
-// static void *maddev_seq_start(struct seq_file *s, loff_t *pos)
-// {
-// 	if (*pos >= maddev_nbr_devs)
-// 		return NULL;   /* No more to read */
-
-// 	return mad_dev_object + *pos;
-// }
-
-// static void *maddev_seq_next(struct seq_file *s, void *v, loff_t *pos)
-// {
-// 	(*pos)++;
-// 	if (*pos >= maddev_nbr_devs)
-// 		return NULL;
-
-// 	return mad_dev_object + *pos;
-// }
-
-// static void maddev_seq_stop(struct seq_file *s, void *v)
-// {
-// 	/* Actually, there's nothing to do here */
-// }
-
-// static int maddev_seq_show(struct seq_file *s, void *v)
-// {
-// 	struct mad_dev *dev = (struct mad_dev *) v;
-// 	struct mad_qset *d;
-// 	int i;
-
-// 	if (down_interruptible(&dev->sem))
-// 		return -ERESTARTSYS;
-
-// 	seq_printf(s, "\nDevice %i: qset %i, q %i, sz %li\n",
-// 			(int) (dev - mad_dev_object), dev->qset,
-// 			dev->quantum, dev->size);
-// 	for (d = dev->data; d; d = d->next)
-//         { /* scan the list */
-// 		seq_printf(s, "  item at %p, qset at %p\n", d, d->data);
-// 		if (d->data && !d->next) /* dump only the last item */
-// 			for (i = 0; i < dev->qset; i++)
-//                 {
-// 				if (d->data[i])
-// 					seq_printf(s, "    % 4i: %8p\n", i, d->data[i]);
-// 			    }
-// 	}
-// 	up(&dev->sem);
-// 	return 0;
-// }
-	
-// /*
-//  * Tie the sequence operators up.
-//  */
-// static struct seq_operations maddev_seq_ops =
-// {
-// 	.start = maddev_seq_start,
-// 	.next  = maddev_seq_next,
-// 	.stop  = maddev_seq_stop,
-// 	.show  = maddev_seq_show
-// };
-
-// /*
-//  * Now to implement the /proc files we need only make an open
-//  * method which sets up the sequence operators.
-//  */
-// static int maddevmem_proc_open(struct inode *inode, struct file *file)
-// {
-// 	return single_open(file, maddev_read_procmem, NULL);
-// }
-
-// static int maddevseq_proc_open(struct inode *inode, struct file *file)
-// {
-// 	return seq_open(file, &maddev_seq_ops);
-// }
-
-// /*
-//  * Create a set of file operations for our proc files.
-//  */
-// static struct file_operations maddevmem_proc_ops = {
-// 	.owner   = THIS_MODULE,
-// 	.open    = maddevmem_proc_open,
-// 	.read    = seq_read,
-// 	.llseek  = seq_lseek,
-// 	.release = single_release
-// };
-
-// static struct file_operations maddevseq_proc_ops = {
-// 	.owner   = THIS_MODULE,
-// 	.open    = maddevseq_proc_open,
-// 	.read    = seq_read,
-// 	.llseek  = seq_lseek,
-// 	.release = seq_release
-// };
-	
-// /*
-//  * Actually create (and remove) the /proc file(s).
-//  */
-// static void maddev_create_proc(void)
-// {
-// 	proc_create_data("maddevmem", 0 /* default mode */,
-// 			         NULL /* parent dir */, &maddevmem_proc_ops,
-// 			         NULL /* client data */);
-// 	proc_create("maddevseq", 0, NULL, &maddevseq_proc_ops);
-// }
-
-// static void maddev_remove_proc(void)
-// {
-// 	/* no problem if it was not registered */
-// 	remove_proc_entry("maddevmem", NULL /* parent dir */);
-// 	remove_proc_entry("maddevseq", NULL);
-// }
-// //
-// #endif /* MADDEV_DEBUG */

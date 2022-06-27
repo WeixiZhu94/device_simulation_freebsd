@@ -638,4 +638,27 @@ typedef struct _MADREGS
 //     ssize_t (*store)(struct bus_type *bus, const char *buf, size_t count);
 // };
 
+// definitions to distinguish different VM mode, accelerator-kernel to use
+enum vm_mode {
+    SHARED = 0,
+    EXCLUSIVE
+};
+typedef enum vm_mode vm_mode;
+
+enum kernel_instance {
+    CRC = 0,
+    SUM
+};
+typedef enum kernel_instance kernel_instance;
+
+struct accelerator_kernel_args {
+    kernel_instance kernel_type;
+    void *kernel_args;
+}
+
+struct vector_add_args {
+    uint64_t *a,*b,*c;
+    uint64_t len;
+}
+
 #endif //_MADDEFS_

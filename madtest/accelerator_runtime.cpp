@@ -1,105 +1,15 @@
-/********1*********2*********3*********4*********5**********6*********7*********/
-/*                                                                             */
-/*  PRODUCT      : MAD Device Simulation Framework                             */
-/*  COPYRIGHT    : (c) 2018 HTF Consulting                                     */
-/*                                                                             */
-/* This source code is provided by Dual/GPL license to the Linux open source   */ 
-/* community                                                                   */
-/*                                                                             */ 
-/*******************************************************************************/
-/*                                                                             */
-/*  Exe files   : madtest.exe                                                  */ 
-/*                                                                             */
-/*  Module NAME : madtest.cpp                                                  */
-/*                                                                             */
-/*  DESCRIPTION : Main module for the MAD test app                             */
-/*                                                                             */
-/*  MODULE_AUTHOR("HTF Consulting");                                           */
-/*  MODULE_LICENSE("Dual/GPL");                                                */
-/*                                                                             */
-/* The source code in this file can be freely used, adapted, and redistributed */
-/* in source or binary form, so long as an acknowledgment appears in derived   */
-/* source files.  The citation should state that the source code comes from a  */
-/* a set of source files developed by HTF Consulting                           */
-/* http://www.htfconsulting.com                                                */
-/*                                                                             */
-/* No warranty is attached.                                                    */
-/* HTF Consulting assumes no responsibility for errors or fitness of use       */
-/*                                                                             */
-/*                                                                             */
-/* $Id: madtest.cpp, v 1.0 2021/01/01 00:00:00 htf $                           */
-/*                                                                             */
-/*******************************************************************************/
-
-#define _MAIN_
-#include "madtest.h"
+#include "accelerator_runtime.h"
 #include <sys/stat.h>
 
-char MadDevName[] = MADDEVNAME;
-char MadDevPathName[100] = "";
+static char MadDevName[] = MADDEVNAME;
+static char MadDevPathName[100] = "";
 
-MADREGS MadRegs;
-PMADREGS pMapdDevRegs = NULL;
+static MADREGS MadRegs;
+static PMADREGS pMapdDevRegs = NULL;
 
-void* pPIOregn = NULL;
-char* pLargeBufr = NULL;
-u8 RandomBufr[8192];
-
-int main(int argc, char **argv)
-{
-//bool bQuiet = false;
-int rc;
-int fd = 1;
-char* pBufr = NULL;
-bool bRC;
-int devnum = -1, op = -1;
-long val = 0;
-long offset = 0;
-char parms[10];
-void* parm = parms;
-struct stat statstr;
-
-    if (argc < 3)
-        {
- 	display_help();
- 	exit(0);
-        }
-
-    bRC = Parse_Cmd(argc, argv, &devnum, &op, &val, &offset, &parm);
-    if (!bRC)
-        {
-        fprintf(stderr, "Parse_Cmd failed! exit=9\n"); 
-    	exit(9);
-        }
-
-    rc = Build_DevName_Open(MadDevName, devnum, MADDEVNUMDX, MadDevPathName, &fd);
-    if (fd < 1)
-        {
-        rc = -errno;
-     	goto exitmain;
-        }
-
-    //rc = fstat(fd, &statstr);
-    //fprintf(stderr, "ParseCmd:stat() fd=%d rc=%d err#=%d stmode=%d stsize=%ld\n",
-    //        fd, rc, errno, statstr. st_mode, statstr.st_size);
-
-    rc = MapDeviceRegsPio(&pMapdDevRegs, fd);
-    if (pMapdDevRegs != NULL)
-        {pPIOregn = ((U8*)pMapdDevRegs + MAD_MAPD_READ_OFFSET);}
-
-    rc = Process_Cmd(fd, op, val, offset, parm);
-
-    close(fd);
-
-    if (pBufr != NULL) //We have a buffer
-        free(pBufr);
-
-    if (rc != 0)
-	fprintf(stderr, "madtest returning rc=%d\n", rc);
-
-exitmain:;
-    exit(rc);
-}
+static void* pPIOregn = NULL;
+static char* pLargeBufr = NULL;
+static u8 RandomBufr[8192];
 
 
 bool Parse_Cmd(int argc, char **argv,
@@ -697,3 +607,41 @@ ssize_t Queued_Io(int fd, u8* pBufr, size_t DataLen, u8 bWrite)
     return 0;
 }
 
+void clContextCreate(vm_mode mode)
+{
+    int rc;
+
+    // Open Device 
+    rc = Build_DevName_Open(MadDevName, devnum, MADDEVNUMDX, MadDevPathName, &fd);
+    if (fd < 1)
+    {
+        return -errno;
+    }
+
+    // Map registers
+    rc = MapDeviceRegsPio(&pMapdDevRegs, fd);
+    if (pMapdDevRegs != NULL)
+        pPIOregn = ((U8*)pMapdDevRegs + MAD_MAPD_READ_OFFSET);
+
+
+    rc = ioctl(fd, MADDEVOBJ_IOC_INIT, NULL);
+    if (rc)
+        printf("[accelerator runtime] INIT failed\n");
+
+    rc = ioctl(fd, MADDEVOBJ_IOC_CTX_CREATE, mode);
+    if (rc)
+        printf("[accelerator runtime] heterogeneous context creation failed\n");
+    return;
+}
+
+// Sync launch, no kernel queue implemented
+void clLaunchKernel(kernel_instance kernel, void *kernel_args)
+{
+    struct accelerator_kernel_args args;
+    args.kernel_type = kernel;
+    args.kernel_args = kernel_args;
+    rc = ioctl(fd, MADDEVOBJ_IOC_LAUNCH_KERNEL, &args);
+    if (rc)
+        printf("[accelerator runtime] kernel launch failed\n");
+    return;
+}
