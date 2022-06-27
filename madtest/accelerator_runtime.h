@@ -32,9 +32,16 @@ typedef unsigned long long u64;
 #include "madkonsts.h"
 #include "maddevioctls.h"
 
-#include <vm/gmem.h>
-#include <vm/gmem_uvas.h>
-#include <vm/gmem_dev.h>
+
+// !!! Must keep it synchronized with gmem.h, otherwise bugs will go wild
+enum gmem_vm_mode {
+	UNIQUE = 0,
+	REPLICATE,
+	SHARE,
+	REPLICATE_CPU,
+	SHARE_CPU
+};
+typedef enum gmem_vm_mode gmem_vm_mode;
 
 #ifdef BIO //Block-mode device
 #define  MADDEVNAME      "maddevb_objX"
