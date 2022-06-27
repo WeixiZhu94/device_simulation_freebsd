@@ -67,13 +67,6 @@ static int setup_ctx(gmem_vm_mode running_mode)
     return -1;
 }
 
-
-        args = (struct vector_add_args*)malloc(sizeof(struct vector_add_args));
-        args->a = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
-        args->b = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
-        args->c = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
-        args->len = TEST_LENGTH;
-
 static int run_kernel(kernel_instance kernel_type, void *args)
 {
     // Do we need to translate user-space va to kernel space va?
