@@ -17,7 +17,7 @@ static int fd;
 
 void clContextCreate(gmem_vm_mode mode)
 {
-    int rc;
+    unsigned long rc;
     int devnum = 1; // By default use device 1
     // Open Device 
     rc = Build_DevName_Open(MadDevName, devnum, MADDEVNUMDX, MadDevPathName, &fd);
@@ -42,7 +42,7 @@ void clContextCreate(gmem_vm_mode mode)
     printf("Issuing ioctl for cmd %lx, mode = %lu\n", MADDEVOBJ_IOC_CTX_CREATE, (unsigned long) mode);
     rc = ioctl(fd, MADDEVOBJ_IOC_CTX_CREATE, mode);
     if (rc) {
-        printf("[accelerator runtime] heterogeneous context creation failed， rc = %d\n");
+        printf("[accelerator runtime] heterogeneous context creation failed， rc = %lu\n");
         exit(-1);
     }
     return;
