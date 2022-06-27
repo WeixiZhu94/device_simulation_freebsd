@@ -26,6 +26,12 @@ typedef unsigned int u32;
 typedef signed long long s64;
 typedef unsigned long long u64;
 
+//
+#include "maddefs.h"
+#include "madkonsts.h"
+#include "maddevioctls.h"
+
+
 // !!! Must keep it synchronized with gmem.h, otherwise bugs will go wild
 enum gmem_vm_mode {
 	UNIQUE = 0,

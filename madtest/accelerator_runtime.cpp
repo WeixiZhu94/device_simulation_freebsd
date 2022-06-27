@@ -1,8 +1,5 @@
 #include "accelerator_runtime.h"
-#include "maddefs.h"
-#include "madkonsts.h"
 #include "madapplib.h"
-#include "maddevioctls.h"
 #include <sys/stat.h>
 
 static char MadDevName[] = MADDEVNAME;
