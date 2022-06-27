@@ -12,9 +12,9 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 	if (kernel == SUM) {
 		struct vector_add_args *args;
 		args = (struct vector_add_args*)malloc(sizeof(struct vector_add_args));
-		args->a = (struct uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
-		args->b = (struct uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
-		args->c = (struct uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
+		args->a = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
+		args->b = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
+		args->c = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
 		args->len = TEST_LENGTH;
 
 		*kernel_args = (void*) args;
