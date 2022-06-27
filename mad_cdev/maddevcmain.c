@@ -58,25 +58,24 @@ gmem_vm_mode mode;
 
 // emulate a hardware memory access
 // VA must be translated by device pmap, then we obtain the PA. Calculation is based on DMAP.
-static vm_offset_t address_translate(vm_offset_t va)
+static void* address_translate(void *va)
 {
-    vm_paddr_t pa;
+    vm_paddr_t pa = 0;
 
     // No TLB emulation, fall through to page walk
     if (mode == SHARE_CPU) {
-        pa = pmap_extract(((vm_map_t) pmap->data)->pmap, va);
+        pa = pmap_extract(((vm_map_t) pmap->data)->pmap, (uintptr_t) va);
         if (pa == 0) {
             gmem_uvas_fault(pmap, va, 8, VM_PROT_READ | VM_PROT_WRITE, NULL);
-            pa = pmap_extract(((vm_map_t) pmap->data)->pmap, va);
+            pa = pmap_extract(((vm_map_t) pmap->data)->pmap, (uintptr_t) va);
             if (pa == 0) {
                 printf("[gmem uvas fault] gives me 0 pa after faulting...\n");
-                exit(-1);
             }
         }
     }
     else
         printf("Other modes unimplemented\n");
-    return PHYS_TO_DMAP(pa);
+    return (void *) PHYS_TO_DMAP(pa);
 }
 
 static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
