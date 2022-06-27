@@ -21,6 +21,8 @@ int main(int argc, char **argv)
 		ret = generate_test(test_program[i], &kernel_args);
 		if (ret)
 			printf("Test generation failed\n");
+		else
+			printf("Test generation succeeded\n");
 
 		clLaunchKernel(test_program[i], kernel_args);
 
