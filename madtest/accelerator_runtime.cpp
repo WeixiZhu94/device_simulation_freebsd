@@ -22,7 +22,8 @@ void clContextCreate(gmem_vm_mode mode)
     rc = Build_DevName_Open(MadDevName, devnum, MADDEVNUMDX, MadDevPathName, &fd);
     if (fd < 1)
     {
-        return -errno;
+        printf("[accelerator_runtime] failed to open device\n");
+        return ;
     }
 
     // Map registers
@@ -44,6 +45,7 @@ void clContextCreate(gmem_vm_mode mode)
 // Sync launch, no kernel queue implemented
 void clLaunchKernel(kernel_instance kernel, void *kernel_args)
 {
+    int rc;
     struct accelerator_kernel_args args;
     args.kernel_type = kernel;
     args.kernel_args = kernel_args;
