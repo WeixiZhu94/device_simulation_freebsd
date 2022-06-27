@@ -48,7 +48,7 @@ void clContextCreate(gmem_vm_mode mode)
     printf("Issuing ioctl for cmd %lx, mode = %lu\n", MADDEVOBJ_IOC_CTX_CREATE, (unsigned long) mode);
     rc = ioctl(fd, MADDEVOBJ_IOC_CTX_CREATE, mode);
     if (rc) {
-        printf("[accelerator runtime] heterogeneous context creation failed， rc = %x\n", rc);
+        printf("[accelerator runtime] heterogeneous context creation failed， rc = %lx\n", rc);
         exit(-1);
     }
     printf("Context Creation suceeeded\n");
