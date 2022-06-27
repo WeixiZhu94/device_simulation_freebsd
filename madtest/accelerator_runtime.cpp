@@ -32,11 +32,12 @@ void clContextCreate(gmem_vm_mode mode)
     if (pMapdDevRegs != NULL)
         pPIOregn = ((U8*)pMapdDevRegs + MAD_MAPD_READ_OFFSET);
 
-
+    printf("Issuing ioctl for cmd %lu\n", MADDEVOBJ_IOC_INIT);
     rc = ioctl(fd, MADDEVOBJ_IOC_INIT, NULL);
     if (rc)
         printf("[accelerator runtime] INIT failed\n");
 
+    printf("Issuing ioctl for cmd %lu, mode = %lu\n", MADDEVOBJ_IOC_CTX_CREATE, (unsigned long) mode);
     rc = ioctl(fd, MADDEVOBJ_IOC_CTX_CREATE, mode);
     if (rc) {
         printf("[accelerator runtime] heterogeneous context creation failed， rc = %d\n");
