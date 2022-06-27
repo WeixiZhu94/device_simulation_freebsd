@@ -44,8 +44,9 @@
 
 
 // GMEM API USAGE:
-#include <sys/gmem.h>
-#include <sys/gmem/gmem_uvas.h>
+#include <vm/gmem.h>
+#include <vm/gmem_dev.h>
+#include <vm/gmem_uvas.h>
 
 gmem_error_t gmem_uvas_create(
     gmem_uvas_t **uvas_res, 
