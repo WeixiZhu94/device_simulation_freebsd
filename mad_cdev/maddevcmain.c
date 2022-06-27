@@ -48,20 +48,6 @@
 #include <vm/gmem_dev.h>
 #include <vm/gmem_uvas.h>
 
-gmem_error_t gmem_uvas_create(
-    gmem_uvas_t **uvas_res, 
-    dev_pmap_t **pmap_res, 
-    gmem_dev_t *dev, // this argument is never used, consider removing it.
-    gmem_mmu_ops_t *mmu_ops,
-    dev_pmap_t *pmap_to_share, 
-    void *dev_data, 
-    int mode,
-    vm_offset_t alignment, 
-    vm_offset_t boundary, 
-    vm_offset_t size,
-    vm_offset_t guard)
-{
-
 // context switch is currently unsupported.
 dev_pmap_t *pmap;
 gmem_mmu_ops_t *mmu_ops;
