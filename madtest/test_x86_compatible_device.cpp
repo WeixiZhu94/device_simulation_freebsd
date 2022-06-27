@@ -14,6 +14,7 @@ int main(int argc, char **argv)
 	int ret;
 
 	// This test program simulates a program run on a peripheral MMU that is compatible with an x86-64 MMU
+	printf("[Test]: Creating context\n");
 	clContextCreate(SHARE_CPU);
 
 	for (int i = 0; i < num_of_tests; i ++) {
