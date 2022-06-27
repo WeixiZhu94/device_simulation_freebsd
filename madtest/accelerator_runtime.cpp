@@ -607,7 +607,7 @@ ssize_t Queued_Io(int fd, u8* pBufr, size_t DataLen, u8 bWrite)
     return 0;
 }
 
-void clContextCreate(vm_mode mode)
+void clContextCreate(gmem_vm_mode mode)
 {
     int rc;
 

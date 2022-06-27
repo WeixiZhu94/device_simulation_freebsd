@@ -55,7 +55,7 @@ gmem_vm_mode mode;
 
 static void setup_ctx(gmem_vm_mode running_mode)
 {
-    if (mode == SHARED) {
+    if (mode == SHARE_CPU) {
         mode = running_mode;
         gmem_uvas_create(NULL, &pmap, NULL, mmu_ops, NULL, NULL, GMEM_UVAS_SHARE_CPU,
             0, 0, 0, 0); // SHARE mode should not care about the last 4 args
@@ -231,7 +231,7 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 	long retval = 0;
 	U32  remains = 0;
     u32 flags1 = 0;
-    // U32 flags2 = 0;
+    struct accelerator_kernel_args *kernel_launch_args;
 
 	PINFO("maddev_ioctl... dev#=%d fp=%p cmd=x%X arg=x%X\n",
 		  (int)pmaddevobj->devnum, fp, cmd, (int)arg);
@@ -337,12 +337,12 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
             break;
 
         case MADDEVOBJ_IOC_CTX_CREATE:
-            setup_ctx((vm_mode) arg);
+            setup_ctx((gmem_vm_mode) arg);
             break;
 
         case MADDEVOBJ_IOC_LAUNCH_KERNEL:
-            struct accelerator_kernel_args *args = (struct accelerator_kernel_args *) arg;
-            run_kernel(args->kernel_type, args->kernel_args);
+            kernel_launch_args = (struct accelerator_kernel_args *) arg;
+            run_kernel(kernel_launch_args->kernel_type, kernel_launch_args->kernel_args);
             break;
 
 	    default:
