@@ -48,17 +48,61 @@
 #include <vm/gmem_dev.h>
 #include <vm/gmem_uvas.h>
 
+#include <vm/vm_map.h>
+// Save our time of implementing an x86-comptaible page walker
+#include <vm/pmap.h>
+
 // context switch is currently unsupported.
 dev_pmap_t *pmap;
 gmem_vm_mode mode;
 
+// emulate a hardware memory access
+// VA must be translated by device pmap, then we obtain the PA. Calculation is based on DMAP.
+static vm_offset_t address_translate(vm_offset_t va)
+{
+    vm_paddr_t pa;
+
+    // No TLB emulation, fall through to page walk
+    if (mode == SHARE_CPU) {
+        pa = pmap_extract(((vm_map_t) pmap->data)->pmap, va);
+        if (pa == 0) {
+            gmem_uvas_fault(pmap, va, 8, VM_PROT_READ | VM_PROT_WRITE, NULL);
+            pa = pmap_extract(((vm_map_t) pmap->data)->pmap, va);
+            if (pa == 0) {
+                printf("[gmem uvas fault] gives me 0 pa after faulting...\n");
+                exit(-1);
+            }
+        }
+    }
+    else
+        printf("Other modes unimplemented\n");
+    return PHYS_TO_DMAP(pa);
+}
+
+static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
+{
+    uint64_t *ka, *kb, *kc;
+    // depending on your mode, a, b, c could be different pa values.
+    for (uint64_t i = 0; i < len; i ++) // Let's assume this for-loop is paralleled by many accelerator cores
+    {
+        ka = address_translate(&a[i]);
+        kb = address_translate(&b[i]);
+        kc = address_translate(&c[i]);
+        *kc = *ka + *kb;
+    }
+}
+
 static int setup_ctx(gmem_vm_mode running_mode)
 {
+    int error;
     if (running_mode == SHARE_CPU) {
         mode = running_mode;
         printf("[devc] setting ctx as share_cpu, save my pmap to address %p\n", &pmap);
-        return gmem_uvas_create(NULL, &pmap, NULL, NULL, NULL, NULL, GMEM_UVAS_SHARE_CPU,
+        error = gmem_uvas_create(NULL, &pmap, NULL, NULL, NULL, NULL, GMEM_UVAS_SHARE_CPU,
             0, 0, 0, 0); // SHARE mode should not care about the last 4 args
+        if (error == GMEM_OK)
+            gmem_uvas_set_pmap_policy(pmap, false, false, 1); // page order = 1
+        return error;
         // pmap->data should now contain the CPU pmap
         // Save your context with pmap->data now.
     }
@@ -74,6 +118,7 @@ static int run_kernel(kernel_instance kernel_type, void *args)
         struct vector_add_args *input_args = (struct vector_add_args*) args;
         printf("[devc] simulating kernel for vector add, a %p, b %p, c %p, len %lu\n", 
             input_args->a, input_args->b, input_args->c, input_args->len);
+        vector_add(input_args->a, input_args->b, input_args->c, input_args->len);
         return -1;
     }
     else

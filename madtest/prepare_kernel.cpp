@@ -20,8 +20,13 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 
 		printf("%s %d, a %p, b %p, c %p, len %lu\n", __func__, __LINE__, args->a, args->b, args->c, args->len);
 		*kernel_args = (void*) args;
-		if (args->a != NULL && args->b != NULL && args->c != NULL)
+		if (args->a != NULL && args->b != NULL && args->c != NULL) {
+			for (uint64_t i = 0; i < args->len; i ++) {
+				args->a[i] = i; // (i * 13 + 9689) % 10007;
+				args->b[i] = i + 1; // (i * 7 + 9689) % 10007;
+			}
 			return 0;
+		}
 		else
 			return -ENOMEM;
 
