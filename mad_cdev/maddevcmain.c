@@ -66,7 +66,7 @@ static void* address_translate(void *va)
     if (mode == SHARE_CPU) {
         pa = pmap_extract(((vm_map_t) pmap->data)->pmap, (uintptr_t) va);
         if (pa == 0) {
-            gmem_uvas_fault(pmap, va, 8, VM_PROT_READ | VM_PROT_WRITE, NULL);
+            gmem_uvas_fault(pmap, (uintptr_t) va, 8, VM_PROT_READ | VM_PROT_WRITE, NULL);
             pa = pmap_extract(((vm_map_t) pmap->data)->pmap, (uintptr_t) va);
             if (pa == 0) {
                 printf("[gmem uvas fault] gives me 0 pa after faulting...\n");
