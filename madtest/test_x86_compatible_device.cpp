@@ -1,9 +1,14 @@
 #include "accelerator_runtime.h"
 
+const char* test_name[] = {
+    "vector_add",
+    "crc",
+};
+
+
 int main(int argc, char **argv)
 {
 	int num_of_tests = 1;
-	char test_name[2][10] = {"vector_add", "crc"};
 	kernel_instance test_program[1] = {SUM};
 	void *kernel_args;
 	int ret;
