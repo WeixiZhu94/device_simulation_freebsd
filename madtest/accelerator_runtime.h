@@ -32,6 +32,10 @@ typedef unsigned long long u64;
 #include "madkonsts.h"
 #include "maddevioctls.h"
 
+#include <vm/gmem.h>
+#include <vm/gmem_uvas.h>
+#include <vm/gmem_dev.h>
+
 #ifdef BIO //Block-mode device
 #define  MADDEVNAME      "maddevb_objX"
 #else //Char-mode device
