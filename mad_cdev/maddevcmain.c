@@ -55,6 +55,7 @@
 // context switch is currently unsupported.
 dev_pmap_t *pmap;
 gmem_vm_mode mode;
+int dev_faults = 0;
 
 // emulate a hardware memory access
 // VA must be translated by device pmap, then we obtain the PA. Calculation is based on DMAP.
@@ -67,6 +68,7 @@ static void* address_translate(void *va)
         pa = pmap_extract(((vm_map_t) pmap->data)->pmap, (uintptr_t) va);
         if (pa == 0) {
             gmem_uvas_fault(pmap, (uintptr_t) va, 8, VM_PROT_READ | VM_PROT_WRITE, NULL);
+            dev_faults ++;
             pa = pmap_extract(((vm_map_t) pmap->data)->pmap, (uintptr_t) va);
             if (pa == 0) {
                 printf("[gmem uvas fault] gives me 0 pa after faulting...\n");
@@ -81,6 +83,7 @@ static void* address_translate(void *va)
 static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
 {
     uint64_t *ka, *kb, *kc;
+    int delta_faults = dev_faults;
     // depending on your mode, a, b, c could be different pa values.
     for (uint64_t i = 0; i < len; i ++) // Let's assume this for-loop is paralleled by many accelerator cores
     {
@@ -89,6 +92,8 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
         kc = address_translate(&c[i]);
         *kc = *ka + *kb;
     }
+    delta_faults = dev_faults - delta_faults;
+    printf("[devc] kernel computation generates %d device page faults\n", dev_faults);
 }
 
 static int setup_ctx(gmem_vm_mode running_mode)
@@ -118,11 +123,11 @@ static int run_kernel(kernel_instance kernel_type, void *args)
         printf("[devc] simulating kernel for vector add, a %p, b %p, c %p, len %lu\n", 
             input_args->a, input_args->b, input_args->c, input_args->len);
         vector_add(input_args->a, input_args->b, input_args->c, input_args->len);
-        return -1;
+        return 0;
     }
     else
         printf("[devc] other kernels not implemented\n");
-    return -2;
+    return -1;
 }
 
 
