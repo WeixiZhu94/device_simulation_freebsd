@@ -235,8 +235,7 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
     u32 flags1 = 0;
     struct accelerator_kernel_args *kernel_launch_args;
 
-	PINFO("maddev_ioctl... dev#=%d fp=%p cmd=x%X arg=x%X\n",
-		  (int)pmaddevobj->devnum, fp, cmd, (int)arg);
+	printf("Doing ioctl: dev#=%d fp=%p cmd=x%X arg=x%X\n", (int)pmaddevobj->devnum, fp, cmd, (int)arg);
 
 	/* The direction is a bitmask, and VERIFY_WRITE catches R/W
 	 * transfers. `Type' is user-oriented, while
@@ -251,7 +250,7 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 
     //If the ioctl queue is not free we return
     if (pmaddevobj->ioctl_f != eIoReset)
-        {return -EAGAIN;}
+        return -EAGAIN;
 
     mutex_lock(&pmaddevobj->devmutex);
 
