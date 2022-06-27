@@ -639,8 +639,8 @@ typedef struct _MADREGS
 // };
 
 enum kernel_instance {
-    CRC = 0,
-    SUM
+    SUM = 0,
+    CRC = 1,
 };
 typedef enum kernel_instance kernel_instance;
 

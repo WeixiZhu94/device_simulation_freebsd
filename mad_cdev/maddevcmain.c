@@ -57,6 +57,7 @@ dev_pmap_t *pmap;
 gmem_vm_mode mode;
 int dev_faults = 0;
 
+/* Device MMU emulation code */
 // emulate a hardware memory access
 // VA must be translated by device pmap, then we obtain the PA. Calculation is based on DMAP.
 static void* address_translate(void *va)
@@ -80,6 +81,7 @@ static void* address_translate(void *va)
     return (void *) PHYS_TO_DMAP(pa);
 }
 
+/* openCL kernel emulation code */
 static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
 {
     uint64_t *ka, *kb, *kc;
@@ -96,25 +98,6 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
     printf("[devc] kernel computation generates %d device page faults\n", dev_faults);
 }
 
-static int setup_ctx(gmem_vm_mode running_mode)
-{
-    int error;
-    if (running_mode == SHARE_CPU) {
-        mode = running_mode;
-        printf("[devc] setting ctx as share_cpu, save my pmap to address %p\n", &pmap);
-        error = gmem_uvas_create(NULL, &pmap, NULL, NULL, NULL, NULL, GMEM_UVAS_SHARE_CPU,
-            0, 0, 0, 0); // SHARE mode should not care about the last 4 args
-        if (error == GMEM_OK)
-            gmem_uvas_set_pmap_policy(pmap, false, false, 1); // page order = 1
-        return error;
-        // pmap->data should now contain the CPU pmap
-        // Save your context with pmap->data now.
-    }
-    else
-        printf("Other GMEM UVAS modes not supported yet\n");
-    return -1;
-}
-
 static int run_kernel(kernel_instance kernel_type, void *args)
 {
     // Do we need to translate user-space va to kernel space va?
@@ -127,6 +110,26 @@ static int run_kernel(kernel_instance kernel_type, void *args)
     }
     else
         printf("[devc] other kernels not implemented\n");
+    return -1;
+}
+
+/* VM code based on GMEM driver API */
+static int setup_ctx(gmem_vm_mode running_mode)
+{
+    int error;
+    if (running_mode == SHARE_CPU) {
+        mode = running_mode;
+        printf("[devc] setting ctx as share_cpu, save my pmap to address %p\n", &pmap);
+        error = gmem_uvas_create(NULL, &pmap, NULL, NULL, NULL, NULL, GMEM_UVAS_SHARE_CPU,
+            0, 0, 0, 0); // SHARE mode should not care about the last 4 args
+        if (error == GMEM_OK)
+            gmem_uvas_set_pmap_policy(pmap, false, false, 1); // page order = 1
+        // pmap->data should now contain the CPU pmap
+        // Save your context with pmap->data now.
+        return error;
+    }
+    else
+        printf("Other GMEM UVAS modes not supported yet\n");
     return -1;
 }
 
