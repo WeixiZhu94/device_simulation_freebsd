@@ -57,7 +57,7 @@ static int setup_ctx(gmem_vm_mode running_mode)
 {
     if (running_mode == SHARE_CPU) {
         printf("[devc] setting ctx as share_cpu\n");
-        return gmem_uvas_create(NULL, &pmap, NULL, mmu_ops, NULL, NULL, GMEM_UVAS_SHARE_CPU,
+        return gmem_uvas_create(NULL, &pmap, NULL, NULL, NULL, NULL, GMEM_UVAS_SHARE_CPU,
             0, 0, 0, 0); // SHARE mode should not care about the last 4 args
         // pmap->data should now contain the CPU pmap
         // Save your context with pmap->data now.
