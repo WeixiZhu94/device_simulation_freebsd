@@ -20,11 +20,13 @@ int main(int argc, char **argv)
 	for (int i = 0; i < num_of_tests; i ++) {
 		printf("Test: %s\n", test_name[i]);
 		ret = generate_test(test_program[i], &kernel_args);
+		printf("Done with test generation\n");
 		if (ret)
 			printf("Test generation failed\n");
 		else
 			printf("Test generation succeeded\n");
 
+		printf("Launching kernel\n");
 		clLaunchKernel(test_program[i], kernel_args);
 
 		ret = validate_test(test_program[i], kernel_args);
