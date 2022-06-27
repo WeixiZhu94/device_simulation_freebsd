@@ -34,10 +34,18 @@ void clContextCreate(gmem_vm_mode mode)
     if (pMapdDevRegs != NULL)
         pPIOregn = ((U8*)pMapdDevRegs + MAD_MAPD_READ_OFFSET);
 
+    
     printf("Issuing ioctl for cmd %lx\n", MADDEVOBJ_IOC_INIT);
     rc = ioctl(fd, MADDEVOBJ_IOC_INIT, NULL);
     if (rc)
         printf("[accelerator runtime] INIT failed\n");
+
+    printf("Issuing ioctl for cmd %lx, indx = %lu\n", MADDEVOBJ_IOC_SET_READ_INDX, 1);
+    rc = ioctl(fd, MADDEVOBJ_IOC_SET_READ_INDX, 1);
+    if (rc) {
+        printf("[accelerator runtime] MADDEVOBJ_IOC_SET_READ_INDX failed， rc = %lu\n");
+        exit(-1);
+    }
 
     printf("Issuing ioctl for cmd %lx, mode = %lu\n", MADDEVOBJ_IOC_CTX_CREATE, (unsigned long) mode);
     rc = ioctl(fd, MADDEVOBJ_IOC_CTX_CREATE, mode);
