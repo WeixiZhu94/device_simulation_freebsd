@@ -50,13 +50,13 @@
 
 // context switch is currently unsupported.
 dev_pmap_t *pmap;
-gmem_mmu_ops_t *mmu_ops;
 gmem_vm_mode mode;
 
 static int setup_ctx(gmem_vm_mode running_mode)
 {
     if (running_mode == SHARE_CPU) {
-        printf("[devc] setting ctx as share_cpu\n");
+        mode = running_mode;
+        printf("[devc] setting ctx as share_cpu, save my pmap to address %p\n", &pmap);
         return gmem_uvas_create(NULL, &pmap, NULL, NULL, NULL, NULL, GMEM_UVAS_SHARE_CPU,
             0, 0, 0, 0); // SHARE mode should not care about the last 4 args
         // pmap->data should now contain the CPU pmap
@@ -339,6 +339,7 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 
         case MADDEVOBJ_IOC_CTX_CREATE:
             retval = setup_ctx((gmem_vm_mode) arg);
+            printf("UVAS has been set up\n");
             break;
 
         case MADDEVOBJ_IOC_LAUNCH_KERNEL:
