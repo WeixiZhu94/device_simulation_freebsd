@@ -647,11 +647,11 @@ typedef enum kernel_instance kernel_instance;
 struct accelerator_kernel_args {
     kernel_instance kernel_type;
     void *kernel_args;
-}
+};
 
 struct vector_add_args {
     uint64_t *a,*b,*c;
     uint64_t len;
-}
+};
 
 #endif //_MADDEFS_
