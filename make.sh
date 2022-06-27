@@ -3,7 +3,7 @@
 for file in madbus mad_cdev madtest
 do
 	cd $file
-	make &
+	make -j4 &
 	cd ..
 done
 wait

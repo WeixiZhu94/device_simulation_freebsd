@@ -18,7 +18,7 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 		args->c = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
 		args->len = TEST_LENGTH;
 
-		printf("%s %d, a %p, b %p, c %p, len %lu\n", __func__, __LINE__, args->a, args->b, args->c, len);
+		printf("%s %d, a %p, b %p, c %p, len %lu\n", __func__, __LINE__, args->a, args->b, args->c, args->len);
 		*kernel_args = (void*) args;
 		if (args->a != NULL && args->b != NULL && args->c != NULL)
 			return 0;
