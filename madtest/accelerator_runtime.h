@@ -80,7 +80,7 @@ ssize_t Async_Io(int fd, u8* pBufr, size_t DataLen, size_t offset, u8 bWrite);
 ssize_t Queued_Io(int fd, u8* pBufr, size_t DataLen, u8 bWrite);
 
 // Library APIs (something like openCL)
-void clContextCreate(vm_mode mode);
+void clContextCreate(gmem_vm_mode mode);
 void clLaunchKernel(kernel_instance kernel, void *args);
 // void clPrefetch(); // do we need to exercise this? maybe we can try and see how this could be implemented by gmem api.
 int generate_test(kernel_instance kernel, void **args);
