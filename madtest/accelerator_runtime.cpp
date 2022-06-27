@@ -27,6 +27,8 @@ void clContextCreate(gmem_vm_mode mode)
         return ;
     }
 
+    printf("[test] IOCTLs: %lx, %lx, %lx\n", MADDEVOBJ_IOC_MAGIC, MADDEVOBJ_IOC_GET_DEVICE, MADDEVOBJ_IOC_FLUSH_WRITE_CACHE);
+
     // Map registers
     rc = MapDeviceRegsPio(&pMapdDevRegs, fd);
     if (pMapdDevRegs != NULL)
