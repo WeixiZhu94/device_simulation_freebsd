@@ -31,9 +31,9 @@ int main(int argc, char **argv)
 
 		ret = validate_test(test_program[i], kernel_args);
 		if (ret == 0)
-			printf("Test %d passed. Test name: %s\n", i, test_name[test_program[i]]);
+			printf("Test %s passed. \n", test_name[test_program[i]]);
 		else
-			printf("Test %d failed. Test name: %s\n", i, test_name[test_program[i]]);
+			printf("Test %s failed. \n", test_name[test_program[i]]);
 	}
 
 	return 0;

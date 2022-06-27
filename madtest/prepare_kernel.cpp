@@ -22,8 +22,8 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 		*kernel_args = (void*) args;
 		if (args->a != NULL && args->b != NULL && args->c != NULL) {
 			for (uint64_t i = 0; i < args->len; i ++) {
-				args->a[i] = i; // (i * 13 + 9689) % 10007;
-				args->b[i] = i + 1; // (i * 7 + 9689) % 10007;
+				args->a[i] = (i * 13 + 9689) % 10007;
+				args->b[i] = (i * 7 + 9689) % 10007;
 			}
 			return 0;
 		}
