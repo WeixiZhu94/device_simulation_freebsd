@@ -8,13 +8,13 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 		printf("No output kernel args\n");
 		return -1;
 	}
-	
+
 	if (kernel == SUM) {
 		struct vector_add_args *args;
-		args = malloc(sizeof(struct vector_add_args));
-		args->a = malloc(TEST_LENGTH * sizeof(uint64_t));
-		args->b = malloc(TEST_LENGTH * sizeof(uint64_t));
-		args->c = malloc(TEST_LENGTH * sizeof(uint64_t));
+		args = (struct vector_add_args*)malloc(sizeof(struct vector_add_args));
+		args->a = (struct uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
+		args->b = (struct uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
+		args->c = (struct uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
 		args->len = TEST_LENGTH;
 
 		*kernel_args = (void*) args;
@@ -35,7 +35,8 @@ int validate_test(kernel_instance kernel, void *kernel_args)
 	if (kernel == SUM) {
 		struct vector_add_args *args = (struct vector_add_args*) kernel_args;
 		uint64_t *a = args->a, *b = args->b, *c = args->c;
-		for (int i = 0; i < TEST_LENGTH; i ++)
+		int i;
+		for (i = 0; i < TEST_LENGTH; i ++)
 			if (!(c[i] == a[i] + b[i]))
 				break;
 		if (i == TEST_LENGTH)
