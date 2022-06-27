@@ -9,7 +9,6 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 		return -1;
 	}
 
-	printf("%s %d\n", __func__, __LINE__);
 	if (kernel == SUM) {
 		struct vector_add_args *args;
 		printf("%s %d\n", __func__, __LINE__);
@@ -19,9 +18,8 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 		args->c = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
 		args->len = TEST_LENGTH;
 
-		printf("%s %d\n", __func__, __LINE__);
+		printf("%s %d, a %p, b %p, c %p, len %lu\n", __func__, __LINE__, args->a, args->b, args->c, len);
 		*kernel_args = (void*) args;
-		printf("%s %d\n", __func__, __LINE__);
 		if (args->a != NULL && args->b != NULL && args->c != NULL)
 			return 0;
 		else
