@@ -40,17 +40,17 @@ void clContextCreate(gmem_vm_mode mode)
     if (rc)
         printf("[accelerator runtime] INIT failed\n");
 
-    printf("Issuing ioctl for cmd %lx, indx = %lu\n", MADDEVOBJ_IOC_SET_READ_INDX, 1);
-    rc = ioctl(fd, MADDEVOBJ_IOC_SET_READ_INDX, 1);
-    if (rc) {
-        printf("[accelerator runtime] MADDEVOBJ_IOC_SET_READ_INDX failed， rc = %lu\n");
-        exit(-1);
-    }
+    // printf("Issuing ioctl for cmd %lx, indx = %lu\n", MADDEVOBJ_IOC_SET_READ_INDX, 1);
+    // rc = ioctl(fd, MADDEVOBJ_IOC_SET_READ_INDX, 1);
+    // if (rc) {
+    //     printf("[accelerator runtime] MADDEVOBJ_IOC_SET_READ_INDX failed， rc = %x\n");
+    //     exit(-1);
+    // }
 
     printf("Issuing ioctl for cmd %lx, mode = %lu\n", MADDEVOBJ_IOC_CTX_CREATE, (unsigned long) mode);
     rc = ioctl(fd, MADDEVOBJ_IOC_CTX_CREATE, mode);
     if (rc) {
-        printf("[accelerator runtime] heterogeneous context creation failed， rc = %lu\n");
+        printf("[accelerator runtime] heterogeneous context creation failed， rc = %x\n");
         exit(-1);
     }
     return;
