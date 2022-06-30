@@ -1,6 +1,6 @@
 #include "accelerator_runtime.h"
 
-#define TEST_LENGTH 1*1024*1024
+#define TEST_LENGTH 1*1024*1024ULL
 
 int generate_test(kernel_instance kernel, void **kernel_args)
 {
@@ -18,6 +18,7 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 		args->vector_add.c = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
 		args->vector_add.len = TEST_LENGTH;
 
+		printf("Total test size: %lxMB\n", TEST_LENGTH * sizeof(uint64_t) / 1024 / 1024);
 		printf("%s %d, args: %p, a %p, b %p, c %p, len %lu\n", __func__, __LINE__, 
 			args, 
 			args->vector_add.a, 
