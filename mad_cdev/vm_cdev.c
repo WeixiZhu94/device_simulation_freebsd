@@ -14,6 +14,7 @@ void dev_fault_trap(dev_pmap_t *pmap, void *va) {
 
 static inline uint64_t *get_pte(vm_page_t pgroot, vm_offset_t va, int lvl) {
     uint64_t *pde;
+    printf("[get_pte] %lx %d\n", va, lvl);
     if (lvl == 0) {
         pde = (uint64_t *) PHYS_TO_DMAP(VM_PAGE_TO_PHYS(&pgroot[get_lvl_index(va, 0) >> 9]));
         return &pde[get_lvl_index(va, 0) & LVL_MASK];
@@ -32,7 +33,9 @@ static inline uint64_t *get_pte(vm_page_t pgroot, vm_offset_t va, int lvl) {
 uint64_t x97_address_translate(dev_pmap_t *pmap, void *va) {
     struct x97_page_table *pgtable = (struct x97_page_table *) pmap->data;
     vm_page_t pgroot = pgtable->pgroot;
+    printf("[x97_address_translate] %p\n", va);
     uint64_t *pte = get_pte(pgroot, (vm_offset_t) va, 2);
+    printf("[x97_address_translate] done\n");
     return *pte;
 }
 
@@ -52,6 +55,8 @@ static gmem_error_t x97_mmu_create(dev_pmap_t *pmap)
     mtx_init(&pgtable->lock, "x97 mmu pg table giant lock", NULL, MTX_DEF);
     if (vmem_xalloc(pm_pool, PT_LEVEL_0, 0, 0, 0, VMEM_ADDR_MIN, VMEM_ADDR_MAX, M_WAITOK | M_BESTFIT, &page_idx))
         printf("!!! x97 failed to initialize page table\n");
+    else
+        printf("[x97] mmu_create initialized %lu pages starting at index %lu", PT_LEVEL_0, page_idx);
     for (int i = 0; i < PT_LEVEL_0; i ++)
         pmap_zero_page(&first_x97_page[page_idx + i]);
     pgtable->pgroot = &first_x97_page[page_idx];
