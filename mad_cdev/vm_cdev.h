@@ -1,33 +1,12 @@
 #ifndef _VM_CDEV_H_
 #define _VM_CDEV_H_
 
-#include <sys/cdefs.h>
-#include <sys/param.h>
-#include <sys/domainset.h>
-#include <sys/kernel.h>
-#include <sys/lock.h>
-#include <sys/proc.h>
-#include <sys/rwlock.h>
-#include <sys/malloc.h>
-#include <sys/sysctl.h>
-#include <sys/systm.h>
-#include <sys/selinfo.h>
-#include <sys/smp.h>
-#include <sys/pipe.h>
-#include <sys/bio.h>
-#include <sys/buf.h>
-#include <sys/vmem.h>
-#include <sys/vmmeter.h>
-#include <sys/sched.h>
-#include <sys/kthread.h>
-#include <sys/unistd.h>
+#include "maddevc.h"
 
-#include <vm/vm.h>
-#include <vm/vm_object.h>
+#include <sys/vmem.h>
 #include <vm/vm_page.h>
-#include <vm/vm_map.h>
-#include <vm/vm_extern.h>
 #include <vm/pmap.h>
+#include <vm/vm_map.h>
 
 // GMEM API USAGE:
 #include <vm/gmem.h>
