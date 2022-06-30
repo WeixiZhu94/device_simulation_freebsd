@@ -59,6 +59,8 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
             return;
         }
 
+        if (i % 1024 * 10 == 0)
+            printf("Progress: %lu\n", i);
         *kc = *ka + *kb;
     }
     delta_faults = dev_faults - delta_faults;

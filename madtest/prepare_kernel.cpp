@@ -1,6 +1,6 @@
 #include "accelerator_runtime.h"
 
-#define TEST_LENGTH 100*1024*1024
+#define TEST_LENGTH 1*1024*1024
 
 int generate_test(kernel_instance kernel, void **kernel_args)
 {
