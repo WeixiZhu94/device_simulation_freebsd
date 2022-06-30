@@ -9,7 +9,7 @@ struct pglist x97_activelist, x97_freelist;
 
 vm_page_t get_victim_page() 
 {
-	if (!TAILQ_EMPTY(x97_freelist))
+	if (!TAILQ_EMPTY(&x97_freelist))
 		printf("The x97 freelist is not empty when you are reclaiming memory\n");
 	vm_page_t m = TAILQ_FIRST(&x97_activelist);
 	// TAILQ_REMOVE(&x97_activelist, m);
@@ -20,8 +20,8 @@ vm_page_t get_victim_page()
 void activate_page(vm_page_t m)
 {
 	if (!TAILQ_EMPTY(&x97_freelist)) {
-		TAILQ_REMOVE(&x97_freelist, m, m->plinks.q);
-		TAILQ_INSERT_TAIL(&x97_activelist, m, m->plinks.q);
+		TAILQ_REMOVE(&x97_freelist, m, plinks.q);
+		TAILQ_INSERT_TAIL(&x97_activelist, m, plinks.q);
 	}
 	else
 		printf("The x97 page to activate does not exist in freelist\n");
@@ -30,8 +30,8 @@ void activate_page(vm_page_t m)
 void free_page(vm_page_t m)
 {
 	if (!TAILQ_EMPTY(&x97_activelist)) {
-		TAILQ_REMOVE(&x97_activelist, m, m->plinks.q);
-		TAILQ_INSERT_HEAD(&x97_freelist, m, m->plinks.q);
+		TAILQ_REMOVE(&x97_activelist, m, plinks.q);
+		TAILQ_INSERT_HEAD(&x97_freelist, m, plinks.q);
 	}
 	else
 		printf("The x97 page to free does not exist in activelist\n");
