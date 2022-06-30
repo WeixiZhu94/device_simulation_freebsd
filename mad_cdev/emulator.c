@@ -60,13 +60,14 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
 
 int run_kernel(void *arg)
 {
-    struct accelerator_kernel_args kernel_launch_args;
+    struct accelerator_kernel_args *kernel_launch_args;
     kernel_instance kernel_type; 
     struct vector_add_args *args;
 
-    copyin(arg, &kernel_launch_args, sizeof(struct accelerator_kernel_args));
-    kernel_type = kernel_launch_args.kernel_type;
-    args = &kernel_launch_args.vector_add;
+    kernel_launch_args = arg;
+    // copyin(arg, &kernel_launch_args, sizeof(struct accelerator_kernel_args));
+    kernel_type = kernel_launch_args->kernel_type;
+    args = &kernel_launch_args->vector_add;
 
     printf("[devc] running kernel, type %u, args %p\n", kernel_type, args);
     // Do we need to translate user-space va to kernel space va?
