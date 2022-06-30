@@ -306,7 +306,7 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
             break;
 
         case MADDEVOBJ_IOC_CTX_CREATE:
-            retval = setup_ctx(pmaddevobj->, (gmem_vm_mode) arg);
+            retval = setup_ctx((gmem_vm_mode) arg);
             printf("UVAS has been set up\n");
             break;
 

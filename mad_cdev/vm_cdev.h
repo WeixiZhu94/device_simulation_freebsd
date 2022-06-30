@@ -10,6 +10,8 @@
 // Save our time of implementing an x86-comptaible page walker
 #include <vm/pmap.h>
 
+// emulator code
+int run_kernel(kernel_instance kernel_type, void *args)
 
 // The code below is shared
 dev_pmap_t *pmap; // This is the current pmap

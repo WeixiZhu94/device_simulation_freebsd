@@ -50,7 +50,7 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
     printf("[devc] kernel computation generates %d device page faults\n", dev_faults);
 }
 
-static int run_kernel(kernel_instance kernel_type, void *args)
+int run_kernel(kernel_instance kernel_type, void *args)
 {
     // Do we need to translate user-space va to kernel space va?
     if (kernel_type == SUM) {
