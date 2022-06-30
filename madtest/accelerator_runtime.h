@@ -38,7 +38,8 @@ enum gmem_vm_mode {
 	REPLICATE,
 	SHARE,
 	REPLICATE_CPU,
-	SHARE_CPU
+	SHARE_CPU,
+	EXCLUSIVE,
 };
 typedef enum gmem_vm_mode gmem_vm_mode;
 
