@@ -1,5 +1,5 @@
-all: obj1 obj2 ob3 obj4 share x97
-	
+all: obj1 obj2 obj3 obj4 share x97
+
 obj1:
 	clang++ accelerator_runtime.cpp -I../include -o a.o
 obj2:
