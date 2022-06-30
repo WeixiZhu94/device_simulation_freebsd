@@ -60,7 +60,7 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
 
 int run_kernel(kernel_instance kernel_type, void *args)
 {
-    printf("[devc] running kernel\n");
+    printf("[devc] running kernel, type %u, args %p\n", kernel_type, args);
     // Do we need to translate user-space va to kernel space va?
     if (kernel_type == SUM) {
         struct vector_add_args input_args;
