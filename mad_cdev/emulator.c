@@ -22,7 +22,7 @@ static void* address_translate(void *va)
     }
     else if (mode == EXCLUSIVE) {
         pa = x97_address_translate(pmap, va);
-        printf("[address_translate] x97 gives me address %lx\n", pa);
+        // printf("[address_translate] x97 gives me address %lx\n", pa);
         if (pa == 0) {
             dev_fault_trap(pmap, va);
             pa = x97_address_translate(pmap, va);
@@ -30,7 +30,7 @@ static void* address_translate(void *va)
                 printf("[gmem uvas fault] gives me 0 pa after faulting...\n");
                 return 0;
             }
-            printf("[dev_fault] x97 faults me address %lx\n", pa);
+            // printf("[dev_fault] x97 faults me address %lx\n", pa);
         }
         if (pa < pmap->mmu_ops->pa_min || pa >= pmap->mmu_ops->pa_max) {
             printf("[emulator] should crash because your pa is illegal, min %lx, pa %lx, max %lx\n", 

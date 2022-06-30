@@ -16,8 +16,8 @@ static inline uint64_t *get_pte(vm_page_t pgroot, vm_offset_t va, int lvl) {
     uint64_t *pde;
     if (lvl == 0) {
         pde = (uint64_t *) PHYS_TO_DMAP(VM_PAGE_TO_PHYS(&pgroot[get_root_index(va)]));
-        printf("[get_pte] %lx %d, pg index %lu, index: %lu, pde: %p\n", va, lvl,
-            get_root_index(va), get_lvl_index(va, 0), pde);
+        // printf("[get_pte] %lx %d, pg index %lu, index: %lu, pde: %p\n", va, lvl,
+        //     get_root_index(va), get_lvl_index(va, 0), pde);
         return &pde[get_lvl_index(va, 0) & LVL_MASK];
     } else {
         pde = get_pte(pgroot, va, lvl - 1);
@@ -27,8 +27,8 @@ static inline uint64_t *get_pte(vm_page_t pgroot, vm_offset_t va, int lvl) {
             // flush device cache.
         }
         pde = (uint64_t *) PHYS_TO_DMAP(*pde);
-        printf("[get_pte] %lx %d, index: %lu, pde: %p\n", va, lvl,
-            get_lvl_index(va, lvl), pde);
+        // printf("[get_pte] %lx %d, index: %lu, pde: %p\n", va, lvl,
+        //     get_lvl_index(va, lvl), pde);
         return &pde[get_lvl_index(va, lvl)];
     }
 }
