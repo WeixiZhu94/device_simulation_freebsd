@@ -16,6 +16,7 @@ static void* address_translate(void *va)
             pa = pmap_extract(((vm_map_t) pmap->data)->pmap, (uintptr_t) va);
             if (pa == 0) {
                 printf("[gmem uvas fault] gives me 0 pa after faulting...\n");
+                return 0;
             }
         }
     }
@@ -26,6 +27,7 @@ static void* address_translate(void *va)
             pa = x97_address_translate(pmap, va);
             if (pa == 0) {
                 printf("[gmem uvas fault] gives me 0 pa after faulting...\n");
+                return 0;
             }
         }
     } else
