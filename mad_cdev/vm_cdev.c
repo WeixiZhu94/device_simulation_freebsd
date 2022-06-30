@@ -101,7 +101,8 @@ static gmem_error_t x97_mmu_enter(dev_pmap_t *pmap, vm_offset_t va, vm_size_t si
         pte = get_pte(pgroot, va_i, 2);
         *pte = (pa & PAGE_MASK) | 0; // No memory protection flags, don't care.
 
-        printf("[x97_mmu_ener] maps va %lx to pa %lx, last level pte %p\n", va_i, pa, pte);
+        printf("[x97_mmu_enter] maps va %lx to pa %lx, last level pte %p, *pte is %lx\n", 
+            va_i, pa, pte, *pte);
         if (*pte < pmap->mmu_ops->pa_min || *pte >= pmap->mmu_ops->pa_max)
             printf("[x97_mmu_enter] installed out of range pa %lx\n", *pte);
         // flush device cache
