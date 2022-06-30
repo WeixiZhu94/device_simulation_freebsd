@@ -14,7 +14,7 @@ void dev_fault_trap(dev_pmap_t *pmap, void *va) {
 
 static inline uint64_t *get_pte(vm_page_t pgroot, vm_offset_t va, int lvl) {
     uint64_t *pde;
-    printf("[get_pte] %lx %d\n", va, lvl);
+    // printf("[get_pte] %lx %d\n", va, lvl);
     if (lvl == 0) {
         pde = (uint64_t *) PHYS_TO_DMAP(VM_PAGE_TO_PHYS(&pgroot[get_lvl_index(va, 0) >> 9]));
         return &pde[get_lvl_index(va, 0) & LVL_MASK];
@@ -33,10 +33,15 @@ static inline uint64_t *get_pte(vm_page_t pgroot, vm_offset_t va, int lvl) {
 uint64_t x97_address_translate(dev_pmap_t *pmap, void *va) {
     struct x97_page_table *pgtable = (struct x97_page_table *) pmap->data;
     vm_page_t pgroot = pgtable->pgroot;
-    printf("[x97_address_translate] %p\n", va);
+    // printf("[x97_address_translate] %p\n", va);
     uint64_t *pte = get_pte(pgroot, (vm_offset_t) va, 2);
-    printf("[x97_address_translate] done, page pa: %lx\n", *pte);
-    return *pte;
+    // printf("[x97_address_translate] done, page pa: %lx\n", *pte);
+    if (*pte != 0) {
+        if (*pte > 0x800000000)
+            printf("%s %d: translate va %lx - pa %lx\n",__func__, __LINE__, (uintptr_t) va, *pte);
+        return *pte | ((uintptr_t va) & PAGE_MASK);
+    } else
+        return 0;
 }
 
 static gmem_error_t x97_mmu_init(struct gmem_mmu_ops* ops)
