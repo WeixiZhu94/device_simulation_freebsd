@@ -32,7 +32,7 @@ static void* address_translate(void *va)
             }
         }
         if (pa < pmap->mmu_ops->pa_min || pa >= pmap->mmu_ops->pa_max) {
-            printf("[emulator] crashes because your pa is illegal");
+            printf("[emulator] crashes because your pa is illegal\n");
             return 0;
         }
     } else
@@ -53,7 +53,7 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
         kc = address_translate(&c[i]);
         if (ka == 0 || kb == 0 || kc == 0) {
             printf("[devc] kernel failed with 0 pa, %p %p %p %p %p %p\n",
-                a, b, c, &a[i], &b[i], &c[i]);
+                ka, kb, kc, &a[i], &b[i], &c[i]);
             return;
         }
 
