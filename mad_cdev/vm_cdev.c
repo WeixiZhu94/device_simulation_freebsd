@@ -98,7 +98,7 @@ static gmem_error_t x97_mmu_enter(dev_pmap_t *pmap, vm_offset_t va, vm_size_t si
     vm_page_t pgroot = pgtable->pgroot;
 
     for (vm_offset_t va_i = va; va_i < va + size; va_i += PAGE_SIZE, pa += PAGE_SIZE) {
-        printf("[x97_mmu_ener] maps va %lx to pa %lx, last level pte %lx\n", va_i, pa, pte);
+        printf("[x97_mmu_ener] maps va %lx to pa %lx, last level pte %p\n", va_i, pa, pte);
         pte = get_pte(pgroot, va_i, 2);
         *pte = (pa & PAGE_MASK) | 0; // No memory protection flags, don't care.
 
