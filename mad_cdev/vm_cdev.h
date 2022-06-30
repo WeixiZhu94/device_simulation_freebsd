@@ -19,7 +19,7 @@ int run_kernel(kernel_instance kernel_type, void *args);
 // The code below is shared
 extern dev_pmap_t *pmap; // This is the current pmap
 extern gmem_vm_mode mode;
-int dev_faults;
+extern int dev_faults;
 void dev_fault_trap(dev_pmap_t *pmap, void *va);
 int setup_ctx(gmem_vm_mode running_mode);
 
