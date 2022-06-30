@@ -38,7 +38,7 @@ static gmem_error_t x97_mmu_init(struct gmem_mmu_ops* ops)
     return GMEM_OK;
 }
 
-static gmem_error_t x97_mmu_pmap_create(dev_pmap_t *pmap)
+static gmem_error_t x97_mmu_create(dev_pmap_t *pmap)
 {
     unsigned long page_idx;
     struct x97_page_table *pgtable = malloc(sizeof(struct x97_page_table), M_DEVBUF, M_WAITOK | M_ZERO);
@@ -54,7 +54,7 @@ static gmem_error_t x97_mmu_pmap_create(dev_pmap_t *pmap)
     return GMEM_OK;
 }
 
-static gmem_error_t x97_mmu_pmap_destroy(dev_pmap_t *pmap)
+static gmem_error_t x97_mmu_destroy(dev_pmap_t *pmap)
 {
     struct x97_page_table *pgtable = (struct x97_page_table *) pmap->data;
 
@@ -116,7 +116,7 @@ struct gmem_mmu_ops x97_mmu_ops = {
 
 
 /* VM code based on GMEM driver API */
-int setup_ctx(device_t device, gmem_vm_mode running_mode)
+int setup_ctx(gmem_vm_mode running_mode)
 {
     int error;
 
@@ -141,7 +141,7 @@ int setup_ctx(device_t device, gmem_vm_mode running_mode)
         // else
         //     dev = device_get_gmem_dev(device);
 
-        error = gmem_uvas_create(NULL, &pmap, NULL, &exclusive_mmu_ops, NULL, NULL, GMEM_UVAS_EXCLUSIVE,
+        error = gmem_uvas_create(NULL, &pmap, NULL, &x97_mmu_ops, NULL, NULL, GMEM_UVAS_EXCLUSIVE,
             0, 0, 0, 0); // exclusive mode should not care about the last 4 args
         if (error == GMEM_OK)
             gmem_uvas_set_pmap_policy(pmap, false, false, 1); // page order = 1
