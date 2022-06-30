@@ -151,6 +151,7 @@ int setup_ctx(gmem_vm_mode running_mode)
             0, 0, 0, 0); // exclusive mode should not care about the last 4 args
         if (error == GMEM_OK)
             gmem_uvas_set_pmap_policy(pmap, false, false, 1); // page order = 1
+        return error;
     } else
         printf("Other GMEM UVAS modes not supported yet\n");
     return -1;

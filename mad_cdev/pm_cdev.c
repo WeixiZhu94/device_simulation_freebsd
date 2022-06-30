@@ -18,9 +18,10 @@ int init_pm(struct gmem_mmu_ops *ops) {
     		first_x97_page[i].flags |= PG_NOCPU;
         last_x97_page = &first_x97_page[npages - 1];
         ops->pa_min = VM_PAGE_TO_PHYS(first_x97_page);
-        ops->pa_max = VM_PAGE_TO_PHYS(last_x97_page);
+        ops->pa_max = VM_PAGE_TO_PHYS(last_x97_page) + PAGE_SIZE;
 		pm_pool = vmem_create("x97 device private physical memory", 0, npages, 1, 16, M_WAITOK | M_BESTFIT);
-        printf("!!! Stealing physical memory for the fake device succeeded, pa_min %lx, pa_max %lx\n", ops->pa_min, ops->pa_max);
+        printf("!!! Stealing physical memory for the fake device succeeded, pa_min %lx, pa_max %lx, npages: %lu\n", 
+        	ops->pa_min, ops->pa_max, npages);
     }
 	return 0;
 }
