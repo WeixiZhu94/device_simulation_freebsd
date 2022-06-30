@@ -22,6 +22,7 @@ static void* address_translate(void *va)
     }
     else if (mode == EXCLUSIVE) {
         pa = x97_address_translate(pmap, va);
+        printf("[address_translate] x97 gives me address %lx\n", pa);
         if (pa == 0) {
             dev_fault_trap(pmap, va);
             pa = x97_address_translate(pmap, va);

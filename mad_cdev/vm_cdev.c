@@ -35,7 +35,7 @@ uint64_t x97_address_translate(dev_pmap_t *pmap, void *va) {
     vm_page_t pgroot = pgtable->pgroot;
     printf("[x97_address_translate] %p\n", va);
     uint64_t *pte = get_pte(pgroot, (vm_offset_t) va, 2);
-    printf("[x97_address_translate] done\n");
+    printf("[x97_address_translate] done, page pa: %lx\n", *pte);
     return *pte;
 }
 
