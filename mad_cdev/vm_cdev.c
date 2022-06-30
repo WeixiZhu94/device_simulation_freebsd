@@ -23,10 +23,10 @@ static inline uint64_t *get_pte(vm_page_t pgroot, vm_offset_t va, int lvl) {
     }
 }
 
-uint64_t x97_address_translate(dev_pmap_t *pmap, vm_offset_t va) {
+uint64_t x97_address_translate(dev_pmap_t *pmap, void *va) {
     struct x97_page_table *pgtable = (struct x97_page_table *) pmap->data;
     vm_page_t pgroot = pgtable->pgroot;
-    uint64_t *pte = get_pte(pgroot, va, 2);
+    uint64_t *pte = get_pte(pgroot, (vm_offset_t) va, 2);
     return *pte;
 }
 

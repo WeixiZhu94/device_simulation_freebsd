@@ -23,7 +23,7 @@ int setup_ctx(gmem_vm_mode running_mode);
 // The code below is specific for x97 mmu
 vmem_t *pm_pool;
 vm_page_t first_x97_page, last_x97_page;
-uint64_t x97_address_translate(dev_pmap_t *pmap, vm_offset_t va);
+uint64_t x97_address_translate(dev_pmap_t *pmap, void *va);
 int init_pm(struct gmem_mmu_ops *ops);
 vm_page_t alloc_pm(void *);
 gmem_error_t free_pm(vm_page_t m);
