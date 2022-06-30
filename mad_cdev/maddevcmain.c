@@ -221,6 +221,8 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 
     mutex_lock(&pmaddevobj->devmutex);
 
+    printf("[cdev] arg %lx, pointer addr %p\n", arg, (void *) arg);
+
     switch(cmd)
 	    {
 	    case MADDEVOBJ_IOC_INIT: //Initialize the device in a standard way
