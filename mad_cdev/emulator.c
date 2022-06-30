@@ -62,7 +62,9 @@ int run_kernel(void *arg)
 {
     struct accelerator_kernel_args kernel_launch_args;
     copyin((void *)arg, &kernel_launch_args, sizeof(struct accelerator_kernel_args));
-    kernel_instance kernel_type, void *args
+    kernel_instance kernel_type; 
+    void *args;
+    
     kernel_type = kernel_launch_args.kernel_type;
     args = kernel_launch_args.kernel_args;
 
