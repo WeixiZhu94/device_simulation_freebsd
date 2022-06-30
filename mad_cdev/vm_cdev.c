@@ -37,7 +37,7 @@ uint64_t x97_address_translate(dev_pmap_t *pmap, void *va) {
     uint64_t *pte = get_pte(pgroot, (vm_offset_t) va, 2);
     // printf("[x97_address_translate] done, page pa: %lx\n", *pte);
     if (*pte != 0) {
-        if (*pte > 0x800000000)
+        if (*pte < pmap->mmu_ops->pa_min || *pte >= pmap->mmu_ops->pa_max)
             printf("%s %d: translate va %lx - pa %lx\n",__func__, __LINE__, (uintptr_t) va, *pte);
         return *pte | ((uintptr_t) va & PAGE_MASK);
     } else
@@ -97,6 +97,9 @@ static gmem_error_t x97_mmu_enter(dev_pmap_t *pmap, vm_offset_t va, vm_size_t si
     for (vm_offset_t va_i = va; va_i < va + size; va_i += PAGE_SIZE, pa += PAGE_SIZE) {
         pte = get_pte(pgroot, va_i, 2);
         *pte = (pa & PAGE_MASK) | 0; // No memory protection flags, don't care.
+
+        if (*pte < pmap->mmu_ops->pa_min || *pte >= pmap->mmu_ops->pa_max)
+            printf("[x97_mmu_enter] installed out of range pa %lx\n", *pte)
         // flush device cache
     }
 
