@@ -50,8 +50,9 @@ struct x97_page_table {
 
 // VA: [ 18 bit ] [ 9 bits ] [ 9 bits ] [ 12 bits ]
 #define PT_LEVEL_0 64 * 8
-#define get_lvl_index(x, lvl) (x >> (9 * (2 - lvl) + 12))
 // #define PAGE_MASK 0xffff
 #define LVL_MASK 0x1ff
+#define get_root_index(x) ((x >> 30 >> 9) & LVL_MASK)
+#define get_lvl_index(x, lvl) ((x >> (9 * (2 - lvl) + 12)) & LVL_MASK)
 
 #endif
