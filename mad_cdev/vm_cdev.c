@@ -56,7 +56,7 @@ static gmem_error_t x97_mmu_create(dev_pmap_t *pmap)
     if (vmem_xalloc(pm_pool, PT_LEVEL_0, 0, 0, 0, VMEM_ADDR_MIN, VMEM_ADDR_MAX, M_WAITOK | M_BESTFIT, &page_idx))
         printf("!!! x97 failed to initialize page table\n");
     else
-        printf("[x97] mmu_create initialized %lu pages starting at index %lu", PT_LEVEL_0, page_idx);
+        printf("[x97] mmu_create initialized %d pages starting at index %lu", PT_LEVEL_0, page_idx);
     for (int i = 0; i < PT_LEVEL_0; i ++)
         pmap_zero_page(&first_x97_page[page_idx + i]);
     pgtable->pgroot = &first_x97_page[page_idx];
