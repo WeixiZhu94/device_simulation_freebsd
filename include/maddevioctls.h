@@ -34,6 +34,7 @@
 #ifndef  _MADIOCTLS_H_
 #define  _MADIOCTLS_H_
 
+#include "maddefs.h"
 /*
  * Ioctl definitions
  */
@@ -56,7 +57,7 @@
 
 // FreeBSD doesn't care IOR/W
 #define MADDEVOBJ_IOC_CTX_CREATE         _IO(MADDEVOBJ_IOC_MAGIC, MADDEVOBJ_IOC_INDEX_BASE+13)
-#define MADDEVOBJ_IOC_LAUNCH_KERNEL      _IO(MADDEVOBJ_IOC_MAGIC, MADDEVOBJ_IOC_INDEX_BASE+14)
+#define MADDEVOBJ_IOC_LAUNCH_KERNEL      _IOW(MADDEVOBJ_IOC_MAGIC, MADDEVOBJ_IOC_INDEX_BASE+14, struct accelerator_kernel_args*)
 
 
 // #define MADDEVOBJ_IOCTL_MAX_NBR 13

@@ -62,29 +62,18 @@ int run_kernel(void *arg)
 {
     struct accelerator_kernel_args kernel_launch_args;
     kernel_instance kernel_type; 
-    void *args;
+    struct vector_add_args *args;
 
-    copyin((void *)arg, &kernel_launch_args, sizeof(struct accelerator_kernel_args));
+    copyin(arg, &kernel_launch_args, sizeof(struct accelerator_kernel_args));
     kernel_type = kernel_launch_args.kernel_type;
-    args = kernel_launch_args.kernel_args;
+    args = &kernel_launch_args.vector_add;
 
     printf("[devc] running kernel, type %u, args %p\n", kernel_type, args);
     // Do we need to translate user-space va to kernel space va?
     if (kernel_type == SUM) {
-        struct vector_add_args input_args = {0};
-        uint64_t *buf = malloc(sizeof(uint64_t) * 4, M_DEVBUF, M_WAITOK | M_ZERO);
-        copyin(buf, args, sizeof(uint64_t) * 4);
-        printf("[devc] Context of buf %p: %lx, %lx, %lx, %lx\n", buf, buf[0], buf[1], buf[2], buf[3]);
-        buf = (uint64_t *) args;
-        printf("[devc] Context of buf %p: %lx, %lx, %lx, %lx\n", buf, buf[0], buf[1], buf[2], buf[3]);
-
-        input_args.a = (uint64_t*) buf[0];
-        input_args.b = (uint64_t*) buf[1];
-        input_args.c = (uint64_t*) buf[2];
-        input_args.len = (uint64_t) buf[3];
         printf("[devc] simulating kernel for vector add, a %p, b %p, c %p, len %lu\n", 
-            input_args.a, input_args.b, input_args.c, input_args.len);
-        vector_add(input_args.a, input_args.b, input_args.c, input_args.len);
+            args->a, args->b, args->c, args->len);
+        vector_add(args->a, args->b, args->c, args->len);
         return 0;
     }
     else

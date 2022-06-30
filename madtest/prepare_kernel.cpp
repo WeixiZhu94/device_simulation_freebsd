@@ -10,27 +10,26 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 	}
 
 	if (kernel == SUM) {
-		struct vector_add_args *args;
-		printf("%s %d\n", __func__, __LINE__);
-		args = (struct vector_add_args*) malloc(sizeof(struct vector_add_args));
-		args->a = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
-		args->b = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
-		args->c = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
-		args->len = TEST_LENGTH;
+		struct accelerator_kernel_args *args;
+		args = (struct accelerator_kernel_args*) malloc(sizeof(struct accelerator_kernel_args));
+		args->kernel_type = kernel;
+		args->vector_add.a = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
+		args->vector_add.b = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
+		args->vector_add.c = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
+		args->vector_add.len = TEST_LENGTH;
 
-		uint64_t *buf = (uint64_t *) malloc(sizeof(uint64_t) * 4);
-		buf[0] = (uintptr_t) args->a;
-		buf[1] = (uintptr_t) args->b;
-		buf[2] = (uintptr_t) args->c;
-		buf[3] = args->len;
-
-		printf("%s %d, buf: %p, args: %p, a %p, b %p, c %p, len %lu\n", __func__, __LINE__, buf, args, args->a, args->b, args->c, args->len);
+		printf("%s %d, args: %p, a %p, b %p, c %p, len %lu\n", __func__, __LINE__, 
+			args, 
+			args->vector_add.a, 
+			args->vector_add.b, 
+			args->vector_add.c, 
+			args->vector_add.len);
 		// *kernel_args = (void*) args;
-		*kernel_args = (void *) buf;
-		if (args->a != NULL && args->b != NULL && args->c != NULL) {
-			for (uint64_t i = 0; i < args->len; i ++) {
-				args->a[i] = (i * 13 + 9689) % 10007;
-				args->b[i] = (i * 7 + 9689) % 10007;
+		*kernel_args = (void *) args;
+		if (args->vector_add.a != NULL && args->vector_add.b != NULL && args->vector_add.c != NULL) {
+			for (uint64_t i = 0; i < args->vector_add.len; i ++) {
+				args->vector_add.a[i] = (i * 13 + 9689) % 10007;
+				args->vector_add.b[i] = (i * 7 + 9689) % 10007;
 			}
 			return 0;
 		}
@@ -48,21 +47,14 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 
 int validate_test(kernel_instance kernel, void *kernel_args)
 {
+	struct accelerator_kernel_args *args;
+	args = (struct accelerator_kernel_args*) kernel_args;
 	if (kernel == SUM) {
-		// struct vector_add_args *args = (struct vector_add_args*) kernel_args;
-		// uint64_t *a = args->a, *b = args->b, *c = args->c;
-		uint64_t *buf, *a, *b, *c, len;
-		buf = (uint64_t *) kernel_args;
-		a = (uint64_t*) buf[0];
-		b = (uint64_t*) buf[1];
-		c = (uint64_t*) buf[2];
-		len = buf[3];
-
 		int i;
-		for (i = 0; i < len; i ++)
-			if (!(c[i] == a[i] + b[i]))
+		for (i = 0; i < args->vector_add.len; i ++)
+			if (!(args->vector_add.c[i] == args->vector_add.a[i] + args->vector_add.b[i]))
 				break;
-		if (i == len)
+		if (i == args->vector_add.len)
 			return 0;
 		else
 			return i;
