@@ -45,7 +45,8 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
         kb = address_translate(&b[i]);
         kc = address_translate(&c[i]);
         if (ka == 0 || kb == 0 || kc == 0) {
-            printf("[devc] kernel failed with 0 pa\n");
+            printf("[devc] kernel failed with 0 pa, %p %p %p %p %p %p\n",
+                a, b, c, &a[i], &b[i], &c[i]);
             return;
         }
 
