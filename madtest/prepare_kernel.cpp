@@ -51,11 +51,12 @@ int validate_test(kernel_instance kernel, void *kernel_args)
 	if (kernel == SUM) {
 		// struct vector_add_args *args = (struct vector_add_args*) kernel_args;
 		// uint64_t *a = args->a, *b = args->b, *c = args->c;
-		uint64_t *buf = (uint64_t *) kernel_args, 
-			*a = (uint64_t) buf[0],
-			*b = (uint64_t) buf[1],
-			*c = (uint64_t) buf[2],
-			len = buf[3];
+		uint64_t *buf, *a, *b, *c, len;
+		buf = (uint64_t *) kernel_args;
+		a = (uint64_t*) buf[0];
+		b = (uint64_t*) buf[1];
+		c = (uint64_t*) buf[2];
+		len = buf[3];
 
 		int i;
 		for (i = 0; i < len; i ++)
