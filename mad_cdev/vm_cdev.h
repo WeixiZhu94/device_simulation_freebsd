@@ -33,8 +33,8 @@ gmem_error_t free_pm(vm_page_t m);
 void zero_page(vm_page_t m);
 int exit_pm(void);
 
-#define X97_PT_LOCK(x)    mtx_lock((x)->lock)
-#define X97_PT_UNLOCK(x)  mtx_unlock((x)->lock)
+#define X97_PT_LOCK(x)    mtx_lock(&(x)->lock)
+#define X97_PT_UNLOCK(x)  mtx_unlock(&(x)->lock)
 struct x97_page_table {
     struct mtx lock;
     vm_page_t pgroot;

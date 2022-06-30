@@ -9,7 +9,7 @@ void dev_fault_trap(dev_pmap_t *pmap, void *va) {
 static inline uint64_t *get_pte(vm_page_t pgroot, vm_offset_t va, int lvl) {
     uint64_t *pde;
     if (lvl == 0) {
-        pde = (uint64_t *) PHYS_TO_DMAP(VM_PAGE_TO_PHYS(&pgroot[get_lvl_0_index(va) >> 9]));
+        pde = (uint64_t *) PHYS_TO_DMAP(VM_PAGE_TO_PHYS(&pgroot[get_lvl_index(va, 0) >> 9]));
         return &pde[get_lvl_index(va, 0) & LVL_MASK];
     } else {
         pde = get_pte(pgroot, va, lvl - 1);
@@ -58,8 +58,7 @@ static gmem_error_t x97_mmu_pmap_destroy(dev_pmap_t *pmap)
 {
     struct x97_page_table *pgtable = (struct x97_page_table *) pmap->data;
 
-    if (vmem_xfree(pm_pool, pgtable->pgroot - first_x97_page, PT_LEVEL_0))
-        printf("!!! x97 failed to free page table");
+    vmem_xfree(pm_pool, pgtable->pgroot - first_x97_page, PT_LEVEL_0);
     mtx_destroy(&pgtable->lock);
 
     free(pgtable, M_DEVBUF);
