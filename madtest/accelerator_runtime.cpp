@@ -59,13 +59,13 @@ void clContextCreate(gmem_vm_mode mode)
 void clLaunchKernel(kernel_instance kernel, void *kernel_args)
 {
     int rc;
-    // struct accelerator_kernel_args *args = (struct accelerator_kernel_args *) malloc(sizeof(struct accelerator_kernel_args));
-    struct accelerator_kernel_args args;
-    args.kernel_type = kernel;
-    args.kernel_args = kernel_args;
+    struct accelerator_kernel_args *args = (struct accelerator_kernel_args *) malloc(sizeof(struct accelerator_kernel_args));
+    // struct accelerator_kernel_args args;
+    args->kernel_type = kernel;
+    args->kernel_args = kernel_args;
 
-    printf("Issuing ioctl for cmd %lx, args = %p\n", MADDEVOBJ_IOC_LAUNCH_KERNEL, &args);
-    rc = ioctl(fd, MADDEVOBJ_IOC_LAUNCH_KERNEL, &args);
+    printf("Issuing ioctl for cmd %lx, args = %p\n", MADDEVOBJ_IOC_LAUNCH_KERNEL, args);
+    rc = ioctl(fd, MADDEVOBJ_IOC_LAUNCH_KERNEL, args);
     if (rc) {
         printf("[accelerator runtime] kernel launch failed\n");
         exit(-1);

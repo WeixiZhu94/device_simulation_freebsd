@@ -192,16 +192,16 @@ static ssize_t maddev_write(struct file *fp, const char __user *usrbufr, size_t 
 static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 {
 	static MADREGS  MadRegs;
-	//
+
 	struct mad_dev_obj *pmaddevobj = fp->private_data;
 	PMADREGS        pmadregs  = (PMADREGS)pmaddevobj->pDevBase;
 	PMADCTLPARMS    pCtlParms = (PMADCTLPARMS)arg;
-	//
+
 	int err = 0;
 	long retval = 0;
 	U32  remains = 0;
     u32 flags1 = 0;
-    struct accelerator_kernel_args *kernel_launch_args;
+    struct accelerator_kernel_args kernel_launch_args;
 
 	printf("Doing ioctl: dev#=%d fp=%p cmd=%x arg=%lx\n", (int)pmaddevobj->devnum, fp, cmd, arg);
 
@@ -311,6 +311,7 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
             break;
 
         case MADDEVOBJ_IOC_LAUNCH_KERNEL:
+            copyin(arg, &kernel_launch_args, sizeof(struct accelerator_kernel_args));
             kernel_launch_args = (struct accelerator_kernel_args *) arg;
             retval = run_kernel(kernel_launch_args->kernel_type, kernel_launch_args->kernel_args);
             break;
