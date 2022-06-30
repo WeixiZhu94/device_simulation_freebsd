@@ -47,8 +47,8 @@ static gmem_error_t x97_mmu_pmap_create(dev_pmap_t *pmap)
     if (vmem_xalloc(pm_pool, PT_LEVEL_0, 0, 0, 0, VMEM_ADDR_MIN, VMEM_ADDR_MAX, M_WAITOK | M_BESTFIT, &page_idx))
         printf("!!! x97 failed to initialize page table\n");
     for (int i = 0; i < PT_LEVEL_0; i ++)
-        pmap_zero_page(&first_page[page_idx + i]);
-    pgtable->pgroot = &first_page[page_idx];
+        pmap_zero_page(&first_x97_page[page_idx + i]);
+    pgtable->pgroot = &first_x97_page[page_idx];
 
     pmap->data = pgtable;
     return GMEM_OK;
@@ -58,7 +58,7 @@ static gmem_error_t x97_mmu_pmap_destroy(dev_pmap_t *pmap)
 {
     struct x97_page_table *pgtable = (struct x97_page_table *) pmap->data;
 
-    if (vmem_xfree(pm_pool, pgtable->pgroot - first_page, PT_LEVEL_0))
+    if (vmem_xfree(pm_pool, pgtable->pgroot - first_x97_page, PT_LEVEL_0))
         printf("!!! x97 failed to free page table");
     mtx_destroy(&pgtable->lock)
 
