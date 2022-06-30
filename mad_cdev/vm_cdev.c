@@ -1,6 +1,11 @@
 #include "vm_cdev.h"
 #include <sys/malloc.h>
 
+vmem_t *pm_pool;
+vm_page_t first_x97_page, last_x97_page;
+dev_pmap_t *pmap; // This is the current pmap
+gmem_vm_mode mode;
+
 void dev_fault_trap(dev_pmap_t *pmap, void *va) {
     gmem_uvas_fault(pmap, (uintptr_t) va, 8, VM_PROT_READ | VM_PROT_WRITE, NULL);
     dev_faults ++;
