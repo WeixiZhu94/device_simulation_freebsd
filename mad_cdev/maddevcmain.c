@@ -311,7 +311,7 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 
         case MADDEVOBJ_IOC_LAUNCH_KERNEL:
             // kernel_launch_args = (struct accelerator_kernel_args *) arg;
-            retval = run_kernel(arg);
+            retval = run_kernel((void *)arg);
             break;
 
 	    default:
