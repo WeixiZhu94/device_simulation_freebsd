@@ -30,6 +30,7 @@ static void* address_translate(void *va)
                 printf("[gmem uvas fault] gives me 0 pa after faulting...\n");
                 return 0;
             }
+            printf("[dev_fault] x97 faults me address %lx\n", pa);
         }
         if (pa < pmap->mmu_ops->pa_min || pa >= pmap->mmu_ops->pa_max) {
             printf("[emulator] should crash because your pa is illegal, min %lx, pa %lx, max %lx\n", 
