@@ -60,7 +60,6 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
 
 int run_kernel(void *arg)
 {
-
     struct accelerator_kernel_args kernel_launch_args;
     copyin((void *)arg, &kernel_launch_args, sizeof(struct accelerator_kernel_args));
     kernel_instance kernel_type, void *args
