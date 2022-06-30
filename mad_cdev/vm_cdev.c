@@ -85,12 +85,12 @@ static gmem_error_t x97_mmu_enter(dev_pmap_t *pmap, vm_offset_t va, vm_size_t si
     }
 
     X97_PT_UNLOCK(pgtable);
-
+    return GMEM_OK;
 }
 
 static gmem_error_t x97_mmu_release(dev_pmap_t *pmap, vm_offset_t va, vm_size_t size)
 {
-
+    return GMEM_OK;
 }
 
 static void x97_mmu_tlb_invl(dev_pmap_t *pmap, vm_offset_t va, vm_size_t size)
@@ -98,7 +98,7 @@ static void x97_mmu_tlb_invl(dev_pmap_t *pmap, vm_offset_t va, vm_size_t size)
     return;
 }
 
-gmem_mmu_ops x97_mmu_ops {
+struct gmem_mmu_ops x97_mmu_ops {
     .inited = 0,
     .mmu_init               = x97_mmu_init,
     .mmu_pmap_create        = x97_mmu_create,
@@ -111,7 +111,7 @@ gmem_mmu_ops x97_mmu_ops {
     .alloc_page             = alloc_pm,
     .free_page              = free_pm,
     .zero_page              = pmap_zero_page,
-}
+};
 
 
 
