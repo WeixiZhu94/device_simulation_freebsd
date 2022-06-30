@@ -3,6 +3,39 @@
 #include <vm/pmap.h>
 #include <sys/vmem.h>
 
+// Locks will need to be implemented in the future to protect free lists.
+// Right now we don't have concurrent device faults.
+struct pglist x97_activelist, x97_freelist;
+
+vm_page_t get_victim_page() 
+{
+	if (!TAILQ_EMPTY(x97_freelist))
+		printf("The x97 freelist is not empty when you are reclaiming memory\n");
+	vm_page_t m = TAILQ_FIRST(&x97_activelist);
+	// TAILQ_REMOVE(&x97_activelist, m);
+	return m;
+}
+
+// active queue: [least-recently-used, ..., most-recently-used]
+void activate_page(vm_page_t m)
+{
+	if (!TAILQ_EMPTY(&x97_freelist)) {
+		TAILQ_REMOVE(&x97_freelist, m, m->plinks.q);
+		TAILQ_INSERT_TAIL(&x97_activelist, m, m->plinks.q);
+	}
+	else
+		printf("The x97 page to activate does not exist in freelist\n");
+}
+
+void free_page(vm_page_t m)
+{
+	if (!TAILQ_EMPTY(&x97_activelist)) {
+		TAILQ_REMOVE(&x97_activelist, m, m->plinks.q);
+		TAILQ_INSERT_HEAD(&x97_freelist, m, m->plinks.q);
+	}
+	else
+		printf("The x97 page to free does not exist in activelist\n");
+}
 
 size_t npages = 1024 * 1024 / 4;
 
@@ -14,8 +47,10 @@ int init_pm(struct gmem_mmu_ops *ops) {
     else {
     	// These vm_page structs must be marked as NOCPU pages so that vm_fault can handle them correctly
     	// This hack should be removed if the VM system can identify device page structs at the boot time
-    	for (int i = 0; i < npages; i ++)
+    	for (int i = 0; i < npages; i ++) {
     		first_x97_page[i].flags |= PG_NOCPU;
+    		TAILQ_INSERT_TAIL(&x97_freelist, &first_x97_page[i], first_x97_page[i].plinks.q);
+    	}
         last_x97_page = &first_x97_page[npages - 1];
         ops->pa_min = VM_PAGE_TO_PHYS(first_x97_page);
         ops->pa_max = VM_PAGE_TO_PHYS(last_x97_page) + PAGE_SIZE;
@@ -23,6 +58,8 @@ int init_pm(struct gmem_mmu_ops *ops) {
         printf("!!! Stealing physical memory for the fake device succeeded, pa_min %lx, pa_max %lx, npages: %lu\n", 
         	ops->pa_min, ops->pa_max, npages);
     }
+    TAILQ_INIT(&x97_activelist);
+    TAILQ_INIT(&x97_freelist);
 	return 0;
 }
 
@@ -37,7 +74,8 @@ vm_page_t alloc_pm()
 	// We cannot allocate a bunch of pages but free one of them...
 	// vmem_xalloc(pm_pool, npages, alignment << 12, 0, 0, VMEM_ADDR_MIN, VMEM_ADDR_MAX, M_WAITOK | M_BESTFIT, &page_idx);
 	if (vmem_alloc(pm_pool, 1, M_BESTFIT | M_WAITOK, &page_idx) == 0) {
-		pmap_zero_page(&first_x97_page[page_idx]);
+		zero_page(&first_x97_page[page_idx]);
+		activate_page(&first_x97_page[page_idx]);
 		return &first_x97_page[page_idx];
 	}
 	else
@@ -48,6 +86,7 @@ gmem_error_t free_pm(vm_page_t m)
 {
 	int page_idx = m - first_x97_page;
 	vmem_free(pm_pool, page_idx, 1);
+	free_page(&first_x97_page[page_idx]);
 	return GMEM_OK;
 }
 

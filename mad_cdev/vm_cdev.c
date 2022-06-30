@@ -135,6 +135,7 @@ struct gmem_mmu_ops x97_mmu_ops = {
     .alloc_page             = alloc_pm,
     .free_page              = free_pm,
     .zero_page              = pmap_zero_page,
+    .get_victim_page        = get_victim_page,
 };
 
 
