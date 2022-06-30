@@ -14,7 +14,7 @@
 #include <vm/gmem_uvas.h>
 
 // emulator code
-int run_kernel(kernel_instance kernel_type, void *args);
+int run_kernel(void *arg);
 
 // The code below is shared
 extern dev_pmap_t *pmap; // This is the current pmap
