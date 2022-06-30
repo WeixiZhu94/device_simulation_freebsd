@@ -98,7 +98,7 @@ static void x97_mmu_tlb_invl(dev_pmap_t *pmap, vm_offset_t va, vm_size_t size)
     return;
 }
 
-struct gmem_mmu_ops x97_mmu_ops {
+struct gmem_mmu_ops x97_mmu_ops = {
     .inited = 0,
     .mmu_init               = x97_mmu_init,
     .mmu_pmap_create        = x97_mmu_create,
