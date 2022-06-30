@@ -71,7 +71,7 @@ int run_kernel(void *arg)
     printf("[devc] running kernel, type %u, args %p\n", kernel_type, args);
     // Do we need to translate user-space va to kernel space va?
     if (kernel_type == SUM) {
-        struct vector_add_args * kernel_args = (struct vector_add_args *) args;
+        // struct vector_add_args * kernel_args = (struct vector_add_args *) args;
         struct vector_add_args input_args;
         copyin(&input_args, (struct vector_add_args *) args, sizeof(struct vector_add_args));
         // copyin(&input_args.a,   &kernel_args->a, sizeof(uint64_t *));
