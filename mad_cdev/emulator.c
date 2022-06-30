@@ -31,6 +31,10 @@ static void* address_translate(void *va)
                 return 0;
             }
         }
+        if (pa < pmap->mmu_ops->pa_min || pa >= pmap->mmu_ops->pa_max) {
+            printf("[emulator] crashes because your pa is illegal");
+            return 0;
+        }
     } else
         printf("Other modes unimplemented\n");
     return (void *) PHYS_TO_DMAP(pa);
