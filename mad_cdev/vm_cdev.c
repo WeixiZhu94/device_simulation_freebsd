@@ -136,13 +136,13 @@ int setup_ctx(device_t device, gmem_vm_mode running_mode)
     else if (running_mode == EXCLUSIVE) {
         mode = running_mode;
         printf("[devc] setting ctx as exclusive, save my pmap to address %p\n", &pmap);
-        gmem_dev_t *dev;
-        if (!is_gmem_dev(device)) 
-            dev = gmem_dev_add(device);
-        else
-            dev = device_get_gmem_dev(device);
+        // gmem_dev_t *dev;
+        // if (!is_gmem_dev(device)) 
+        //     dev = gmem_dev_add(device);
+        // else
+        //     dev = device_get_gmem_dev(device);
 
-        error = gmem_uvas_create(NULL, &pmap, dev, &exclusive_mmu_ops, NULL, NULL, GMEM_UVAS_EXCLUSIVE,
+        error = gmem_uvas_create(NULL, &pmap, NULL, &exclusive_mmu_ops, NULL, NULL, GMEM_UVAS_EXCLUSIVE,
             0, 0, 0, 0); // exclusive mode should not care about the last 4 args
         if (error == GMEM_OK)
             gmem_uvas_set_pmap_policy(pmap, false, false, 1); // page order = 1

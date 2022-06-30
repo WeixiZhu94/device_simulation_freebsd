@@ -22,7 +22,7 @@ int setup_ctx(device_t device, gmem_vm_mode running_mode);
 vmem_t *pm_pool;
 vm_page_t first_x97_page, last_x97_page;
 uint64_t x97_address_translate(dev_pmap_t *pmap, vm_offset_t va);
-int init_pm(gmem_mmu_ops *ops);
+int init_pm(struct gmem_mmu_ops *ops);
 vm_page_t alloc_pm(void *);
 gmem_error_t free_pm(vm_page_t m);
 void zero_page(vm_page_t m);
@@ -45,7 +45,7 @@ struct x97_page_table {
 // VA: [ 18 bit ] [ 9 bits ] [ 9 bits ] [ 12 bits ]
 #define PT_LEVEL_0 64 * 8
 #define get_lvl_index(x, lvl) (x >> (9 * (2 - lvl) + 12))
-#define PAGE_MASK 0xffff
+// #define PAGE_MASK 0xffff
 #define LVL_MASK 0x1ff
 
 #endif
