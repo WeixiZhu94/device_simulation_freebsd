@@ -196,7 +196,7 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 	struct mad_dev_obj *pmaddevobj = fp->private_data;
 	PMADREGS        pmadregs  = (PMADREGS)pmaddevobj->pDevBase;
 	PMADCTLPARMS    pCtlParms = (PMADCTLPARMS)arg;
-    struct accelerator_kernel_args karg;
+    struct accelerator_kernel_args *karg = malloc(sizeof(struct accelerator_kernel_args), M_DEVBUF, M_WAITOK | M_ZERO);
 
 	int err = 0;
 	long retval = 0;
@@ -314,7 +314,7 @@ static long maddev_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 
         case MADDEVOBJ_IOC_LAUNCH_KERNEL:
             // kernel_launch_args = (struct accelerator_kernel_args *) arg;
-            copyin((void *) arg, &karg, sizeof(struct accelerator_kernel_args));
+            copyin((void *) arg, (void *) karg, sizeof(struct accelerator_kernel_args));
             retval = run_kernel((void *) &arg);
             break;
 
