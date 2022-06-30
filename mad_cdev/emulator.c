@@ -69,7 +69,7 @@ int run_kernel(void *arg)
     kernel_type = kernel_launch_args->kernel_type;
     args = &kernel_launch_args->vector_add;
 
-    printf("[devc] running kernel, type %u, args %p\n", kernel_type, args);
+    printf("[devc] running kernel, karg %p, type %u, args %p\n", arg, kernel_type, args);
     // Do we need to translate user-space va to kernel space va?
     if (kernel_type == SUM) {
         printf("[devc] simulating kernel for vector add, a %p, b %p, c %p, len %lu\n", 
