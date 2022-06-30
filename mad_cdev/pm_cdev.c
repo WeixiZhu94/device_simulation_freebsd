@@ -27,11 +27,12 @@ int init_pm(struct gmem_mmu_ops *ops) {
 
 int exit_pm() {
 	vmem_destroy(pm_pool);
+	return 0;
 }
 
 vm_page_t alloc_pm()
 {
-	int page_idx = -1;
+	unsigned long page_idx = 0;
 	// We cannot allocate a bunch of pages but free one of them...
 	// vmem_xalloc(pm_pool, npages, alignment << 12, 0, 0, VMEM_ADDR_MIN, VMEM_ADDR_MAX, M_WAITOK | M_BESTFIT, &page_idx);
 	if (vmem_alloc(pm_pool, 1, M_BESTFIT | M_WAITOK, &page_idx) == 0) {
