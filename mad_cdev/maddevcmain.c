@@ -41,6 +41,7 @@
 
 #define _DEVICE_DRIVER_MAIN_
 #include "maddevc.h"		/* local definitions */
+#include "vm_cdev.h"
 
 //Function prototypes
 static ssize_t
