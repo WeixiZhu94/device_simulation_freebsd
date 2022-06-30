@@ -44,6 +44,11 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
         ka = address_translate(&a[i]);
         kb = address_translate(&b[i]);
         kc = address_translate(&c[i]);
+        if (ka == 0 || kb == 0 || kc == 0) {
+            printf("[devc] kernel failed with 0 pa\n");
+            return;
+        }
+
         *kc = *ka + *kb;
     }
     delta_faults = dev_faults - delta_faults;
