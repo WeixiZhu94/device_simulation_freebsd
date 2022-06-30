@@ -17,7 +17,7 @@ vm_page_t get_victim_page()
 }
 
 // active queue: [least-recently-used, ..., most-recently-used]
-void activate_page(vm_page_t m)
+static inline void activate_page(vm_page_t m)
 {
 	if (!TAILQ_EMPTY(&x97_freelist)) {
 		TAILQ_REMOVE(&x97_freelist, m, plinks.q);
@@ -27,7 +27,7 @@ void activate_page(vm_page_t m)
 		printf("The x97 page to activate does not exist in freelist\n");
 }
 
-void free_page(vm_page_t m)
+static inline void free_page(vm_page_t m)
 {
 	if (!TAILQ_EMPTY(&x97_activelist)) {
 		TAILQ_REMOVE(&x97_activelist, m, plinks.q);
@@ -49,7 +49,7 @@ int init_pm(struct gmem_mmu_ops *ops) {
     	// This hack should be removed if the VM system can identify device page structs at the boot time
     	for (int i = 0; i < npages; i ++) {
     		first_x97_page[i].flags |= PG_NOCPU;
-    		TAILQ_INSERT_TAIL(&x97_freelist, &first_x97_page[i], first_x97_page[i].plinks.q);
+    		TAILQ_INSERT_TAIL(&x97_freelist, &first_x97_page[i], plinks.q);
     	}
         last_x97_page = &first_x97_page[npages - 1];
         ops->pa_min = VM_PAGE_TO_PHYS(first_x97_page);
