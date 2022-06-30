@@ -63,12 +63,13 @@ int run_kernel(kernel_instance kernel_type, void *args)
     printf("[devc] running kernel, type %u, args %p\n", kernel_type, args);
     // Do we need to translate user-space va to kernel space va?
     if (kernel_type == SUM) {
+        struct vector_add_args * kernel_args = (struct vector_add_args *) args;
         struct vector_add_args input_args;
         // copyin(&input_args, (struct vector_add_args *) args, sizeof(struct vector_add_args));
-        copyin(&input_args.a, (struct vector_add_args *) args->a, sizeof(uint64_t *));
-        copyin(&input_args.b, (struct vector_add_args *) args->b, sizeof(uint64_t *));
-        copyin(&input_args.c, (struct vector_add_args *) args->c, sizeof(uint64_t *));
-        copyin(&input_args.len, (struct vector_add_args *) args->len, sizeof(uint64_t));
+        copyin(&input_args.a,   kernel_args->a, sizeof(uint64_t *));
+        copyin(&input_args.b,   kernel_args->b, sizeof(uint64_t *));
+        copyin(&input_args.c,   kernel_args->c, sizeof(uint64_t *));
+        copyin(&input_args.len, kernel_args->len, sizeof(uint64_t));
         printf("[devc] simulating kernel for vector add, a %p, b %p, c %p, len %lu\n", 
             input_args.a, input_args.b, input_args.c, input_args.len);
         vector_add(input_args.a, input_args.b, input_args.c, input_args.len);
