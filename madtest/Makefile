@@ -1,7 +1,7 @@
 all: obj1 obj3 obj4
 
 obj1:
-	clang++ -o a.o accelerator_runtime.cpp prepare_kernel.cpp -c -I../include 
+	clang++ accelerator_runtime.cpp prepare_kernel.cpp -c -I../include 
 obj3: obj1
 	clang++ *.o test_x86_compatible_device.cpp -I../include -o share_cpu_test.x
 obj4: obj1 
