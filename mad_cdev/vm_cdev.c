@@ -39,7 +39,7 @@ uint64_t x97_address_translate(dev_pmap_t *pmap, void *va) {
     if (*pte != 0) {
         if (*pte > 0x800000000)
             printf("%s %d: translate va %lx - pa %lx\n",__func__, __LINE__, (uintptr_t) va, *pte);
-        return *pte | ((uintptr_t va) & PAGE_MASK);
+        return *pte | ((uintptr_t) va & PAGE_MASK);
     } else
         return 0;
 }
