@@ -11,14 +11,14 @@
 #include <vm/pmap.h>
 
 // emulator code
-int run_kernel(kernel_instance kernel_type, void *args)
+int run_kernel(kernel_instance kernel_type, void *args);
 
 // The code below is shared
 dev_pmap_t *pmap; // This is the current pmap
 gmem_vm_mode mode;
 int dev_faults;
 void dev_fault_trap(dev_pmap_t *pmap, void *va);
-int setup_ctx(device_t device, gmem_vm_mode running_mode);
+int setup_ctx(gmem_vm_mode running_mode);
 
 // The code below is specific for x97 mmu
 vmem_t *pm_pool;
