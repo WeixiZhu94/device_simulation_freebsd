@@ -29,7 +29,7 @@ int exit_pm() {
 	vmem_destroy(pm_pool);
 }
 
-vm_page_t alloc_pm(void *)
+vm_page_t alloc_pm()
 {
 	int page_idx = -1;
 	// We cannot allocate a bunch of pages but free one of them...
