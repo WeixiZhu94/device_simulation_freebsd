@@ -9,8 +9,8 @@ void dev_fault_trap(dev_pmap_t *pmap, void *va) {
 static inline uint64_t *get_pte(vm_page_t pgroot, vm_offset_t va, int lvl) {
     uint64_t *pde;
     if (lvl == 0) {
-        pde = (uint64_t *) VM_PAGE_TO_DMAP(&pgroot[get_lvl_0_index(va) >> 9]);
-        return &pde[get_lvl_index(va, 0) && LVL_MASK];
+        pde = (uint64_t *) PHYS_TO_DMAP(VM_PAGE_TO_PHYS(&pgroot[get_lvl_0_index(va) >> 9]));
+        return &pde[get_lvl_index(va, 0) & LVL_MASK];
     } else {
         pde = get_pte(pgroot, va, lvl - 1);
         if (*pde == 0) {
@@ -40,7 +40,7 @@ static gmem_error_t x97_mmu_init(struct gmem_mmu_ops* ops)
 
 static gmem_error_t x97_mmu_pmap_create(dev_pmap_t *pmap)
 {
-    int page_idx;
+    unsigned long page_idx;
     struct x97_page_table *pgtable = malloc(sizeof(struct x97_page_table), M_DEVBUF, M_WAITOK | M_ZERO);
 
     mtx_init(&pgtable->lock, "x97 mmu pg table giant lock", NULL, MTX_DEF);
@@ -60,7 +60,7 @@ static gmem_error_t x97_mmu_pmap_destroy(dev_pmap_t *pmap)
 
     if (vmem_xfree(pm_pool, pgtable->pgroot - first_x97_page, PT_LEVEL_0))
         printf("!!! x97 failed to free page table");
-    mtx_destroy(&pgtable->lock)
+    mtx_destroy(&pgtable->lock);
 
     free(pgtable, M_DEVBUF);
     return GMEM_OK;
