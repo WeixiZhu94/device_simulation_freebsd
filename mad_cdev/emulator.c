@@ -66,10 +66,10 @@ int run_kernel(kernel_instance kernel_type, void *args)
         struct vector_add_args * kernel_args = (struct vector_add_args *) args;
         struct vector_add_args input_args;
         // copyin(&input_args, (struct vector_add_args *) args, sizeof(struct vector_add_args));
-        copyin(&input_args.a,   kernel_args->a, sizeof(uint64_t *));
-        copyin(&input_args.b,   kernel_args->b, sizeof(uint64_t *));
-        copyin(&input_args.c,   kernel_args->c, sizeof(uint64_t *));
-        copyin(&input_args.len, kernel_args->len, sizeof(uint64_t));
+        copyin(&input_args.a,   &kernel_args->a, sizeof(uint64_t *));
+        copyin(&input_args.b,   &kernel_args->b, sizeof(uint64_t *));
+        copyin(&input_args.c,   &kernel_args->c, sizeof(uint64_t *));
+        copyin(&input_args.len, &kernel_args->len, sizeof(uint64_t));
         printf("[devc] simulating kernel for vector add, a %p, b %p, c %p, len %lu\n", 
             input_args.a, input_args.b, input_args.c, input_args.len);
         vector_add(input_args.a, input_args.b, input_args.c, input_args.len);
