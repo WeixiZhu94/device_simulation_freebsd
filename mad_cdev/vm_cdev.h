@@ -31,7 +31,7 @@ int init_pm(struct gmem_mmu_ops *ops);
 vm_page_t alloc_pm(void);
 gmem_error_t free_pm(vm_page_t m);
 void zero_page(vm_page_t m);
-vm_page_t get_victim_page();
+vm_page_t get_victim_page(void);
 int exit_pm(void);
 
 #define X97_PT_LOCK(x)    mtx_lock(&(x)->lock)
