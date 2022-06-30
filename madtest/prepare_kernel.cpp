@@ -12,14 +12,21 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 	if (kernel == SUM) {
 		struct vector_add_args *args;
 		printf("%s %d\n", __func__, __LINE__);
-		args = (struct vector_add_args*)malloc(sizeof(struct vector_add_args));
+		args = (struct vector_add_args*) malloc(sizeof(struct vector_add_args));
 		args->a = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
 		args->b = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
 		args->c = (uint64_t*) malloc(TEST_LENGTH * sizeof(uint64_t));
 		args->len = TEST_LENGTH;
 
-		printf("%s %d, args: %p, a %p, b %p, c %p, len %lu\n", __func__, __LINE__, args, args->a, args->b, args->c, args->len);
-		*kernel_args = (void*) args;
+		uint64_t *buf = (uint64_t *) malloc(sizeof(uint64_t) * 4);
+		buf[0] = (uintptr_t) args->a;
+		buf[1] = (uintptr_t) args->b;
+		buf[2] = (uintptr_t) args->c;
+		buf[3] = args->len;
+
+		printf("%s %d, buf: %p, args: %p, a %p, b %p, c %p, len %lu\n", __func__, __LINE__, buf, args, args->a, args->b, args->c, args->len);
+		// *kernel_args = (void*) args;
+		*kernel_args = (void *) buf;
 		if (args->a != NULL && args->b != NULL && args->c != NULL) {
 			for (uint64_t i = 0; i < args->len; i ++) {
 				args->a[i] = (i * 13 + 9689) % 10007;
@@ -42,13 +49,19 @@ int generate_test(kernel_instance kernel, void **kernel_args)
 int validate_test(kernel_instance kernel, void *kernel_args)
 {
 	if (kernel == SUM) {
-		struct vector_add_args *args = (struct vector_add_args*) kernel_args;
-		uint64_t *a = args->a, *b = args->b, *c = args->c;
+		// struct vector_add_args *args = (struct vector_add_args*) kernel_args;
+		// uint64_t *a = args->a, *b = args->b, *c = args->c;
+		uint64_t *buf = (uint64_t *) kernel_args, 
+			*a = (uint64_t) buf[0],
+			*b = (uint64_t) buf[1],
+			*c = (uint64_t) buf[2],
+			len = buf[3];
+
 		int i;
-		for (i = 0; i < TEST_LENGTH; i ++)
+		for (i = 0; i < len; i ++)
 			if (!(c[i] == a[i] + b[i]))
 				break;
-		if (i == TEST_LENGTH)
+		if (i == len)
 			return 0;
 		else
 			return i;

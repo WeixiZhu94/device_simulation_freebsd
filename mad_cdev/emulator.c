@@ -61,23 +61,23 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
 int run_kernel(void *arg)
 {
     struct accelerator_kernel_args kernel_launch_args;
-    copyin((void *)arg, &kernel_launch_args, sizeof(struct accelerator_kernel_args));
     kernel_instance kernel_type; 
     void *args;
-    
+
+    copyin((void *)arg, &kernel_launch_args, sizeof(struct accelerator_kernel_args));
     kernel_type = kernel_launch_args.kernel_type;
     args = kernel_launch_args.kernel_args;
 
     printf("[devc] running kernel, type %u, args %p\n", kernel_type, args);
     // Do we need to translate user-space va to kernel space va?
     if (kernel_type == SUM) {
-        // struct vector_add_args * kernel_args = (struct vector_add_args *) args;
-        struct vector_add_args input_args;
-        copyin(&input_args, (struct vector_add_args *) args, sizeof(struct vector_add_args));
-        // copyin(&input_args.a,   &kernel_args->a, sizeof(uint64_t *));
-        // copyin(&input_args.b,   &kernel_args->b, sizeof(uint64_t *));
-        // copyin(&input_args.c,   &kernel_args->c, sizeof(uint64_t *));
-        // copyin(&input_args.len, &kernel_args->len, sizeof(uint64_t));
+        struct vector_add_args input_args = {0};
+        uint64_t *buf = malloc(sizeof(uint64_t) * 4, M_DEVBUF, M_WAITOK | M_ZERO);
+        copyin(buf, (void *) args, sizeof(uint64_t) * 4);
+        input_args.a = (uint64_t*) buf[0];
+        input_args.b = (uint64_t*) buf[1];
+        input_args.c = (uint64_t*) buf[2];
+        input_args.len = (uint64_t) buf[3];
         printf("[devc] simulating kernel for vector add, a %p, b %p, c %p, len %lu\n", 
             input_args.a, input_args.b, input_args.c, input_args.len);
         vector_add(input_args.a, input_args.b, input_args.c, input_args.len);
