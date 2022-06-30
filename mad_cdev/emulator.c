@@ -32,8 +32,8 @@ static void* address_translate(void *va)
             }
         }
         if (pa < pmap->mmu_ops->pa_min || pa >= pmap->mmu_ops->pa_max) {
-            printf("[emulator] should crash because your pa is illegal,
-                min %lx, pa %lx, max %lx\n", pmap->mmu_ops->pa_min, pa, pmap->mmu_ops->pa_max);
+            printf("[emulator] should crash because your pa is illegal, min %lx, pa %lx, max %lx\n", 
+                pmap->mmu_ops->pa_min, pa, pmap->mmu_ops->pa_max);
             return 0;
         }
     } else
