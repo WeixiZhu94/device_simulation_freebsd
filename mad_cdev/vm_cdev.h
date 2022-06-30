@@ -28,9 +28,10 @@ vmem_t *pm_pool;
 vm_page_t first_x97_page, last_x97_page;
 uint64_t x97_address_translate(dev_pmap_t *pmap, void *va);
 int init_pm(struct gmem_mmu_ops *ops);
-vm_page_t alloc_pm(void *);
+vm_page_t alloc_pm();
 gmem_error_t free_pm(vm_page_t m);
 void zero_page(vm_page_t m);
+int exit_pm();
 
 #define X97_PT_LOCK(x)    mtx_lock((x)->lock)
 #define X97_PT_UNLOCK(x)  mtx_unlock((x)->lock)

@@ -6,7 +6,7 @@
 
 size_t npages = 1024 * 1024 / 4;
 
-int init_pm(gmem_mmu_ops *ops) {
+int init_pm(struct gmem_mmu_ops *ops) {
     first_x97_page = vm_page_alloc_contig(NULL, 0, VM_ALLOC_NORMAL | VM_ALLOC_NOBUSY | VM_ALLOC_NOOBJ,
         npages, 0, 32ULL << 30, 1ULL << 30, 0, VM_MEMATTR_DEFAULT);
     if (first_x97_page == NULL)
@@ -34,7 +34,7 @@ vm_page_t alloc_pm(void *)
 	int page_idx = -1;
 	// We cannot allocate a bunch of pages but free one of them...
 	// vmem_xalloc(pm_pool, npages, alignment << 12, 0, 0, VMEM_ADDR_MIN, VMEM_ADDR_MAX, M_WAITOK | M_BESTFIT, &page_idx);
-	if (vmem_alloc(pm_pool, 1, &page_idx) == 0) {
+	if (vmem_alloc(pm_pool, 1, M_BESTFIT | M_WAITOK, &page_idx) == 0) {
 		pmap_zero_page(&first_x97_page[page_idx]);
 		return &first_x97_page[page_idx];
 	}
