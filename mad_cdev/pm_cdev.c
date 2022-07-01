@@ -17,7 +17,7 @@ vm_page_t get_victim_page()
 }
 
 // active queue: [least-recently-used, ..., most-recently-used]
-static inline void activate_x97_page(vm_page_t m)
+void activate_x97_page(vm_page_t m)
 {
 	if (!TAILQ_EMPTY(&x97_freelist)) {
 		TAILQ_REMOVE(&x97_freelist, m, plinks.q);
@@ -59,7 +59,7 @@ int init_pm(struct gmem_mmu_ops *ops) {
         last_x97_page = &first_x97_page[npages - 1];
         ops->pa_min = VM_PAGE_TO_PHYS(first_x97_page);
         ops->pa_max = VM_PAGE_TO_PHYS(last_x97_page) + PAGE_SIZE;
-		pm_pool = vmem_create("x97 device private physical memory", 0, npages, 1, 16, M_WAITOK | M_BESTFIT);
+		pm_pool = vmem_create("x97 device private physical memory", 0, npages, 1, 16, M_NOWAIT | M_BESTFIT);
         printf("!!! Stealing physical memory for the fake device succeeded, pa_min %lx, pa_max %lx, npages: %lu\n", 
         	ops->pa_min, ops->pa_max, npages);
     }
@@ -76,7 +76,7 @@ vm_page_t alloc_pm()
 	unsigned long page_idx = 0;
 	// We cannot allocate a bunch of pages but free one of them...
 	// vmem_xalloc(pm_pool, npages, alignment << 12, 0, 0, VMEM_ADDR_MIN, VMEM_ADDR_MAX, M_WAITOK | M_BESTFIT, &page_idx);
-	if (vmem_alloc(pm_pool, 1, M_BESTFIT | M_WAITOK, &page_idx) == 0) {
+	if (vmem_alloc(pm_pool, 1, M_BESTFIT | M_NOWAIT, &page_idx) == 0) {
 		zero_page(&first_x97_page[page_idx]);
 		activate_x97_page(&first_x97_page[page_idx]);
 		return &first_x97_page[page_idx];
