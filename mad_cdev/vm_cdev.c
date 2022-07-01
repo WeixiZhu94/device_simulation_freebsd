@@ -43,7 +43,7 @@ uint64_t x97_address_translate(dev_pmap_t *pmap, void *va) {
     uint64_t *pte = get_pte(pgroot, (vm_offset_t) va, 2);
     // printf("[x97_address_translate] done, page pa: %lx\n", *pte);
     if (*pte != 0) {
-        if (*pte < pmap->mmu_ops->pa_min || *pte >= pmap->mmu_ops->pa_max)
+        if (pmap->mode == EXCLUSIVE && (*pte < pmap->mmu_ops->pa_min || *pte >= pmap->mmu_ops->pa_max))
             printf("%s %d: translate va %lx - pa %lx\n",__func__, __LINE__, (uintptr_t) va, *pte);
         return *pte | ((uintptr_t) va & ~PAGE_MASK);
     } else
@@ -109,7 +109,7 @@ static gmem_error_t x97_mmu_enter(dev_pmap_t *pmap, vm_offset_t va, vm_size_t si
 
         // printf("[x97_mmu_enter] maps va %lx to pa %lx, last level pte %p, *pte is %lx\n", 
         //     va_i, pa, pte, *pte);
-        if (*pte < pmap->mmu_ops->pa_min || *pte >= pmap->mmu_ops->pa_max)
+        if (pmap->mode == EXCLUSIVE && (*pte < pmap->mmu_ops->pa_min || *pte >= pmap->mmu_ops->pa_max))
             printf("[x97_mmu_enter] installed out of range pa %lx\n", *pte);
         // flush device cache
     }
