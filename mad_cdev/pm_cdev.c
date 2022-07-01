@@ -37,7 +37,8 @@ static inline void free_x97_page(vm_page_t m)
 		printf("The x97 page to free does not exist in activelist\n");
 }
 
-size_t npages = 1024 * 1024 / 4;
+#define GB_PAGES 1024 * 1024 / 4
+size_t npages = GB_PAGES / 10;
 
 int init_pm(struct gmem_mmu_ops *ops) {
     first_x97_page = vm_page_alloc_contig(NULL, 0, VM_ALLOC_NORMAL | VM_ALLOC_NOBUSY | VM_ALLOC_NOOBJ,
