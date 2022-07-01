@@ -149,7 +149,9 @@ void madbus_dev_thread(void* pvoid)
         //Check for kthread_stop after reactivating
        	// if (kthread_should_stop()) 
         //     {break;}
-        kproc_suspend_check(pmadbusobj->pThread);  
+        kproc_suspend_check(pmadbusobj->pThread); 
+        // This is useless, make it sleep for most of the time 
+        sleep(60);
 
         //Let's confirm that we maintain processor affinity after releasing our quantum
        	// cur_cpu = get_cpu();
