@@ -62,10 +62,10 @@ int madbus_create_thread(PMADBUSOBJ pmadbusobj)
 
     ThreadName[TNDX] = DevNumStr[pmadbusobj->devnum];
  
-
-    int error = kproc_create(&madbus_dev_thread, (void *)pmadbusobj, &pmadbusobj->pThread, 0, 0, "%s", ThreadName);
-    if (error)
-        printf("kproc thread %s creation failed\n", ThreadName);
+    // Mute this useless thread. we don't do any io emulation
+    // int error = kproc_create(&madbus_dev_thread, (void *)pmadbusobj, &pmadbusobj->pThread, 0, 0, "%s", ThreadName);
+    // if (error)
+    //     printf("kproc thread %s creation failed\n", ThreadName);
 
     // kthread_bind(pmadbusobj->pThread, pmadbusobj->devnum); //assigning cpu=dev#
     
@@ -151,7 +151,7 @@ void madbus_dev_thread(void* pvoid)
         //     {break;}
         kproc_suspend_check(pmadbusobj->pThread); 
         // This is useless, make it sleep for most of the time 
-        sleep(60);
+        // sleep(60);
 
         //Let's confirm that we maintain processor affinity after releasing our quantum
        	// cur_cpu = get_cpu();
