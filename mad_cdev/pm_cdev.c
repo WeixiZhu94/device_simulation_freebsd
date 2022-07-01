@@ -19,8 +19,8 @@ vm_page_t get_victim_page()
 // active queue: [least-recently-used, ..., most-recently-used]
 void wire_x97_page(vm_page_t m)
 {
-	if (!TAILQ_EMPTY(&x97_freelist)) {
-		TAILQ_REMOVE(&x97_freelist, m, plinks.q);
+	if (!TAILQ_EMPTY(&x97_activelist)) {
+		TAILQ_REMOVE(&x97_activelist, m, plinks.q);
 		TAILQ_INSERT_TAIL(&x97_wirelist, m, plinks.q);
 	}
 	else
@@ -28,7 +28,7 @@ void wire_x97_page(vm_page_t m)
 }
 
 // active queue: [least-recently-used, ..., most-recently-used]
-static inline void activate_x97_page(vm_page_t m)
+void activate_x97_page(vm_page_t m)
 {
 	if (!TAILQ_EMPTY(&x97_freelist)) {
 		TAILQ_REMOVE(&x97_freelist, m, plinks.q);
