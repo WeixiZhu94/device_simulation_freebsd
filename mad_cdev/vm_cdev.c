@@ -22,7 +22,7 @@ static inline uint64_t *get_pte(vm_page_t pgroot, vm_offset_t va, int lvl) {
     } else {
         pde = get_pte(pgroot, va, lvl - 1);
         if (*pde == 0) {
-            vm_page_t m = alloc_pm();
+            vm_page_t m = alloc_pm(pmap);
             if (m == NULL)
                 printf("!!! We are in short of memory when allocating page table...\n");
             *pde = VM_PAGE_TO_PHYS(m) | 0; // no flags. don't care
