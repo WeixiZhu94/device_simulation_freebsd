@@ -9,8 +9,8 @@ struct pglist x97_activelist, x97_freelist, x97_wirelist;
 
 vm_page_t get_victim_page() 
 {
-	if (!TAILQ_EMPTY(&x97_freelist))
-		printf("The x97 freelist is not empty when you are reclaiming memory\n");
+	// if (!TAILQ_EMPTY(&x97_freelist))
+	// 	printf("The x97 freelist is not empty when you are reclaiming memory\n");
 	vm_page_t m = TAILQ_FIRST(&x97_activelist);
 	// TAILQ_REMOVE(&x97_activelist, m);
 	return m;
@@ -92,7 +92,7 @@ vm_page_t alloc_pm(dev_pmap_t *pmap)
 
 	while (vmem_alloc(pm_pool, 1, M_BESTFIT | M_NOWAIT, &page_idx) != 0) {
 		retry ++;
-		reclaim_dev_page(pmap, 512);
+		reclaim_dev_page(pmap, 1);
 
 		if (retry > 2) {
 			printf("vmem_alloc failed, retry reclaiming dev pages %d\n", retry);
