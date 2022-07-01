@@ -69,7 +69,7 @@ static gmem_error_t x97_mmu_create(dev_pmap_t *pmap)
         printf("[x97] mmu_create initialized %d pages starting at index %lu", PT_LEVEL_0, page_idx);
     for (int i = 0; i < PT_LEVEL_0; i ++) {
         pmap_zero_page(&first_x97_page[page_idx + i]);
-        activate_x97_page(&first_x97_page[page_idx + i]);
+        wire_x97_page(&first_x97_page[page_idx + i]);
     }
     pgtable->pgroot = &first_x97_page[page_idx];
 

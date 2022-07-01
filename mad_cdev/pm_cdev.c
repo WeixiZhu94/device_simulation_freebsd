@@ -5,7 +5,7 @@
 
 // Locks will need to be implemented in the future to protect free lists.
 // Right now we don't have concurrent device faults.
-struct pglist x97_activelist, x97_freelist;
+struct pglist x97_activelist, x97_freelist, x97_wirelist;
 
 vm_page_t get_victim_page() 
 {
@@ -17,7 +17,18 @@ vm_page_t get_victim_page()
 }
 
 // active queue: [least-recently-used, ..., most-recently-used]
-void activate_x97_page(vm_page_t m)
+void wire_x97_page(vm_page_t m)
+{
+	if (!TAILQ_EMPTY(&x97_freelist)) {
+		TAILQ_REMOVE(&x97_freelist, m, plinks.q);
+		TAILQ_INSERT_TAIL(&x97_wirelist, m, plinks.q);
+	}
+	else
+		printf("The x97 page to wire does not exist in freelist\n");
+}
+
+// active queue: [least-recently-used, ..., most-recently-used]
+static inline void activate_x97_page(vm_page_t m)
 {
 	if (!TAILQ_EMPTY(&x97_freelist)) {
 		TAILQ_REMOVE(&x97_freelist, m, plinks.q);
@@ -49,6 +60,7 @@ int init_pm(struct gmem_mmu_ops *ops) {
     	// Initing page queues
 	    TAILQ_INIT(&x97_activelist);
 	    TAILQ_INIT(&x97_freelist);
+	    TAILQ_INIT(&x97_wirelist);
 
     	// These vm_page structs must be marked as NOCPU pages so that vm_fault can handle them correctly
     	// This hack should be removed if the VM system can identify device page structs at the boot time
