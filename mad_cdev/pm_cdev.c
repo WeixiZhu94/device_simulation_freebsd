@@ -71,7 +71,7 @@ int exit_pm() {
 	return 0;
 }
 
-vm_page_t alloc_pm(dev_pmap_t pmap)
+vm_page_t alloc_pm(dev_pmap_t *pmap)
 {
 	int retry = 0;
 	unsigned long page_idx = 0;
