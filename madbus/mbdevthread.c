@@ -63,9 +63,9 @@ int madbus_create_thread(PMADBUSOBJ pmadbusobj)
     ThreadName[TNDX] = DevNumStr[pmadbusobj->devnum];
  
     // Mute this useless thread. we don't do any io emulation
-    // int error = kproc_create(&madbus_dev_thread, (void *)pmadbusobj, &pmadbusobj->pThread, 0, 0, "%s", ThreadName);
-    // if (error)
-    //     printf("kproc thread %s creation failed\n", ThreadName);
+    int error = kproc_create(&madbus_dev_thread, (void *)pmadbusobj, &pmadbusobj->pThread, 0, 0, "%s", ThreadName);
+    if (error)
+        printf("kproc thread %s creation failed\n", ThreadName);
 
     // kthread_bind(pmadbusobj->pThread, pmadbusobj->devnum); //assigning cpu=dev#
     
@@ -140,8 +140,7 @@ void madbus_dev_thread(void* pvoid)
                 kproc_suspend_check(pmadbusobj->pThread);  
         }
 
-        // tsleep(&pmadbusobj->pThread, 0,
-        //     "dev thread", 1 * hz / 1000);
+        tsleep(&pmadbusobj->pThread, 0, "dev thread", 1 * hz);
 
         //Release our quantum 
     	// schedule(); 
