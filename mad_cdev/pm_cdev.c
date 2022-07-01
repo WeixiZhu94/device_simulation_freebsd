@@ -92,15 +92,16 @@ vm_page_t alloc_pm(dev_pmap_t *pmap)
 
 	while (vmem_alloc(pm_pool, 1, M_BESTFIT | M_NOWAIT, &page_idx) != 0) {
 		retry ++;
-		reclaim_dev_page(pmap);
+		reclaim_dev_page(pmap, 512);
 
 		if (retry > 2) {
 			printf("vmem_alloc failed, retry reclaiming dev pages %d\n", retry);
 			printf("We will freeze you if retry fails after 5 times\n");
 		}
 		while (retry > 5) {
-			printf("[alloc_pm] goes to sleep\n");
-			tsleep(NULL, 0, "alloc pm", 1 * hz);
+			// printf("[alloc_pm] goes to sleep\n");
+			// tsleep(NULL, 0, "alloc pm", 1 * hz); 
+			cpu_relax();
 		}
 	}
 
