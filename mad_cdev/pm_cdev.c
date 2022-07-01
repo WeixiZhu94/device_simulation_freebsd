@@ -45,6 +45,10 @@ int init_pm(struct gmem_mmu_ops *ops) {
     if (first_x97_page == NULL)
         printf("!!! Failed to steal physical memory for the fake device!!!\n");
     else {
+    	// Initing page queues
+	    TAILQ_INIT(&x97_activelist);
+	    TAILQ_INIT(&x97_freelist);
+
     	// These vm_page structs must be marked as NOCPU pages so that vm_fault can handle them correctly
     	// This hack should be removed if the VM system can identify device page structs at the boot time
     	for (int i = 0; i < npages; i ++) {
@@ -58,8 +62,6 @@ int init_pm(struct gmem_mmu_ops *ops) {
         printf("!!! Stealing physical memory for the fake device succeeded, pa_min %lx, pa_max %lx, npages: %lu\n", 
         	ops->pa_min, ops->pa_max, npages);
     }
-    TAILQ_INIT(&x97_activelist);
-    TAILQ_INIT(&x97_freelist);
 	return 0;
 }
 
