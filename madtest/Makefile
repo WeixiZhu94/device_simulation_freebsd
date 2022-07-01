@@ -5,7 +5,9 @@ obj1:
 obj3: obj1
 	clang++ *.o test_x86_compatible_device.cpp -I../include -o share_cpu_test.x
 obj4: obj1 
-	clang++ *.o test_x97_device.cpp -I../include -o x97_test.x
+	clang++ *.o test_x97_discrete_device.cpp -I../include -o x97_discrete_test.x
+obj5: obj1 
+	clang++ *.o test_x97_coherent_device.cpp -I../include -o x97_coherent_test.x
 
 
 # 	clang++ accelerator_runtime.cpp prepare_kernel.cpp test_x86_compatible_device.cpp -I../include -o share_cpu_test.x
