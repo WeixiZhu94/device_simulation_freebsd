@@ -24,7 +24,7 @@ void wire_x97_page(vm_page_t m)
 		TAILQ_INSERT_TAIL(&x97_wirelist, m, plinks.q);
 	}
 	else
-		printf("The x97 page to wire does not exist in freelist\n");
+		printf("The x97 page to wire does not exist in activelist\n");
 }
 
 // active queue: [least-recently-used, ..., most-recently-used]

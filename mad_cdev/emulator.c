@@ -43,7 +43,7 @@ static void* address_translate(void *va)
 }
 
 /* openCL kernel emulation code */
-static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
+static int vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
 {
     uint64_t *ka, *kb, *kc;
     int delta_faults = dev_faults;
@@ -56,7 +56,7 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
         if (ka == 0 || kb == 0 || kc == 0) {
             printf("[devc] kernel failed with 0 pa, %p %p %p %p %p %p\n",
                 ka, kb, kc, &a[i], &b[i], &c[i]);
-            return;
+            return -1;
         }
 
         if (i % (1024 * 128) == 0)
@@ -65,6 +65,7 @@ static void vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
     }
     delta_faults = dev_faults - delta_faults;
     printf("[devc] kernel computation generates %d device page faults\n", dev_faults);
+    return 0;
 }
 
 int run_kernel(void *arg)
@@ -83,8 +84,7 @@ int run_kernel(void *arg)
     if (kernel_type == SUM) {
         printf("[devc] simulating kernel for vector add, a %p, b %p, c %p, len %lu\n", 
             args->a, args->b, args->c, args->len);
-        vector_add(args->a, args->b, args->c, args->len);
-        return 0;
+        return vector_add(args->a, args->b, args->c, args->len);
     }
     else
         printf("[devc] other kernels not implemented\n");
