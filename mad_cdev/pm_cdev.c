@@ -101,7 +101,7 @@ vm_page_t alloc_pm(dev_pmap_t *pmap)
 		while (retry > 5) {
 			// printf("[alloc_pm] goes to sleep\n");
 			// tsleep(NULL, 0, "alloc pm", 1 * hz); 
-			cpu_relax();
+			cpu_spinwait();
 		}
 	}
 
