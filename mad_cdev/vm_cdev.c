@@ -174,11 +174,12 @@ int setup_ctx(gmem_vm_mode running_mode)
     } else if (running_mode == REPLICATE_CPU) {
 
         mode = running_mode;
-        printf("[devc] setting ctx as replicate, save my pmap to address %p\n", &pmap);
+        printf("[devc] setting ctx as replicate cpu, save my pmap to address %p\n", &pmap);
         error = gmem_uvas_create(NULL, &pmap, NULL, &x97_mmu_ops, NULL, NULL, GMEM_UVAS_REPLICATE_CPU,
             0, 0, 0, 0); // exclusive mode should not care about the last 4 args
         if (error == GMEM_OK)
             gmem_uvas_set_pmap_policy(pmap, false, false, 1); // page order = 1
+        return error;
     } else
         printf("Other GMEM UVAS modes not supported yet\n");
     return -1;
