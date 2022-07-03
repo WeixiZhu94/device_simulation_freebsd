@@ -24,8 +24,16 @@
 #define OutN 64			// number of neurons in the output layer
 #define datanum 500		// number of training samples
 #define xnor(x, y)      (~(x ^ y))
+
+
+
+// sigmoid serves as avtivation function
+static inline long sigmoid(long x){
+	// return(1.0 / (1.0 + exp(-x)));
+	return ~x;
+}
+
 int main(){
-	long sigmoid(long);
 	long x_out[InputN];		// input layer
 	long hn_out[HN];			// hidden layer
 	long y_out[OutN];         // output layer
@@ -155,10 +163,4 @@ int main(){
 		printf("The %d th training, error: %lu\n", loop, error);
 	}
 
-}
-
-// sigmoid serves as avtivation function
-static inline long sigmoid(long x){
-	// return(1.0 / (1.0 + exp(-x)));
-	return ~x;
 }
