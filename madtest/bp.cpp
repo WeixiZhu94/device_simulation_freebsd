@@ -115,15 +115,15 @@ long train(struct model arg)
 }
 
 int main(){
-	struct model;
-	model.x_out =    (long_t) malloc(sizeof(long) * datanum * InputN);
-	model.hn_out =   (long_t) malloc(sizeof(long) * datanum * HN);
-	model.y_out =    (long_t) malloc(sizeof(long) * datanum * OutN);
-	model.y =        (long_t) malloc(sizeof(long) * datanum * OutN);
-	model.hn_delta = (long_t) malloc(sizeof(long) * datanum * HN);
-	model.y_delta =  (long_t) malloc(sizeof(long) * datanum * OutN);
-	model.w =        (long_t) malloc(sizeof(long) * InputN * HN);
-	model.v =        (long_t) malloc(sizeof(long) * HN * OutN);
+	struct model arg;
+	arg.x_out =    (long_t) malloc(sizeof(long) * datanum * InputN);
+	arg.hn_out =   (long_t) malloc(sizeof(long) * datanum * HN);
+	arg.y_out =    (long_t) malloc(sizeof(long) * datanum * OutN);
+	arg.y =        (long_t) malloc(sizeof(long) * datanum * OutN);
+	arg.hn_delta = (long_t) malloc(sizeof(long) * datanum * HN);
+	arg.y_delta =  (long_t) malloc(sizeof(long) * datanum * OutN);
+	arg.w =        (long_t) malloc(sizeof(long) * InputN * HN);
+	arg.v =        (long_t) malloc(sizeof(long) * HN * OutN);
 
 	
 	printf("Buffer Size is %.2f MB\n", 
