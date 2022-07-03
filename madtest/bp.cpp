@@ -28,7 +28,7 @@
 typedef long** long_t;
 struct model {
 	long_t x_out, hn_out, y_out, y, hn_delta, y_delta, w, v;
-}
+};
 
 // sigmoid serves as avtivation function
 static inline long sigmoid(long x){
@@ -49,7 +49,7 @@ long train(struct model arg)
 
 	long error = 0;	
 	long alpha = 10; 
-	beta = 10;
+	long beta = 10;
 	long delta, sumtemp, errtemp;	
 	int i, j, m;
 
