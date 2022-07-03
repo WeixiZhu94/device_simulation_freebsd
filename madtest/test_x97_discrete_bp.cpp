@@ -118,9 +118,9 @@ static void run_bp()
 
 		generate_bp_input((struct accelerator_kernel_args *) kernel_args);
 
-		cpu_bp((struct accelerator_kernel_args *) kernel_args);
+		// cpu_bp((struct accelerator_kernel_args *) kernel_args);
 		// printf("Launching kernel\n");
-		// clLaunchKernel(test_program[i], kernel_args);
+		clLaunchKernel(test_program[i], kernel_args);
 	}
 }
 

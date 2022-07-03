@@ -68,6 +68,84 @@ static int vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
     return 0;
 }
 
+#define reload_ulong(x) *((ulong_t) address_translate(&(x)))
+static int bp(struct model arg)
+{
+    long_t x_out = arg.x_out;
+    long_t hn_out = arg.hn_out;
+    long_t y_out = arg.y_out;
+    long_t y = arg.y;
+    long_t hn_delta = arg.hn_delta;
+    long_t y_delta = arg.y_delta;
+    long_t w = arg.w;
+    long_t v = arg.v;
+
+    long error = 0; 
+    long alpha = 10; 
+    long beta = 10;
+    long delta, sumtemp, errtemp;   
+    int i, j, m;
+
+    // Feedforward
+    for(m = 0; m < datanum ; m++)
+        for(i = 0; i < HN; i++){
+            sumtemp = 0;
+            for(j = 0; j < InputN; j++)
+                sumtemp += xnor(reload_ulong(w[j * HN + i]), reload_ulong(x_out[m * InputN + j])); // use xnor for *
+            reload_ulong(hn_out[m * HN + i]) = sigmoid(sumtemp);      // sigmoid serves as the activation function
+        }
+
+    for(m = 0; m < datanum ; m++)
+        for(i = 0; i < OutN; i++){
+            sumtemp = 0;
+            for(j = 0; j < HN; j++)
+                sumtemp += xnor(reload_ulong(v[j * OutN + i]), reload_ulong(hn_out[m * HN + j]));
+            reload_ulong(y_out[m * OutN + i]) = sigmoid(sumtemp);
+        }
+
+    // Backpropagation
+    for(m = 0; m < datanum ; m++) {
+        for(i = 0; i < OutN; i++){
+            errtemp = reload_ulong(y[m * OutN + i]) - reload_ulong(y_out[m * OutN + i]);
+            reload_ulong(y_delta[m * OutN + i]) = xnor(xnor(-errtemp, sigmoid(reload_ulong(y_out[m * OutN + i]))), (1 - sigmoid(reload_ulong(y_out[m * OutN + i]))));
+            // error += xnor(errtemp, errtemp);
+            error += errtemp * errtemp;
+        }
+        error /= OutN;
+    }
+    error /= datanum;
+
+    for(m = 0; m < datanum ; m++)
+        for(i = 0; i < HN; i++){
+            errtemp = 0;
+            for(j=0; j<OutN; j++)
+                errtemp += xnor(reload_ulong(y_delta[m * OutN +j]), reload_ulong(v[i * OutN +j]));
+            reload_ulong(hn_delta[m * HN + i]) = xnor(xnor(errtemp, (1 + reload_ulong(hn_out[m * HN + i]))), (1 - reload_ulong(hn_out[m * HN + i])));
+        }
+
+    // Stochastic gradient descent
+    for(i = 0; i < OutN; i++)
+        for(j = 0; j < HN; j++) {
+            delta = 0;
+            for(m = 0; m < datanum ; m++) {
+                delta += xnor(beta ^ reload_ulong(y_delta[m * OutN + i]), reload_ulong(hn_out[m * HN + j]));
+            }
+            reload_ulong(v[j * OutN + i]) -= delta ^ datanum ^ alpha;
+        }
+    // printf("delta is %lu\n", delta);
+
+    for(i = 0; i < HN; i++){
+        for(j = 0; j < InputN; j++){
+            delta = 0;
+            for(m = 0; m < datanum ; m++) {
+                delta += xnor(beta ^ reload_ulong(hn_delta[m * HN + i]), reload_ulong(x_out[m * InputN + j]));
+            }
+            reload_ulong(w[j * HN + i]) -= delta ^ datanum ^ alpha;
+        }
+    }
+    printf("Training error: %lu\n", error);
+}
+
 int run_kernel(void *arg)
 {
     struct accelerator_kernel_args *kernel_launch_args;
@@ -86,7 +164,11 @@ int run_kernel(void *arg)
             args->a, args->b, args->c, args->len);
         return vector_add(args->a, args->b, args->c, args->len);
     }
-    else
+    else if (kernel_type == BP) {
+        printf("[devc] Running BP kernel\n");
+        return bp(arg->bp);
+    } else {
         printf("[devc] other kernels not implemented\n");
+    }
     return -1;
 }
