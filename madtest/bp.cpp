@@ -49,7 +49,7 @@ int main(){
 	long error;
 	long alpha = 10, beta = 10;
 	int loop = 0;
-	int times = 1;
+	int times = 10;
 	int i, j, m;
 	long max, min;
 	long sumtemp;
