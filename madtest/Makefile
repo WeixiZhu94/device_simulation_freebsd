@@ -1,4 +1,4 @@
-all: obj1 obj3 obj4 obj5 bp
+all: obj1 obj3 obj4 obj5 obj6 bp
 
 obj1:
 	clang++ accelerator_runtime.cpp prepare_kernel.cpp -c -I../include 
