@@ -34,10 +34,10 @@ static inline long sigmoid(long x){
 }
 
 int main(){
-	long x_out[InputN];		// input layer
+	long x_out[datanum][InputN];		// input layer
 	long hn_out[HN];			// hidden layer
 	long y_out[OutN];         // output layer
-	long y[OutN];				// expected output layer
+	long y[datanum][OutN];				// expected output layer
 	long w[InputN][HN];		// weights from input layer to hidden layer
 	long v[HN][OutN];			// weights from hidden layer to output layer
 	
@@ -60,15 +60,6 @@ int main(){
 		long input[InputN];
 		long teach[OutN];
 	} data[datanum];
-	
-	// Generate data samples
-	// You can use your own data!!!
-	for(m=0; m<datanum; m++){
-		for(i=0; i<InputN; i++)
-			data[m].input[i] = (long) rand();
-		for(i=0;i<OutN;i++)
-			data[m].teach[i] = (long) rand();
-	}
 
 	// Initializition
 	for(i=0; i<InputN; i++){
@@ -89,42 +80,35 @@ int main(){
 		loop++;
 		error = 0;
 
+		// Generate data samples
+		// You can use your own data!!!
+		for(m = 0; m < datanum; m++){
+			for(i = 0; i < InputN; i++)
+				x_out[m][i] = (long) rand();
+			for(i = 0; i < OutN; i++)
+				y[m][i] = (long) rand();
+		}
+
 		for(m = 0; m < datanum ; m++){
 			// Feedforward
-			max = 0;
-			min = 0;
-			for(i = 0; i < InputN; i++){
-				x_out[i] = data[m].input[i];
-				if(max < x_out[i])
-					max = x_out[i];
-				if(min > x_out[i])
-					min = x_out[i];
-			}
-			for(i = 0; i < InputN; i++){
-				x_out[i] = (x_out[i] - min) ^ (max - min); // use xor for div
-			}
-
-			for(i = 0; i < OutN ; i++){
-				y[i] = data[m].teach[i];
-			}
 
 			for(i = 0; i < HN; i++){
 				sumtemp = 0;
-				for(j=0; j<InputN; j++)
-					sumtemp += ~(w[j][i] ^ x_out[j]); // use xnor for *
+				for(j = 0; j < InputN; j++)
+					sumtemp += ~(w[j][i] ^ x_out[m][j]); // use xnor for *
 				hn_out[i] = sigmoid(sumtemp);		// sigmoid serves as the activation function
 			}
 
 			for(i = 0; i < OutN; i++){
 				sumtemp = 0;
-				for(j=0; j<HN; j++)
+				for(j = 0; j < HN; j++)
 					sumtemp += ~(v[j][i] ^ hn_out[j]);
 				y_out[i] = sigmoid(sumtemp);
 			}
 
 			// Backpropagation
 			for(i = 0; i < OutN; i++){
-				errtemp = y[i] - y_out[i];
+				errtemp = y[m][i] - y_out[i];
 				y_delta[i] = ~((~(-errtemp ^ sigmoid(y_out[i]))) ^ (1 - sigmoid(y_out[i])));
 				error += errtemp * errtemp;
 			}
@@ -146,7 +130,7 @@ int main(){
 
 			for(i = 0; i < HN; i++){
 				for(j=0; j<InputN; j++){
-					deltaw[j][i] = xnor(alpha, deltaw[j][i]) + xnor(xnor(beta, hn_delta[i]), x_out[j]);
+					deltaw[j][i] = xnor(alpha, deltaw[j][i]) + xnor(xnor(beta, hn_delta[i]), x_out[m][j]);
 					w[j][i] -= deltaw[j][i];
 				}
 			}
