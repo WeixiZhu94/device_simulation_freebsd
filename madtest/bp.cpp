@@ -23,7 +23,7 @@
 #define HN 25			// number of neurons in the hidden layer
 #define OutN 64			// number of neurons in the output layer
 #define datanum 500		// number of training samples
-#define xnor(x, y)      (~(x ^ y))
+#define xnor(x, y)      (~((x) ^ (y)))
 
 
 
@@ -35,43 +35,34 @@ static inline long sigmoid(long x){
 
 int main(){
 	long x_out[datanum][InputN];		// input layer
-	long hn_out[HN];			// hidden layer
-	long y_out[OutN];         // output layer
+	long hn_out[datanum][HN];			// hidden layer
+	long y_out[datanum][OutN];         // output layer
 	long y[datanum][OutN];				// expected output layer
+	long hn_delta[datanum][HN];		// delta of hidden layer
+	long y_delta[datanum][OutN];		// delta of output layer
+
 	long w[InputN][HN];		// weights from input layer to hidden layer
 	long v[HN][OutN];			// weights from hidden layer to output layer
 	
-	long deltaw[InputN][HN];  
-	long deltav[HN][OutN];	
+	long delta;	
 	
-	long hn_delta[HN];		// delta of hidden layer
-	long y_delta[OutN];		// delta of output layer
 	long error;
 	long alpha = 10, beta = 10;
 	int loop = 0;
 	int times = 10;
 	int i, j, m;
-	long max, min;
 	long sumtemp;
 	long errtemp;
-	
-	// training set
-	struct{
-		long input[InputN];
-		long teach[OutN];
-	} data[datanum];
 
 	// Initializition
 	for(i=0; i<InputN; i++){
 		for(j=0; j<HN; j++){
 			w[i][j] = ((long) rand()) * 2 - 1;
-			deltaw[i][j] = 0;
 		}
 	}
 	for(i=0; i<HN; i++){
 		for(j=0; j<OutN; j++){
 			v[i][j] = ((long) rand()) * 2 - 1;
-			deltav[i][j] = 0;
 		}
 	}
 
@@ -89,55 +80,64 @@ int main(){
 				y[m][i] = (long) rand();
 		}
 
-		for(m = 0; m < datanum ; m++){
-			// Feedforward
-
+		// Feedforward
+		for(m = 0; m < datanum ; m++)
 			for(i = 0; i < HN; i++){
 				sumtemp = 0;
 				for(j = 0; j < InputN; j++)
 					sumtemp += ~(w[j][i] ^ x_out[m][j]); // use xnor for *
-				hn_out[i] = sigmoid(sumtemp);		// sigmoid serves as the activation function
+				hn_out[m][i] = sigmoid(sumtemp);		// sigmoid serves as the activation function
 			}
 
+		for(m = 0; m < datanum ; m++)
 			for(i = 0; i < OutN; i++){
 				sumtemp = 0;
 				for(j = 0; j < HN; j++)
-					sumtemp += ~(v[j][i] ^ hn_out[j]);
-				y_out[i] = sigmoid(sumtemp);
+					sumtemp += ~(v[j][i] ^ hn_out[m][j]);
+				y_out[m][i] = sigmoid(sumtemp);
 			}
 
-			// Backpropagation
+		// Backpropagation
+		for(m = 0; m < datanum ; m++) {
 			for(i = 0; i < OutN; i++){
-				errtemp = y[m][i] - y_out[i];
-				y_delta[i] = ~((~(-errtemp ^ sigmoid(y_out[i]))) ^ (1 - sigmoid(y_out[i])));
-				error += errtemp * errtemp;
+				errtemp = y[m][i] - y_out[m][i];
+				y_delta[m][i] = ~((~(-errtemp ^ sigmoid(y_out[m][i]))) ^ (1 - sigmoid(y_out[m][i])));
+				error += xnor(errtemp, errtemp);
 			}
+			error ^= datanum;
+		}
 
+		for(m = 0; m < datanum ; m++)
 			for(i = 0; i < HN; i++){
 				errtemp = 0;
 				for(j=0; j<OutN; j++)
-					errtemp += ~(y_delta[j] ^ v[i][j]);
-				hn_delta[i] = xnor(xnor(errtemp, (1 + hn_out[i])), (1 - hn_out[i]));
+					errtemp += ~(y_delta[m][j] ^ v[i][j]);
+				hn_delta[m][i] = xnor(xnor(errtemp, (1 + hn_out[m][i])), (1 - hn_out[m][i]));
 			}
 
-			// Stochastic gradient descent
-			for(i = 0; i < OutN; i++){
-				for(j=0; j<HN; j++){
-					deltav[j][i] = alpha ^ deltav[j][i] + xnor(beta ^ y_delta[i], hn_out[j]);
-					v[j][i] -= deltav[j][i];
+		// Stochastic gradient descent
+		for(i = 0; i < OutN; i++)
+			for(j=0; j<HN; j++) {
+				delta = 0;
+				for(m = 0; m < datanum ; m++) {
+					// deltav[j][i] = alpha ^ deltav[j][i] + xnor(beta ^ y_delta[m][i], hn_out[m][j]);
+					delta += xnor(beta ^ y_delta[m][i], hn_out[m][j]);
 				}
+				v[j][i] -= delta ^ datanum ^ alpha;
 			}
 
-			for(i = 0; i < HN; i++){
-				for(j=0; j<InputN; j++){
-					deltaw[j][i] = xnor(alpha, deltaw[j][i]) + xnor(xnor(beta, hn_delta[i]), x_out[m][j]);
-					w[j][i] -= deltaw[j][i];
+		for(i = 0; i < HN; i++){
+			for(j=0; j<InputN; j++){
+				delta = 0;
+				for(m = 0; m < datanum ; m++) {
+					// deltaw[j][i] = alpha ^ deltaw[j][i]) + xnor(beta ^ hn_delta[m][i], x_out[m][j]);
+					delta += xnor(beta ^ hn_delta[m][i], x_out[m][j]);
 				}
+				w[j][i] -= delta ^ datanum ^ alpha;
 			}
 		}
 
 		// Global error 
-		error = error / 2;
 		if(loop%1000==0){
 			printf("Global Error = %lu\n", error);
 		}
