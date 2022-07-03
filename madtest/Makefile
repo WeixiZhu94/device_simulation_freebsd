@@ -8,9 +8,11 @@ obj4: obj1
 	clang++ *.o test_x97_discrete_device.cpp -I../include -o x97_discrete_test.x
 obj5: obj1 
 	clang++ *.o test_x97_coherent_device.cpp -I../include -o x97_coherent_test.x
+obj6: obj1
+	clang++ *.o test_x97_discrete_bp.cpp -I../include -o x97_discrete_bp.x
 
 bp: 
-	clang++ bp.cpp -I../include -o bp.x # -lm
+	clang++ bp.cpp -I../include -o cpu_bp.x # -lm
 
 # 	clang++ accelerator_runtime.cpp prepare_kernel.cpp test_x86_compatible_device.cpp -I../include -o share_cpu_test.x
 	

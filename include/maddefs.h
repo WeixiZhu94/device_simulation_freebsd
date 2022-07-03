@@ -641,6 +641,7 @@ typedef struct _MADREGS
 enum kernel_instance {
     SUM = 0,
     CRC = 1,
+    BP = 2,
 };
 typedef enum kernel_instance kernel_instance;
 
@@ -653,6 +654,21 @@ struct accelerator_kernel_args {
     kernel_instance kernel_type;
     // void *kernel_args;
     struct vector_add_args vector_add;
+    struct model bp;
 };
+
+#define InputN 100      // number of neurons in the input layer
+#define HN 100          // number of neurons in the hidden layer
+#define OutN 100            // number of neurons in the output layer
+#define datanum 30000       // number of training samples
+#define xnor(x, y)      (~((x) ^ (y)))
+
+typedef long* long_t;
+struct model {
+    long_t x_out, hn_out, y_out, y, hn_delta, y_delta, w, v;
+};
+
+// sigmoid serves as avtivation function
+#define sigmoid(x) (~(x))
 
 #endif //_MADDEFS_
