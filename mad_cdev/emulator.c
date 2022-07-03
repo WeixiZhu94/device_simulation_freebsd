@@ -68,7 +68,7 @@ static int vector_add(uint64_t *a, uint64_t *b, uint64_t *c, uint64_t len)
     return 0;
 }
 
-#define reload_ulong(x) *((ulong_t) address_translate(&(x)))
+#define reload_long(x) *((long_t) address_translate(&(x)))
 static int bp(struct model arg)
 {
     long_t x_out = arg.x_out;
@@ -91,23 +91,23 @@ static int bp(struct model arg)
         for(i = 0; i < HN; i++){
             sumtemp = 0;
             for(j = 0; j < InputN; j++)
-                sumtemp += xnor(reload_ulong(w[j * HN + i]), reload_ulong(x_out[m * InputN + j])); // use xnor for *
-            reload_ulong(hn_out[m * HN + i]) = sigmoid(sumtemp);      // sigmoid serves as the activation function
+                sumtemp += xnor(reload_long(w[j * HN + i]), reload_long(x_out[m * InputN + j])); // use xnor for *
+            reload_long(hn_out[m * HN + i]) = sigmoid(sumtemp);      // sigmoid serves as the activation function
         }
 
     for(m = 0; m < datanum ; m++)
         for(i = 0; i < OutN; i++){
             sumtemp = 0;
             for(j = 0; j < HN; j++)
-                sumtemp += xnor(reload_ulong(v[j * OutN + i]), reload_ulong(hn_out[m * HN + j]));
-            reload_ulong(y_out[m * OutN + i]) = sigmoid(sumtemp);
+                sumtemp += xnor(reload_long(v[j * OutN + i]), reload_long(hn_out[m * HN + j]));
+            reload_long(y_out[m * OutN + i]) = sigmoid(sumtemp);
         }
 
     // Backpropagation
     for(m = 0; m < datanum ; m++) {
         for(i = 0; i < OutN; i++){
-            errtemp = reload_ulong(y[m * OutN + i]) - reload_ulong(y_out[m * OutN + i]);
-            reload_ulong(y_delta[m * OutN + i]) = xnor(xnor(-errtemp, sigmoid(reload_ulong(y_out[m * OutN + i]))), (1 - sigmoid(reload_ulong(y_out[m * OutN + i]))));
+            errtemp = reload_long(y[m * OutN + i]) - reload_long(y_out[m * OutN + i]);
+            reload_long(y_delta[m * OutN + i]) = xnor(xnor(-errtemp, sigmoid(reload_long(y_out[m * OutN + i]))), (1 - sigmoid(reload_long(y_out[m * OutN + i]))));
             // error += xnor(errtemp, errtemp);
             error += errtemp * errtemp;
         }
@@ -119,8 +119,8 @@ static int bp(struct model arg)
         for(i = 0; i < HN; i++){
             errtemp = 0;
             for(j=0; j<OutN; j++)
-                errtemp += xnor(reload_ulong(y_delta[m * OutN +j]), reload_ulong(v[i * OutN +j]));
-            reload_ulong(hn_delta[m * HN + i]) = xnor(xnor(errtemp, (1 + reload_ulong(hn_out[m * HN + i]))), (1 - reload_ulong(hn_out[m * HN + i])));
+                errtemp += xnor(reload_long(y_delta[m * OutN +j]), reload_long(v[i * OutN +j]));
+            reload_long(hn_delta[m * HN + i]) = xnor(xnor(errtemp, (1 + reload_long(hn_out[m * HN + i]))), (1 - reload_long(hn_out[m * HN + i])));
         }
 
     // Stochastic gradient descent
@@ -128,9 +128,9 @@ static int bp(struct model arg)
         for(j = 0; j < HN; j++) {
             delta = 0;
             for(m = 0; m < datanum ; m++) {
-                delta += xnor(beta ^ reload_ulong(y_delta[m * OutN + i]), reload_ulong(hn_out[m * HN + j]));
+                delta += xnor(beta ^ reload_long(y_delta[m * OutN + i]), reload_long(hn_out[m * HN + j]));
             }
-            reload_ulong(v[j * OutN + i]) -= delta ^ datanum ^ alpha;
+            reload_long(v[j * OutN + i]) -= delta ^ datanum ^ alpha;
         }
     // printf("delta is %lu\n", delta);
 
@@ -138,9 +138,9 @@ static int bp(struct model arg)
         for(j = 0; j < InputN; j++){
             delta = 0;
             for(m = 0; m < datanum ; m++) {
-                delta += xnor(beta ^ reload_ulong(hn_delta[m * HN + i]), reload_ulong(x_out[m * InputN + j]));
+                delta += xnor(beta ^ reload_long(hn_delta[m * HN + i]), reload_long(x_out[m * InputN + j]));
             }
-            reload_ulong(w[j * HN + i]) -= delta ^ datanum ^ alpha;
+            reload_long(w[j * HN + i]) -= delta ^ datanum ^ alpha;
         }
     }
     printf("Training error: %lu\n", error);
