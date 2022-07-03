@@ -58,23 +58,23 @@ long train(struct model arg)
 		for(i = 0; i < HN; i++){
 			sumtemp = 0;
 			for(j = 0; j < InputN; j++)
-				sumtemp += xnor(w[j][i], x_out[m][j]); // use xnor for *
-			hn_out[m][i] = sigmoid(sumtemp);		// sigmoid serves as the activation function
+				sumtemp += xnor(w[j * HN + i], x_out[m * InputN + j]); // use xnor for *
+			hn_out[m * HN + i] = sigmoid(sumtemp);		// sigmoid serves as the activation function
 		}
 
 	for(m = 0; m < datanum ; m++)
 		for(i = 0; i < OutN; i++){
 			sumtemp = 0;
 			for(j = 0; j < HN; j++)
-				sumtemp += xnor(v[j][i], hn_out[m][j]);
-			y_out[m][i] = sigmoid(sumtemp);
+				sumtemp += xnor(v[j * OutN + i], hn_out[m * HN + j]);
+			y_out[m * OutN + i] = sigmoid(sumtemp);
 		}
 
 	// Backpropagation
 	for(m = 0; m < datanum ; m++) {
 		for(i = 0; i < OutN; i++){
-			errtemp = y[m][i] - y_out[m][i];
-			y_delta[m][i] = xnor(xnor(-errtemp, sigmoid(y_out[m][i])), (1 - sigmoid(y_out[m][i])));
+			errtemp = y[m * OutN + i] - y_out[m * OutN + i];
+			y_delta[m * OutN + i] = xnor(xnor(-errtemp, sigmoid(y_out[m * OutN + i])), (1 - sigmoid(y_out[m * OutN + i])));
 			// error += xnor(errtemp, errtemp);
 			error += errtemp * errtemp;
 		}
@@ -86,28 +86,28 @@ long train(struct model arg)
 		for(i = 0; i < HN; i++){
 			errtemp = 0;
 			for(j=0; j<OutN; j++)
-				errtemp += xnor(y_delta[m][j], v[i][j]);
-			hn_delta[m][i] = xnor(xnor(errtemp, (1 + hn_out[m][i])), (1 - hn_out[m][i]));
+				errtemp += xnor(y_delta[m * OutN +j], v[i * OutN +j]);
+			hn_delta[m * HN + i] = xnor(xnor(errtemp, (1 + hn_out[m * HN + i])), (1 - hn_out[m * HN + i]));
 		}
 
 	// Stochastic gradient descent
 	for(i = 0; i < OutN; i++)
-		for(j=0; j < HN; j++) {
+		for(j = 0; j < HN; j++) {
 			delta = 0;
 			for(m = 0; m < datanum ; m++) {
-				delta += xnor(beta ^ y_delta[m][i], hn_out[m][j]);
+				delta += xnor(beta ^ y_delta[m * OutN + i], hn_out[m * HN + j]);
 			}
-			v[j][i] -= delta ^ datanum ^ alpha;
+			v[j * OutN + i] -= delta ^ datanum ^ alpha;
 		}
 	// printf("delta is %lu\n", delta);
 
 	for(i = 0; i < HN; i++){
-		for(j=0; j < InputN; j++){
+		for(j = 0; j < InputN; j++){
 			delta = 0;
 			for(m = 0; m < datanum ; m++) {
-				delta += xnor(beta ^ hn_delta[m][i], x_out[m][j]);
+				delta += xnor(beta ^ hn_delta[m * HN + i], x_out[m * InputN + j]);
 			}
-			w[j][i] -= delta ^ datanum ^ alpha;
+			w[j * HN + i] -= delta ^ datanum ^ alpha;
 		}
 	}
 	printf("Training error: %lu\n", error);
@@ -132,12 +132,12 @@ int main(){
 	// Initializition
 	for(int i = 0; i < InputN; i++){
 		for(int j = 0; j < HN; j++){
-			arg.w[i][j] = ((long) rand()) * 2 - 1;
+			arg.w[i * HN + j] = ((long) rand()) * 2 - 1;
 		}
 	}
 	for(int i = 0; i < HN; i++){
 		for(int j = 0; j < OutN; j++){
-			arg.v[i][j] = ((long) rand()) * 2 - 1;
+			arg.v[i * OutN + j] = ((long) rand()) * 2 - 1;
 		}
 	}
 
@@ -149,9 +149,9 @@ int main(){
 		// You can use your own data!!!
 		for(int m = 0; m < datanum; m++){
 			for(int i = 0; i < InputN; i++)
-				arg.x_out[m][i] = (long) rand();
+				arg.x_out[m * InputN + i] = (long) rand();
 			for(int i = 0; i < OutN; i++)
-				arg.y[m][i] = (long) rand();
+				arg.y[m * OutN + i] = (long) rand();
 		}
 
 		train(arg);
