@@ -1,4 +1,5 @@
 #include "accelerator_runtime.h"
+#include "maddefs.h"
 
 const char* test_name[] = {
     "vector_add",
