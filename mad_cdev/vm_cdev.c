@@ -43,8 +43,11 @@ uint64_t x97_address_translate(dev_pmap_t *pmap, void *va) {
     uint64_t *pte = get_pte(pgroot, (vm_offset_t) va, 2);
     // printf("[x97_address_translate] done, page pa: %lx\n", *pte);
     if (*pte != 0) {
-        if (pmap->mode == EXCLUSIVE && (*pte < pmap->mmu_ops->pa_min || *pte >= pmap->mmu_ops->pa_max))
+        if (pmap->mode == EXCLUSIVE && (*pte < pmap->mmu_ops->pa_min || *pte >= pmap->mmu_ops->pa_max)) {
+            printf("PDE page status: refcount %u, flags %u", DMAP_TO_VM_PAGE(pte)->ref_count, DMAP_TO_VM_PAGE(pte)->flags);
             printf("%s %d: translate va %lx - pa %lx\n",__func__, __LINE__, (uintptr_t) va, *pte);
+            return 0;
+        }
         return *pte | ((uintptr_t) va & ~PAGE_MASK);
     } else
         return 0;
