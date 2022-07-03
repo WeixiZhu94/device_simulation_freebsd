@@ -30,6 +30,7 @@ void wire_x97_page(vm_page_t m)
 		active_cnt --;
 		TAILQ_INSERT_TAIL(&x97_wirelist, m, plinks.q);
 		wire_cnt ++;
+		m->ref_count ++;
 	}
 	else
 		printf("The x97 page to wire does not exist in activelist\n");

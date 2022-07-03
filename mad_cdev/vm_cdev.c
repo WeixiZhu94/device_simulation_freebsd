@@ -52,6 +52,8 @@ uint64_t x97_address_translate(dev_pmap_t *pmap, void *va) {
             print_page_q();
             return 0;
         }
+        if (PHYS_TO_VM_PAGE((uintptr_t) *pte)->ref_count > 7)
+            printf("The accessing page is a page table page!!!\n");
         return *pte | ((uintptr_t) va & ~PAGE_MASK);
     } else
         return 0;
