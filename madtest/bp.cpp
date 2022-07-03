@@ -22,7 +22,7 @@
 #define InputN 100		// number of neurons in the input layer
 #define HN 100			// number of neurons in the hidden layer
 #define OutN 100			// number of neurons in the output layer
-#define datanum 10000		// number of training samples
+#define datanum 30000		// number of training samples
 #define xnor(x, y)      (~((x) ^ (y)))
 
 
@@ -49,7 +49,7 @@ int main(){
 	long error;
 	long alpha = 10, beta = 10;
 	int loop = 0;
-	int times = 10;
+	int times = 3;
 	int i, j, m;
 	long sumtemp;
 	long errtemp;
