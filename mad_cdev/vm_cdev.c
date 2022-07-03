@@ -52,7 +52,7 @@ uint64_t x97_address_translate(dev_pmap_t *pmap, void *va) {
             print_page_q();
             return 0;
         }
-        if (pmap->mode == EXCLUSIVE && PHYS_TO_VM_PAGE((uintptr_t) *pte)->ref_count > 7)
+        if (pmap->mode == EXCLUSIVE && VPRC_WIRE_COUNT(PHYS_TO_VM_PAGE((uintptr_t) *pte)->ref_count > 7))
             printf("The accessing page %lx is a page table page!!!, ref count %u\n", 
                 *pte, PHYS_TO_VM_PAGE((uintptr_t) *pte)->ref_count);
         return *pte | ((uintptr_t) va & ~PAGE_MASK);
@@ -123,7 +123,7 @@ static gmem_error_t x97_mmu_enter(dev_pmap_t *pmap, vm_offset_t va, vm_size_t si
         if (pmap->mode == EXCLUSIVE && (*pte < pmap->mmu_ops->pa_min || *pte >= pmap->mmu_ops->pa_max))
             printf("[x97_mmu_enter] installed out of range pa %lx\n", *pte);
         // flush device cache
-        if (pmap->mode == EXCLUSIVE && PHYS_TO_VM_PAGE(pa)->ref_count > 7)
+        if (pmap->mode == EXCLUSIVE && VPRC_WIRE_COUNT(PHYS_TO_VM_PAGE(pa)->ref_count > 7))
             printf("The mapped page %lx is a page table page, ref count %u!!!\n", 
                 pa, PHYS_TO_VM_PAGE(pa)->ref_count);
     }
