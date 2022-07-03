@@ -24,10 +24,8 @@
 #define OutN 64			// number of neurons in the output layer
 #define datanum 500		// number of training samples
 
-void main(){
+int main(){
 	double sigmoid(double);
-	CString result = "";
-	char buffer[200];
 	double x_out[InputN];		// input layer
 	double hn_out[HN];			// hidden layer
 	double y_out[OutN];         // output layer
@@ -150,10 +148,7 @@ void main(){
 		// Global error 
 		error = error / 2;
 		if(loop%1000==0){
-			result = "Global Error = ";
-			sprintf(buffer, "%f", error);
-			result += buffer;
-			result += "\r\n";
+			printf("Global Error = %.2f\n", error);
 		}
 		if(error < errlimit)
 			break;
