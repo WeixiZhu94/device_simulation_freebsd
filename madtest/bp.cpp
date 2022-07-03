@@ -15,7 +15,7 @@
 // Credit: https://github.com/jakezhaojb/Backpropagation-C/blob/master/bp.cpp
 
 #include <stdio.h>
-#include <afx.h>
+// #include <afx.h>
 #include <math.h>
 #include <stdlib.h>
 
