@@ -142,6 +142,7 @@ int main(){
 	}
 
 	// Training
+	int times = 3;
 	for (int i = 0; i < times; i ++) {
 
 		// Generate data samples
@@ -153,7 +154,7 @@ int main(){
 				arg.y[m][i] = (long) rand();
 		}
 
-		train(model);
+		train(arg);
 	}
 
 }
