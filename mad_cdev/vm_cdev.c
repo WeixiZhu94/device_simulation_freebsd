@@ -134,6 +134,22 @@ static gmem_error_t x97_mmu_enter(dev_pmap_t *pmap, vm_offset_t va, vm_size_t si
 
 static gmem_error_t x97_mmu_release(dev_pmap_t *pmap, vm_offset_t va, vm_size_t size)
 {
+    struct x97_page_table *pgtable = (struct x97_page_table *) pmap->data;
+    uint64_t *pte;
+    if (va + size > VA_MASK) {
+        printf("!!! VA out of range\n");
+        return -1;
+    }
+
+    X97_PT_LOCK(pgtable);
+    vm_page_t pgroot = pgtable->pgroot;
+
+    for (vm_offset_t va_i = va; va_i < va + size; va_i += PAGE_SIZE) {
+        pte = get_pte(pgroot, va_i, 2);
+        *pte = 0; // No memory protection flags, don't care.
+    }
+
+    X97_PT_UNLOCK(pgtable);
     return GMEM_OK;
 }
 
