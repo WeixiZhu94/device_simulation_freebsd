@@ -19,10 +19,10 @@
 // #include <math.h>
 #include <stdlib.h>
 
-#define InputN 64		// number of neurons in the input layer
-#define HN 25			// number of neurons in the hidden layer
-#define OutN 64			// number of neurons in the output layer
-#define datanum 500		// number of training samples
+#define InputN 1000		// number of neurons in the input layer
+#define HN 1000			// number of neurons in the hidden layer
+#define OutN 1000			// number of neurons in the output layer
+#define datanum 1000		// number of training samples
 #define xnor(x, y)      (~((x) ^ (y)))
 
 
