@@ -144,7 +144,7 @@ static int bp(struct model arg)
         }
     }
     printf("Training error: %lu\n", error);
-    return error;
+    return 0;
 }
 
 int run_kernel(void *arg)
