@@ -85,7 +85,7 @@ int main(){
 			for(i = 0; i < HN; i++){
 				sumtemp = 0;
 				for(j = 0; j < InputN; j++)
-					sumtemp += ~(w[j][i] ^ x_out[m][j]); // use xnor for *
+					sumtemp += xnor(w[j][i], x_out[m][j]); // use xnor for *
 				hn_out[m][i] = sigmoid(sumtemp);		// sigmoid serves as the activation function
 			}
 
@@ -93,7 +93,7 @@ int main(){
 			for(i = 0; i < OutN; i++){
 				sumtemp = 0;
 				for(j = 0; j < HN; j++)
-					sumtemp += ~(v[j][i] ^ hn_out[m][j]);
+					sumtemp += xnor(v[j][i], hn_out[m][j]);
 				y_out[m][i] = sigmoid(sumtemp);
 			}
 
@@ -101,18 +101,19 @@ int main(){
 		for(m = 0; m < datanum ; m++) {
 			for(i = 0; i < OutN; i++){
 				errtemp = y[m][i] - y_out[m][i];
-				y_delta[m][i] = ~((~(-errtemp ^ sigmoid(y_out[m][i]))) ^ (1 - sigmoid(y_out[m][i])));
-				error += xnor(errtemp, errtemp);
+				y_delta[m][i] = xnor(xnor(-errtemp, sigmoid(y_out[m][i])), (1 - sigmoid(y_out[m][i])));
+				// error += xnor(errtemp, errtemp);
+				error += errtemp * errtemp;
 			}
-			error ^= OutN;
+			error /= OutN;
 		}
-		error ^= datanum;
+		error /= datanum;
 
 		for(m = 0; m < datanum ; m++)
 			for(i = 0; i < HN; i++){
 				errtemp = 0;
 				for(j=0; j<OutN; j++)
-					errtemp += ~(y_delta[m][j] ^ v[i][j]);
+					errtemp += xnor(y_delta[m][j], v[i][j]);
 				hn_delta[m][i] = xnor(xnor(errtemp, (1 + hn_out[m][i])), (1 - hn_out[m][i]));
 			}
 
