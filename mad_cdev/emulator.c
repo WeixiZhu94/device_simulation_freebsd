@@ -154,7 +154,7 @@ int run_kernel(void *arg)
 
     kernel_type = kernel_launch_args->kernel_type;
 
-    printf("[devc] running kernel, karg %p, type %u, args %p\n", arg, kernel_type, args);
+    printf("[devc] running kernel, karg %p, type %u\n", arg, kernel_type);
     // Do we need to translate user-space va to kernel space va?
     if (kernel_type == SUM) {
         struct vector_add_args *args;
