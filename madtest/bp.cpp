@@ -40,7 +40,8 @@ long train(struct model arg)
 {
 	long_t x_out = arg.x_out;
 	long_t hn_out = arg.hn_out;
-	long_t y_out = arg.y;
+	long_t y_out = arg.y_out;
+	long_t y = arg.y;
 	long_t hn_delta = arg.hn_delta;
 	long_t y_delta = arg.y_delta;
 	long_t w = arg.w;
