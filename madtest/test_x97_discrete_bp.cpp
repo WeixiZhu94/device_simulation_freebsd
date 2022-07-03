@@ -99,14 +99,14 @@ void cpu_bp(struct accelerator_kernel_args *kernel_args)
 		}
 	}
 	printf("Training error: %lu\n", error);
-	return error;
+	// return error;
 }
 
 static void run_bp()
 {
 	int ret;
 	void *kernel_args;
-	ret = generate_test(test_program[i], &kernel_args);
+	ret = generate_test(test_program[0], &kernel_args);
 	printf("Done with test initialization\n");
 	if (ret)
 		printf("Test generation failed\n");
