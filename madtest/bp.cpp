@@ -104,7 +104,7 @@ int main(){
 				y_delta[m][i] = ~((~(-errtemp ^ sigmoid(y_out[m][i]))) ^ (1 - sigmoid(y_out[m][i])));
 				error += xnor(errtemp, errtemp);
 			}
-			error ^= outN;
+			error ^= OutN;
 		}
 		error ^= datanum;
 
