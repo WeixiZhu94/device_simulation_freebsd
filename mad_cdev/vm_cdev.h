@@ -24,6 +24,7 @@ void dev_fault_trap(dev_pmap_t *pmap, void *va);
 int setup_ctx(gmem_vm_mode running_mode);
 void wire_x97_page(vm_page_t m);
 void activate_x97_page(vm_page_t m);
+void print_page_q();
 
 // The code below is specific for x97 mmu
 extern vmem_t *pm_pool;

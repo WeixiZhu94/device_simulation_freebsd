@@ -44,8 +44,12 @@ uint64_t x97_address_translate(dev_pmap_t *pmap, void *va) {
     // printf("[x97_address_translate] done, page pa: %lx\n", *pte);
     if (*pte != 0) {
         if (pmap->mode == EXCLUSIVE && (*pte < pmap->mmu_ops->pa_min || *pte >= pmap->mmu_ops->pa_max)) {
-            printf("PDE page status: refcount %u, flags %u", PHYS_TO_VM_PAGE(DMAP_TO_PHYS((uintptr_t) pte))->ref_count, PHYS_TO_VM_PAGE(DMAP_TO_PHYS((uintptr_t) pte))->flags);
-            printf("%s %d: translate va %lx - pa %lx\n",__func__, __LINE__, (uintptr_t) va, *pte);
+            printf("%s %d: translate va %lx - pa %lx\n",__func__, __LINE__, 
+                (uintptr_t) va, *pte);
+            printf("PDE page status: refcount %u, flags %u", 
+                PHYS_TO_VM_PAGE(DMAP_TO_PHYS((uintptr_t) pte))->ref_count, 
+                PHYS_TO_VM_PAGE(DMAP_TO_PHYS((uintptr_t) pte))->flags);
+            print_page_q();
             return 0;
         }
         return *pte | ((uintptr_t) va & ~PAGE_MASK);
@@ -79,6 +83,7 @@ static gmem_error_t x97_mmu_create(dev_pmap_t *pmap)
     pgtable->pgroot = &first_x97_page[page_idx];
 
     pmap->data = pgtable;
+    print_page_q();
     return GMEM_OK;
 }
 

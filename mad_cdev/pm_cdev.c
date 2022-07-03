@@ -6,6 +6,12 @@
 // Locks will need to be implemented in the future to protect free lists.
 // Right now we don't have concurrent device faults.
 struct pglist x97_activelist, x97_freelist, x97_wirelist;
+int active_cnt = 0, free_cnt = 0, wire_cnt = 0;
+
+void print_page_q()
+{
+	printf("Page queue: active %d, free %d, wire %d\n");
+}
 
 vm_page_t get_victim_page() 
 {
@@ -21,7 +27,9 @@ void wire_x97_page(vm_page_t m)
 {
 	if (!TAILQ_EMPTY(&x97_activelist)) {
 		TAILQ_REMOVE(&x97_activelist, m, plinks.q);
+		active_cnt --;
 		TAILQ_INSERT_TAIL(&x97_wirelist, m, plinks.q);
+		wire_cnt ++;
 	}
 	else
 		printf("The x97 page to wire does not exist in activelist\n");
@@ -32,7 +40,9 @@ void activate_x97_page(vm_page_t m)
 {
 	if (!TAILQ_EMPTY(&x97_freelist)) {
 		TAILQ_REMOVE(&x97_freelist, m, plinks.q);
+		free_cnt --;
 		TAILQ_INSERT_TAIL(&x97_activelist, m, plinks.q);
+		active_cnt ++;
 	}
 	else
 		printf("The x97 page to activate does not exist in freelist\n");
@@ -42,7 +52,9 @@ static inline void free_x97_page(vm_page_t m)
 {
 	if (!TAILQ_EMPTY(&x97_activelist)) {
 		TAILQ_REMOVE(&x97_activelist, m, plinks.q);
+		active_cnt --;
 		TAILQ_INSERT_HEAD(&x97_freelist, m, plinks.q);
+		free_cnt ++;
 	}
 	else
 		printf("The x97 page to free does not exist in activelist\n");
@@ -68,6 +80,7 @@ int init_pm(struct gmem_mmu_ops *ops) {
     		first_x97_page[i].flags |= PG_NOCPU;
     		first_x97_page[i].ref_count = 7;
     		TAILQ_INSERT_TAIL(&x97_freelist, &first_x97_page[i], plinks.q);
+    		free_cnt ++;
     	}
         last_x97_page = &first_x97_page[npages - 1];
         ops->pa_min = VM_PAGE_TO_PHYS(first_x97_page);
@@ -75,6 +88,7 @@ int init_pm(struct gmem_mmu_ops *ops) {
 		pm_pool = vmem_create("x97 device private physical memory", 0, npages, 1, 16, M_NOWAIT | M_BESTFIT);
         printf("!!! Stealing physical memory for the fake device succeeded, pa_min %lx, pa_max %lx, npages: %lu\n", 
         	ops->pa_min, ops->pa_max, npages);
+        print_page_q();
     }
 	return 0;
 }
