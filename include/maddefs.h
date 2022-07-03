@@ -650,6 +650,12 @@ struct vector_add_args {
     uint64_t len;
 };
 
+
+typedef long* long_t;
+struct model {
+    long_t x_out, hn_out, y_out, y, hn_delta, y_delta, w, v;
+};
+
 struct accelerator_kernel_args {
     kernel_instance kernel_type;
     // void *kernel_args;
@@ -662,11 +668,6 @@ struct accelerator_kernel_args {
 #define OutN 100            // number of neurons in the output layer
 #define datanum 30000       // number of training samples
 #define xnor(x, y)      (~((x) ^ (y)))
-
-typedef long* long_t;
-struct model {
-    long_t x_out, hn_out, y_out, y, hn_delta, y_delta, w, v;
-};
 
 // sigmoid serves as avtivation function
 #define sigmoid(x) (~(x))
