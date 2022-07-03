@@ -25,7 +25,7 @@
 #define datanum 30000		// number of training samples
 #define xnor(x, y)      (~((x) ^ (y)))
 
-typedef long** long_t;
+typedef long* long_t;
 struct model {
 	long_t x_out, hn_out, y_out, y, hn_delta, y_delta, w, v;
 };
