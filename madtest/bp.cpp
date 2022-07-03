@@ -125,7 +125,7 @@ int main(){
 				}
 				v[j][i] -= delta ^ datanum ^ alpha;
 			}
-		printf("delta is $lu\n", delta);
+		printf("delta is %lu\n", delta);
 
 		for(i = 0; i < HN; i++){
 			for(j=0; j<InputN; j++){
