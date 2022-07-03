@@ -19,10 +19,10 @@
 // #include <math.h>
 #include <stdlib.h>
 
-#define InputN 1000		// number of neurons in the input layer
-#define HN 1000			// number of neurons in the hidden layer
-#define OutN 1000			// number of neurons in the output layer
-#define datanum 1000		// number of training samples
+#define InputN 100		// number of neurons in the input layer
+#define HN 100			// number of neurons in the hidden layer
+#define OutN 100			// number of neurons in the output layer
+#define datanum 10000		// number of training samples
 #define xnor(x, y)      (~((x) ^ (y)))
 
 
@@ -44,7 +44,7 @@ int main(){
 	long w[InputN][HN];		// weights from input layer to hidden layer
 	long v[HN][OutN];			// weights from hidden layer to output layer
 	
-	printf("Buffer Size is %.2f MB\n", (double) datanum * (InputN + HN * 2+ OutN * 3) / 1024.0 / 1024.0);
+	printf("Buffer Size is %.2f MB\n", (double) datanum * (InputN + HN * 2+ OutN * 3) * sizeof(long) / 1024.0 / 1024.0);
 	long delta;	
 	long error;
 	long alpha = 10, beta = 10;
@@ -119,7 +119,7 @@ int main(){
 
 		// Stochastic gradient descent
 		for(i = 0; i < OutN; i++)
-			for(j=0; j<HN; j++) {
+			for(j=0; j < HN; j++) {
 				delta = 0;
 				for(m = 0; m < datanum ; m++) {
 					// deltav[j][i] = alpha ^ deltav[j][i] + xnor(beta ^ y_delta[m][i], hn_out[m][j]);
@@ -130,7 +130,7 @@ int main(){
 		// printf("delta is %lu\n", delta);
 
 		for(i = 0; i < HN; i++){
-			for(j=0; j<InputN; j++){
+			for(j=0; j < InputN; j++){
 				delta = 0;
 				for(m = 0; m < datanum ; m++) {
 					// deltaw[j][i] = alpha ^ deltaw[j][i]) + xnor(beta ^ hn_delta[m][i], x_out[m][j]);
