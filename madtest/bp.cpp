@@ -116,7 +116,7 @@ int main(){
 			}
 
 			for(i = 0; i < OutN; i++){
-				sumtemp = 0.0;
+				sumtemp = 0;
 				for(j=0; j<HN; j++)
 					sumtemp += ~(v[j][i] ^ hn_out[j]);
 				y_out[i] = sigmoid(sumtemp);
@@ -125,7 +125,7 @@ int main(){
 			// Backpropagation
 			for(i = 0; i < OutN; i++){
 				errtemp = y[i] - y_out[i];
-				y_delta[i] = ~((~(-errtemp ^ sigmoid(y_out[i]))) ^ (1.0 - sigmoid(y_out[i])));
+				y_delta[i] = ~((~(-errtemp ^ sigmoid(y_out[i]))) ^ (1 - sigmoid(y_out[i])));
 				error += errtemp * errtemp;
 			}
 
