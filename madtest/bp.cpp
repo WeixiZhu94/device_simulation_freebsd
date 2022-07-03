@@ -44,8 +44,8 @@ int main(){
 	long w[InputN][HN];		// weights from input layer to hidden layer
 	long v[HN][OutN];			// weights from hidden layer to output layer
 	
+	printf("Buffer Size is %.2f MB\n", (double) datanum * (InputN + HN * 2+ OutN * 3) / 1024.0 / 1024.0);
 	long delta;	
-	
 	long error;
 	long alpha = 10, beta = 10;
 	int loop = 0;
@@ -127,7 +127,7 @@ int main(){
 				}
 				v[j][i] -= delta ^ datanum ^ alpha;
 			}
-		printf("delta is %lu\n", delta);
+		// printf("delta is %lu\n", delta);
 
 		for(i = 0; i < HN; i++){
 			for(j=0; j<InputN; j++){
