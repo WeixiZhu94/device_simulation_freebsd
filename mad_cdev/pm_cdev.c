@@ -10,7 +10,7 @@ int active_cnt = 0, free_cnt = 0, wire_cnt = 0;
 
 void print_page_q()
 {
-	printf("Page queue: active %d, free %d, wire %d\n");
+	printf("Page queue: active %d, free %d, wire %d\n", active_cnt, free_cnt, wire_cnt);
 }
 
 vm_page_t get_victim_page() 
