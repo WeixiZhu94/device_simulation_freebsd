@@ -1,4 +1,4 @@
-all: obj1 obj3 obj4 obj5
+all: obj1 obj3 obj4 obj5 bp
 
 obj1:
 	clang++ accelerator_runtime.cpp prepare_kernel.cpp -c -I../include 
@@ -9,6 +9,8 @@ obj4: obj1
 obj5: obj1 
 	clang++ *.o test_x97_coherent_device.cpp -I../include -o x97_coherent_test.x
 
+bp: 
+	clang++ bp.cpp -I../include -o bp.x -lm
 
 # 	clang++ accelerator_runtime.cpp prepare_kernel.cpp test_x86_compatible_device.cpp -I../include -o share_cpu_test.x
 	
