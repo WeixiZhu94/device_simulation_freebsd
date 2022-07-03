@@ -111,6 +111,7 @@ long train(struct model arg)
 		}
 	}
 	printf("Training error: %lu\n", error);
+	return error;
 }
 
 int main(){
@@ -131,12 +132,12 @@ int main(){
 	// Initializition
 	for(int i = 0; i < InputN; i++){
 		for(int j = 0; j < HN; j++){
-			model.w[i][j] = ((long) rand()) * 2 - 1;
+			arg.w[i][j] = ((long) rand()) * 2 - 1;
 		}
 	}
 	for(int i = 0; i < HN; i++){
 		for(int j = 0; j < OutN; j++){
-			model.v[i][j] = ((long) rand()) * 2 - 1;
+			arg.v[i][j] = ((long) rand()) * 2 - 1;
 		}
 	}
 
@@ -147,9 +148,9 @@ int main(){
 		// You can use your own data!!!
 		for(int m = 0; m < datanum; m++){
 			for(int i = 0; i < InputN; i++)
-				model.x_out[m][i] = (long) rand();
+				arg.x_out[m][i] = (long) rand();
 			for(int i = 0; i < OutN; i++)
-				model.y[m][i] = (long) rand();
+				arg.y[m][i] = (long) rand();
 		}
 
 		train(model);
