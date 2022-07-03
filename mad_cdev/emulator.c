@@ -144,29 +144,28 @@ static int bp(struct model arg)
         }
     }
     printf("Training error: %lu\n", error);
+    return error;
 }
 
 int run_kernel(void *arg)
 {
-    struct accelerator_kernel_args *kernel_launch_args;
+    struct accelerator_kernel_args *kernel_launch_args = arg;
     kernel_instance kernel_type; 
-    struct vector_add_args *args;
 
-    kernel_launch_args = arg;
-    // copyin(arg, &kernel_launch_args, sizeof(struct accelerator_kernel_args));
     kernel_type = kernel_launch_args->kernel_type;
-    args = &kernel_launch_args->vector_add;
 
     printf("[devc] running kernel, karg %p, type %u, args %p\n", arg, kernel_type, args);
     // Do we need to translate user-space va to kernel space va?
     if (kernel_type == SUM) {
+        struct vector_add_args *args;
+        args = &kernel_launch_args->vector_add;
         printf("[devc] simulating kernel for vector add, a %p, b %p, c %p, len %lu\n", 
             args->a, args->b, args->c, args->len);
         return vector_add(args->a, args->b, args->c, args->len);
     }
     else if (kernel_type == BP) {
         printf("[devc] Running BP kernel\n");
-        return bp(arg->bp);
+        return bp(kernel_launch_args->bp);
     } else {
         printf("[devc] other kernels not implemented\n");
     }
