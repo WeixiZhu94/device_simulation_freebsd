@@ -62,7 +62,7 @@ static inline void free_x97_page(vm_page_t m)
 }
 
 #define MB_PAGES 1024 / 4
-size_t npages = MB_PAGES * 100; // 100MB pages
+size_t npages = MB_PAGES * 200; // 100MB pages
 
 int init_pm(struct gmem_mmu_ops *ops) {
     first_x97_page = vm_page_alloc_contig(NULL, 0, VM_ALLOC_NORMAL | VM_ALLOC_NOBUSY | VM_ALLOC_NOOBJ,
