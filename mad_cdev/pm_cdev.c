@@ -30,7 +30,7 @@ void wire_x97_page(vm_page_t m)
 		active_cnt --;
 		TAILQ_INSERT_TAIL(&x97_wirelist, m, plinks.q);
 		wire_cnt ++;
-		m->ref_count +=2;
+		// m->ref_count +=2;
 	}
 	else
 		printf("The x97 page to wire does not exist in activelist\n");
@@ -79,7 +79,7 @@ int init_pm(struct gmem_mmu_ops *ops) {
     	// This hack should be removed if the VM system can identify device page structs at the boot time
     	for (int i = 0; i < npages; i ++) {
     		first_x97_page[i].flags |= PG_NOCPU;
-    		first_x97_page[i].ref_count = 7;
+    		// first_x97_page[i].ref_count = 7;
     		TAILQ_INSERT_TAIL(&x97_freelist, &first_x97_page[i], plinks.q);
     		free_cnt ++;
     	}
